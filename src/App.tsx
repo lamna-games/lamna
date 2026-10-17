@@ -365,7 +365,7 @@ function App() {
         <section className="section game-section">
           <div className="game-heading">
             <span className="kicker">مباراة تجريبية</span>
-            <h1>لوحة التحدّي</h1>
+            <h1>{matchName||"لوحة التحدّي"}</h1>
             <p className="muted">نسخة تجريبية: ٦ أسئلة مختلفة لكل فئة، و{wordlessModeCount} طرق لعب في «ولا كلمة». المحتوى المرئي والصوتي النهائي قيد التطوير.</p>
           </div>
           <div className="scoreboard">
@@ -376,6 +376,14 @@ function App() {
                 <b>
                   {scores[i]} <small>نقطة</small>
                 </b>
+                <div className="board-team-aids">
+                  {chosenAids[i].map(id=>{
+                    const aid=aidCatalog.find(x=>x.id===id)!;
+                    return <span key={id} className={usedAids[i].includes(id)?'spent':''} title={aid.name}>
+                      <AidGlyph id={id} size={14}/>{aid.name}
+                    </span>;
+                  })}
+                </div>
               </div>
             ))}
           </div>
@@ -390,7 +398,7 @@ function App() {
                     <button
                       disabled={used.includes(n)||active!==null}
                       onClick={() => {
-                        setActive(n);
+                        setActive(n);setAidEffect(null);setAidOwner(null);
                         setReveal(false);setPickWinner(false);setShowHelp(false);setShowHint(false);setPhase('question');setSeconds(60);setPaused(false);
                       }}
                       key={n}
@@ -404,7 +412,7 @@ function App() {
               </div>
             ))}
           </div>
-          <div className="game-bottom"><button className="outline" disabled={!history.length||active!==null} onClick={()=>{const h=history[history.length-1];setHistory(v=>v.slice(0,-1));setUsed(v=>v.filter(x=>x!==h.question));setTurn(v=>1-v);if(h.team!==null)setScores(v=>v.map((s,i)=>i===h.team?s-h.points:s));setShowResult(false)}}>↶ تراجع عن آخر نتيجة</button>
+          <div className="game-bottom"><button className="outline" disabled={!history.length||active!==null} onClick={()=>{const h=history[history.length-1];setHistory(v=>v.slice(0,-1));setUsed(v=>v.filter(x=>x!==h.question));setTurn(v=>1-v);setScores(v=>v.map((s,i)=>s-(h.changes?.[i]??(h.team===i?h.points:0))));setShowResult(false)}}>↶ تراجع عن آخر نتيجة</button>
             <span>المتبقي: {36 - used.length} سؤال</span>
             <button className="outline" onClick={() => go('home')}>
               إنهاء التجربة
@@ -460,6 +468,10 @@ function App() {
                       {phase==='steal'&&<div className="play-status">فرصة السرقة للفريق: {teams[1-stealFrom]} — 10 ثوانٍ</div>}
                       {phase==='var'&&<div className="play-status">مراجعة VAR للفريق: {teams[varTeam]}</div>}
                       <h2>{currentQuestion?.prompt}</h2>
+                      {aidEffect!==null&&<div className="play-aid-activated">
+                        <strong>{aidCatalog.find(x=>x.id===aidEffect)?.name}</strong>
+                        <span>{aidEffect==='phone'?'زاد وقت السؤال 30 ثانية للتشاور مع صديق':aidEffect==='two'?'يُسمح بمحاولتين للإجابة بدل محاولة واحدة':aidEffect==='rest'?'حدّد لاعبًا من الخصم يستريح عن المشاركة في هذا السؤال':aidEffect==='pit'?'إذا أجاب فريقك صح تخصم نقاط السؤال أيضًا من الخصم':'السؤال الآن عند الخصم: إذا لم يجب تُخصم منه نقاط السؤال'}</span>
+                      </div>}
                       {currentQuestion?.mode && <p className="play-context">{currentQuestion.mode}</p>}
                       {currentQuestion?.instructions && <p className="play-instructions">{currentQuestion.instructions}</p>}
                       {showHint && <p className="play-hint">تلميح: {currentQuestion?.hint}</p>}
@@ -492,18 +504,21 @@ function App() {
                       <div className="play-team-score">{scores[i]}</div>
                       <div className="play-team-help-label">وسائل المساعدة</div>
                       <div className="play-team-controls">
-                        <button type="button" title="التلميح" aria-label={'تلميح '+team} disabled={i!==(phase==='steal'?1-stealFrom:turn)||help[i]===0||showHint} onClick={()=>setShowHelp(v=>!v)}>؟<small>{help[i]}</small></button>
-                        <button type="button" title="VAR" disabled={varUsed[i]||phase==='var'} onClick={()=>openVar(i)}>VAR</button>
+                        {chosenAids[i].map(id=>{
+                          const aid=aidCatalog.find(x=>x.id===id)!;
+                          const spent=usedAids[i].includes(id);
+                          const playable=!spent&&active!==null&&!reveal&&!pickWinner&&phase!=='var'&&aidEffect===null&&i===(phase==='steal'?1-stealFrom:turn);
+                          return <button key={id} type="button" title={aid.info}
+                            className={'play-aid-button '+(spent?'spent':'')+(playable?' available':'')}
+                            aria-label={aid.name+(spent?' (مستخدمة)':'')}
+                            disabled={!playable} onClick={()=>activateAid(i,id)}>
+                              <AidGlyph id={id} size={20}/><span>{aid.name}</span>
+                          </button>;
+                        })}
                       </div>
                     </div>
                   ))}
                 </div>
-                {phase==='var'&&<button type="button" className="play-var-return" onClick={()=>{setPhase(phaseBeforeVar);setPaused(false)}}>✓ إنهاء مراجعة VAR والعودة للسؤال</button>}
-                {showHelp&&<div className="play-help-popup">
-                  <span>تلميح للفريق الحالي</span>
-                  <button type="button" disabled={help[phase==='steal'?1-stealFrom:turn]===0||showHint} onClick={()=>{const i=phase==='steal'?1-stealFrom:turn;setHelp(v=>v.map((x,j)=>i===j?x-1:x));setShowHint(true);setShowHelp(false);}}>عرض التلميح</button>
-                  <button type="button" onClick={()=>setShowHelp(false)}>إغلاق</button>
-                </div>}
               </div>
             </div>
           )}
