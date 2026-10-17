@@ -30,6 +30,7 @@ let schema=null;
 async function setup(pool){
  if(!schema){
  schema=(async()=>{
+ await pool.query('ALTER TABLE lamna_accounts ADD COLUMN IF NOT EXISTS is_admin BOOLEAN NOT NULL DEFAULT FALSE');
  await pool.query(`CREATE TABLE IF NOT EXISTS lamna_entitlements(
   account_id BIGINT PRIMARY KEY REFERENCES lamna_accounts(id) ON DELETE CASCADE,
   free_used BOOLEAN NOT NULL DEFAULT FALSE,
@@ -61,7 +62,9 @@ async function setup(pool){
   question_number INTEGER NOT NULL CHECK (question_number BETWEEN 0 AND 35),
   reason TEXT NOT NULL CHECK(reason IN ('question_error','answer_error','image_unreadable','other')),
   comment TEXT NOT NULL DEFAULT '',created_at TIMESTAMPTZ DEFAULT now(),
+  resolved_at TIMESTAMPTZ,
   UNIQUE(account_id,match_id,question_number,reason))`);
+ await pool.query('ALTER TABLE lamna_question_reports ADD COLUMN IF NOT EXISTS resolved_at TIMESTAMPTZ');
  })().catch(e=>{schema=null;throw e;});
  }
  await schema;
@@ -70,7 +73,7 @@ async function account(pool,req){
  const match=/^Bearer ([a-f0-9]{64})$/.exec(String(req.headers.authorization||''));
  if(!match)return null;
  const hash=crypto.createHash('sha256').update(match[1]).digest('hex');
- const r=await pool.query(`SELECT a.id,a.first_name,a.email
+ const r=await pool.query(`SELECT a.id,a.first_name,a.email,a.is_admin
  FROM lamna_sessions s JOIN lamna_accounts a ON a.id=s.account_id
  WHERE s.token_hash=$1 AND s.expires_at>now() LIMIT 1`,[hash]);
  return r.rows[0]||null;
@@ -102,8 +105,21 @@ export async function handleStore(req,res,url,pool,ensureAccounts){
  }
  const user=await account(pool,req).catch(()=>null);
  if(!user){send(req,res,401,{message:'سجّل دخولك لاستخدام المباريات.'});return true;}
+ if(route==='/api/store/admin/reports'&&req.method==='GET'){
+  if(!user.is_admin){send(req,res,403,{message:'هذه الصفحة مخصصة لإدارة لمنا.'});return true;}
+  const r=await pool.query(`SELECT q.id,q.match_id,q.question_number,q.reason,q.comment,q.created_at,q.resolved_at,
+   m.match_name,m.selected,m.questions
+   FROM lamna_question_reports q JOIN lamna_matches m ON m.id=q.match_id
+   ORDER BY (q.resolved_at IS NULL) DESC,q.created_at DESC LIMIT 150`);
+  send(req,res,200,{reports:r.rows.map(r=>{
+   const col=Math.floor(r.question_number/6),slot=r.question_number%6;
+   const question=r.questions?.[col]?.[slot];
+   return {id:r.id,matchId:r.match_id,matchName:r.match_name,reason:r.reason,comment:r.comment,createdAt:r.created_at,resolvedAt:r.resolved_at,
+    category:r.selected?.[col],questionNumber:r.question_number,prompt:question?.prompt||'',answer:question?.answer||''};
+  })});return true;
+ }
  if(route==='/api/store/me'&&req.method==='GET'){
-  send(req,res,200,{user:{id:user.id,firstName:user.first_name},...(await readMe(pool,user.id))});return true;
+  send(req,res,200,{user:{id:user.id,firstName:user.first_name,isAdmin:Boolean(user.is_admin)},...(await readMe(pool,user.id))});return true;
  }
  if(route.startsWith('/api/store/matches/')&&req.method==='GET'){
   const id=route.slice('/api/store/matches/'.length);
@@ -196,6 +212,14 @@ export async function handleStore(req,res,url,pool,ensureAccounts){
   const r=await pool.query("UPDATE lamna_matches SET status='completed',finished_at=COALESCE(finished_at,now()) WHERE id=$1 AND account_id=$2 RETURNING id",[id,user.id]);
   if(!r.rowCount){send(req,res,404,{message:'المباراة غير موجودة'});return true;}
   send(req,res,200,{ok:true,...(await readMe(pool,user.id))});return true;
+ }
+ if(route==='/api/store/admin/resolve'){
+  if(!user.is_admin){send(req,res,403,{message:'هذه العملية للإدارة فقط.'});return true;}
+  const id=String(data.reportId||'');
+  if(!/^[a-f0-9-]{36}$/i.test(id)){send(req,res,400,{message:'معرف البلاغ غير صحيح.'});return true;}
+  const r=await pool.query('UPDATE lamna_question_reports SET resolved_at=COALESCE(resolved_at,now()) WHERE id=$1 RETURNING id',[id]);
+  if(!r.rowCount){send(req,res,404,{message:'البلاغ غير موجود.'});return true;}
+  send(req,res,200,{ok:true});return true;
  }
  if(route==='/api/store/report'){
   const id=String(data.matchId||'');
