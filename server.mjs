@@ -148,15 +148,22 @@ const server = http.createServer(async(req,res)=>{
      }
      const salt=crypto.randomBytes(24).toString('hex');
      const hash=passwordHash(data.password,salt);
+     const client=await accountsPool.connect();
      try{
-      const r=await accountsPool.query('INSERT INTO lamna_accounts(first_name,last_name,email,phone,country,password_salt,password_hash) VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING id',[firstName,lastName,email,phone,country,salt,hash]);
-      respond(res,201,{created:true,id:r.rows[0].id});return;
+      await client.query('BEGIN');
+      const r=await client.query('INSERT INTO lamna_accounts(first_name,last_name,email,phone,country,password_salt,password_hash) VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING id',[firstName,lastName,email,phone,country,salt,hash]);
+      const newToken=crypto.randomBytes(32).toString('hex');
+      const tokenHash=crypto.createHash('sha256').update(newToken).digest('hex');
+      await client.query("INSERT INTO lamna_sessions(token_hash,account_id,expires_at) VALUES($1,$2,NOW()+INTERVAL '7 days')",[tokenHash,r.rows[0].id]);
+      await client.query('COMMIT');
+      respond(res,201,{created:true,token:newToken,firstName:firstName});return;
      }catch(e){
+      await client.query('ROLLBACK').catch(()=>{});
       if(e?.code==='23505'){
        respond(res,409,{message:e?.constraint?.includes('phone')?'رقم الجوال مسجّل بالفعل. سجّل دخولك.':'البريد الإلكتروني مسجّل بالفعل. سجّل دخولك.'});return;
       }
       throw e;
-     }
+     }finally{client.release();}
     }
     if(u.pathname==='/api/accounts/login'){
      const email=String(data.email||'').trim().toLowerCase();
