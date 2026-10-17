@@ -58,7 +58,7 @@ const server = http.createServer(async(req,res)=>{
       const id=random().slice(0,22), token=random(), hostKey=random();
       const room={id,token,hostKey,itemIndex,duration,createdAt:Date.now(),startedAt:null};
       rooms.set(id,room);
-      respond(res,201,{id,hostKey,duration,phoneUrl:'https://lamna-board-20-preview.onrender.com/secret/'+id+'?token='+token});return;
+      respond(res,201,{id,hostKey,duration,phoneUrl:'https://lamna-board-20-preview.onrender.com/?wordless='+id+'&token='+token});return;
     }catch {respond(res,400,{error:'invalid_request'});return;}
   }
   if(parts[0]==='api'&&parts[1]==='rooms'&&parts[2]&&parts.length>=4){
