@@ -80,19 +80,20 @@ function AidGlyph({ id, size=26 }: { id:AidId; size?:number }) {
 function App() {
   const getInitialPage=():Page=>{
     const fromHash=window.location.hash.replace(/^#\/?/,'');
-    return (['privacy','terms','faq','contact','pricing'] as string[]).includes(fromHash)?fromHash as Page:'home';
+    return (['privacy','terms','faq','contact','pricing','account'] as string[]).includes(fromHash)?fromHash as Page:'home';
   };
   const [page, setPage] = useState<Page>(getInitialPage);
   React.useEffect(()=>{
     const handleHash=()=>{
       const hash=window.location.hash.replace(/^#\/?/,'');
-      if((['privacy','terms','faq','contact','pricing'] as string[]).includes(hash)){setPage(hash as Page);}
+      if((['privacy','terms','faq','contact','pricing','account'] as string[]).includes(hash)){setPage(hash as Page);}
       else if(page!=='game')setPage('home');
     };
     window.addEventListener('hashchange',handleHash);
     return()=>window.removeEventListener('hashchange',handleHash);
   },[page]);
   const [authMode,setAuthMode] = useState<'register'|'login'>('register');
+  const [sessionVersion,setSessionVersion]=useState(0);
   const [accountsEnabled,setAccountsEnabled] = useState(false);
   React.useEffect(()=>{
     let mounted=true;
@@ -226,7 +227,7 @@ function App() {
   },[accountsEnabled,activeSession?.id,activeSession?.status,showResult,active]);
   const go = (p: Page) => {
     setPage(p);
-    const infoPages=['privacy','terms','faq','contact','pricing'] as const;
+    const infoPages=['privacy','terms','faq','contact','pricing','account'] as const;
     if(infoPages.some(item=>item===p)){window.history.pushState(null,'','#'+p);}
     else if(window.location.hash){window.history.pushState(null,'',window.location.pathname+window.location.search);}
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -310,16 +311,21 @@ function App() {
         <div onClick={() => go('home')} className="brand-link">
           {brand}
         </div>
-        {accountsEnabled && <div className="lm-header-accounts">
-          <button type="button" onClick={()=>{setAuthMode('register');go('account');}}>سجّل معنا</button>
-          <button type="button" onClick={()=>{setAuthMode('login');go('account');}}>تسجيل الدخول</button>
-        </div>}
+        <div className="lm-header-accounts">
+          {token()
+            ? <button type="button" onClick={()=>go('account')}>حسابي</button>
+            : <>
+                <button type="button" onClick={()=>{setAuthMode('register');go('account');}}>سجّل معنا</button>
+                <button type="button" onClick={()=>{setAuthMode('login');go('account');}}>تسجيل الدخول</button>
+              </>
+          }
+        </div>
         {page!=='home'&&<nav>
           <button onClick={() => go('home')}>الرئيسية</button>
           <button onClick={scrollToGames}>الفئات</button>
           <button onClick={() => go('pricing')}>الباقات</button>
           <button onClick={() => go('faq')}>الأسئلة الشائعة</button>
-          {accountsEnabled && <button onClick={() => {setAuthMode('login');go('account');}}>حسابي</button>}
+          <button onClick={() => {setAuthMode('login');go('account');}}>حسابي</button>
         </nav>}
       </header>}
       {page === 'home' && (
@@ -658,9 +664,11 @@ function App() {
       {(page==='privacy'||page==='terms'||page==='faq'||page==='contact')&&
         <StoreInformation page={page} onBack={()=>go('home')}/>}
 
-      {page === 'account' && (accountsEnabled&&!token()
-        ? <AuthScreen initialMode={authMode} onReturn={()=>go('home')}/>
-        : <StoreCommerce mode="wallet" accountsEnabled={accountsEnabled} onBack={()=>go('home')} onLogin={()=>{setAuthMode('login');go('account')}} onResume={applyMatch}/>)}
+      {page === 'account' && (!token()
+        ? <AuthScreen key={authMode+'-'+sessionVersion} initialMode={authMode} onReturn={()=>go('home')}
+             onAuthenticated={()=>{setSessionVersion(v=>v+1);setAuthMode('login');go('account')}}/>
+        : <StoreCommerce mode="wallet" accountsEnabled={accountsEnabled} onBack={()=>{setSessionVersion(v=>v+1);go('home')}}
+             onLogin={()=>{setAuthMode('login');setSessionVersion(v=>v+1);go('account')}} onResume={applyMatch}/>)}
       {page!=='game' && <footer className="lamna-site-footer">
         <div>{brand}</div>
         <p>ألعاب تجمعنا</p>
