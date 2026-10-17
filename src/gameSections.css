@@ -1,0 +1,33 @@
+/* Lamna: ten original expandable sections in the SAME page, five games per section. */
+.lm-section-shortcuts{display:flex;gap:9px;overflow-x:auto;scroll-snap-type:x proximity;margin:17px 0 22px;padding:5px 2px 12px;scrollbar-width:thin}
+.lm-section-shortcuts button{flex:0 0 auto;scroll-snap-align:start;border:1px solid #cfe9eb;color:#13485c;background:#fff;border-radius:30px;padding:11px 15px;font-size:14px;font-weight:900;min-height:41px;transition:border-color .15s,background .15s}
+.lm-section-shortcuts button.is-current{background:#e7f8f9;border-color:#27b4ba;color:#087b86}
+.lm-category-groups{display:flex;flex-direction:column;gap:15px;max-width:100%}
+.lm-category-group{scroll-margin-top:18px;border:1px solid #dcebed;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 3px 13px #1134490b}
+.lm-category-group.is-open{border-color:#9bd9db;box-shadow:0 5px 18px #128d9d15}
+.lm-category-heading{width:100%;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:19px 21px;background:#fff!important;border:0!important;color:#12364b!important;text-align:right;min-height:86px;cursor:pointer}
+.lm-category-group.is-open .lm-category-heading{background:#f5fbfb!important}
+.lm-category-heading-copy{display:flex;flex-direction:column;gap:7px;min-width:0}
+.lm-category-heading-copy strong{font-weight:1000;font-size:clamp(19px,2.7vw,24px);line-height:1.3}
+.lm-category-heading-copy small{color:#66808b;font-weight:650;font-size:13px}
+.lm-category-heading-meta{display:flex;align-items:center;gap:13px;flex-shrink:0}
+.lm-category-count{border-radius:30px;background:#fff1eb;color:#b85232;padding:8px 12px;font-size:13px;font-weight:900}
+.lm-category-expand{display:grid;place-items:center;background:#edf8f8;color:#057f8a;border:1px solid #bfe6e5;width:35px;height:35px;border-radius:50%;font-size:28px;font-weight:700;line-height:1}
+.lm-category-content{padding:10px 17px 23px;border-top:1px solid #e4f0f0}
+.lm-category-content .lm-library-grid{margin:9px 0 0;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px}
+@media(max-width:950px){.lm-category-content .lm-library-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}}
+@media(max-width:600px){
+ .lm-section-shortcuts{gap:7px;margin:12px 0 17px}
+ .lm-section-shortcuts button{font-size:12px;padding:10px 12px}
+ .lm-category-groups{gap:12px}
+ .lm-category-heading{padding:13px 12px;min-height:72px;gap:8px}
+ .lm-category-heading-copy strong{font-size:18px}
+ .lm-category-heading-copy small{font-size:11px;max-width:175px}
+ .lm-category-heading-meta{gap:7px}
+ .lm-category-count{font-size:11px;padding:6px 8px}
+ .lm-category-expand{width:30px;height:30px;font-size:23px}
+ .lm-category-content{padding:9px 10px 17px}
+ .lm-category-content .lm-library-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+ .lm-category-content .lm-library-card{border-radius:14px!important}
+ .lm-category-content .lm-library-card .lamna-cover-label strong{font-size:clamp(11px,3.4vw,16px)}
+}
