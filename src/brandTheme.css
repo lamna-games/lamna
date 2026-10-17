@@ -99,13 +99,13 @@ html,body,#root,.site,.site.has-landing{background:var(--lm-brand-paper)!importa
 .in-match .lamna-match-playfield .game-board{background:transparent!important}
 .in-match .game-board .board-points button,
 .in-match .game-board .board-points button:not(:disabled){
- background:#e9f7f8!important;color:var(--lm-brand-ink)!important;
- border:1px solid #cee8e9!important;
+ background:#fff!important;color:var(--lm-brand-ink)!important;
+ border:2px solid #80c9ce!important;
 }
 .in-match .game-board .board-points button:hover:not(:disabled){background:#c8eff0!important}
 .in-match .game-board .board-points button:disabled{
- background:#f1f4f4!important;color:#9daeb4!important;
- border-color:#ecf0f0!important;
+ background:#fff!important;color:#a0b1b8!important;
+ border-color:#dfe9ea!important;
 }
 .in-match .lamna-match-footer{background:#fff!important;border-top-color:var(--lm-brand-line)!important}
 .in-match .lamna-match-team-name,
