@@ -165,10 +165,15 @@ export async function handleStore(req,res,url,pool,ensureAccounts){
      await client.query('INSERT INTO lamna_seen_questions(account_id,question_id,match_id) VALUES($1,$2,$3)',[user.id,question.id,id]);
     }
    }
-   await client.query('COMMIT');send(req,res,201,{match:{id,kind,selected,questions,match_name:matchName,status:'active',progress:initialProgress},...(await readMe(pool,user.id))});return true;
+   await client.query('COMMIT');
+   send(req,res,201,{
+    match:{id,kind,selected,questions,match_name:matchName,status:'active',progress:initialProgress},
+    credits:kind==='paid'?row.credits-1:row.credits,
+    freeRemaining:false
+   });return true;
   }catch{
    await client.query('ROLLBACK').catch(()=>{});
-   send(req,res,503,{message:'تعذر بدء المباراة. لم يُخصم رصيدك.'});return true;
+   send(req,res,503,{message:'تعذر تأكيد بدء المباراة. راجع مبارياتك من الحساب قبل إعادة المحاولة.'});return true;
   }finally{client.release();}
  }
  if(route==='/api/store/progress'){
