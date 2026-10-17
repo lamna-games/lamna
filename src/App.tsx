@@ -163,8 +163,8 @@ function App() {
     </div>
   );
   return (
-    <div className="site" dir="rtl">
-      <header className="header">
+    <div className={"site"+(page==="game"?" in-match":"")} dir="rtl">
+      {page!=="game" && <header className="header">
         <div onClick={() => go('home')} className="brand-link">
           {brand}
         </div>
@@ -174,7 +174,7 @@ function App() {
           <button onClick={() => go('pricing')}>الباقات</button>
           <button onClick={() => go('account')}>حسابي</button>
         </nav>
-      </header>
+      </header>}
       {page === 'home' && (
         <>
           <section className="hero">
@@ -362,31 +362,28 @@ function App() {
         </section>
       )}
       {page === 'game' && (
-        <section className="section game-section">
-          <div className="game-heading">
-            <span className="kicker">مباراة تجريبية</span>
-            <h1>{matchName||"لوحة التحدّي"}</h1>
-            <p className="muted">نسخة تجريبية: ٦ أسئلة مختلفة لكل فئة، و{wordlessModeCount} طرق لعب في «ولا كلمة». المحتوى المرئي والصوتي النهائي قيد التطوير.</p>
-          </div>
-          <div className="scoreboard">
-            {teams.map((t, i) => (
-              <div className={'team ' + (turn === i ? 'current' : '')} key={i}>
-                <small>{turn === i ? '● الدور الحالي' : 'الفريق'}</small>
-                <strong>{t || 'فريق ' + (i + 1)}</strong>
-                <b>
-                  {scores[i]} <small>نقطة</small>
-                </b>
-                <div className="board-team-aids">
-                  {chosenAids[i].map(id=>{
-                    const aid=aidCatalog.find(x=>x.id===id)!;
-                    return <span key={id} className={usedAids[i].includes(id)?'spent':''} title={aid.name}>
-                      <AidGlyph id={id} size={14}/>{aid.name}
-                    </span>;
-                  })}
-                </div>
+        <section className="lamna-match-screen" dir="rtl" aria-label="لوحة مباراة لمنا">
+          <div className="lamna-match-shell">
+            <header className="lamna-match-header">
+              <nav className="lamna-match-nav" aria-label="التحكم بالمباراة">
+                <button type="button" onClick={()=>go('home')}>↪ الخروج</button>
+                <button type="button" title="التراجع عن آخر نتيجة" disabled={!history.length||active!==null}
+                  onClick={()=>{
+                    const last=history[history.length-1];if(!last)return;
+                    setHistory(v=>v.slice(0,-1));setUsed(v=>v.filter(x=>x!==last.question));
+                    setTurn(v=>1-v);
+                    setScores(v=>v.map((score,i)=>Math.max(0,score-(last.changes?.[i]??(last.team===i?last.points:0)))));
+                    setShowResult(false);
+                  }}>↶ تراجع</button>
+                <button type="button" onClick={()=>{setActive(null);setShowResult(true)}}>➜ إنهاء المباراة</button>
+              </nav>
+              <div className="lamna-match-topline">
+                <span className="lamna-match-current">دور فريق: <strong>{teams[turn]||'الفريق '+(turn+1)}</strong></span>
+                <div className="lamna-match-logo">لمنا</div>
               </div>
-            ))}
-          </div>
+              <div className="lamna-match-title">{matchName||'لوحة التحدّي'}</div>
+            </header>
+            <div className="lamna-match-playfield">
           <div className="game-board">
             {selected.map((id, col) => (
               <div className="board-column" key={id}>
@@ -412,13 +409,37 @@ function App() {
               </div>
             ))}
           </div>
-          <div className="game-bottom"><button className="outline" disabled={!history.length||active!==null} onClick={()=>{const h=history[history.length-1];setHistory(v=>v.slice(0,-1));setUsed(v=>v.filter(x=>x!==h.question));setTurn(v=>1-v);setScores(v=>v.map((s,i)=>s-(h.changes?.[i]??(h.team===i?h.points:0))));setShowResult(false)}}>↶ تراجع عن آخر نتيجة</button>
-            <span>المتبقي: {36 - used.length} سؤال</span>
-            <button className="outline" onClick={() => go('home')}>
-              إنهاء التجربة
-            </button>
+
+            </div>
+            <div className="lamna-match-footer">
+              <div className="lamna-match-teams">
+                {teams.map((team,i)=>(
+                  <div className="lamna-match-team" key={i}>
+                    <div className="lamna-match-team-name">{team||'الفريق '+(i+1)}</div>
+                    <div className="lamna-match-scorebox">
+                      <button type="button" aria-label={'خصم 200 نقطة من '+team}
+                        onClick={()=>setScores(v=>v.map((score,j)=>j===i?Math.max(0,score-200):score))}>−</button>
+                      <strong aria-label={'نقاط '+team}>{scores[i]}</strong>
+                      <button type="button" aria-label={'إضافة 200 نقطة إلى '+team}
+                        onClick={()=>setScores(v=>v.map((score,j)=>j===i?score+200:score))}>+</button>
+                    </div>
+                    <div className="lamna-match-help-title">وسائل المساعدة</div>
+                    <div className="lamna-match-help-icons">
+                      {chosenAids[i].map(id=>{
+                        const aid=aidCatalog.find(x=>x.id===id)!;
+                        return <span key={id} title={aid.name}
+                          className={'lamna-match-help-icon '+(usedAids[i].includes(id)?'spent':'')}
+                          aria-label={aid.name+(usedAids[i].includes(id)?' (مستخدمة)':'')}>
+                          <AidGlyph id={id} size={19}/>
+                        </span>;
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-          {showResult && active===null && <div className="modal-back"><div className="question-modal result-modal"><span className="kicker">نهاية المباراة</span><h2>{scores[0]===scores[1]?'تعادل الفريقين!':'الفائز: '+teams[scores[0]>scores[1]?0:1]+' 🏆'}</h2><p>{teams[0]}: {scores[0]} نقطة — {teams[1]}: {scores[1]} نقطة</p><p>أُنجزت 36 جولة</p><div className="modal-actions"><button className="primary" onClick={()=>{setShowResult(false);go('setup')}}>مباراة جديدة</button><button className="outline" onClick={()=>{setShowResult(false);go('home')}}>الرئيسية</button></div></div></div>}
+          {showResult && active===null && <div className="modal-back"><div className="question-modal result-modal"><span className="kicker">نهاية المباراة</span><h2>{scores[0]===scores[1]?'تعادل الفريقين!':'الفائز: '+teams[scores[0]>scores[1]?0:1]+' 🏆'}</h2><p>{teams[0]}: {scores[0]} نقطة — {teams[1]}: {scores[1]} نقطة</p><p>أُنجزت {used.length} من 36 سؤالًا</p><div className="modal-actions"><button className="primary" onClick={()=>{setShowResult(false);go('setup')}}>مباراة جديدة</button><button className="outline" onClick={()=>{setShowResult(false);go('home')}}>الرئيسية</button></div></div></div>}
           {active !== null && (
             <div className="play-screen" dir="rtl" role="dialog" aria-modal="true" aria-label="شاشة لعب السؤال">
               <div className="play-header">
@@ -573,11 +594,11 @@ function App() {
           </div>
         </section>
       )}
-      <footer>
+      {page!=='game' && <footer>
         <div>{brand}</div>
         <p>لمنا — ألعاب تجمعنا</p>
         <small>نسخة مستقلة تجريبية • بدون دفع أو تسجيل حقيقي</small>
-      </footer>
+      </footer>}
     </div>
   );
 }
