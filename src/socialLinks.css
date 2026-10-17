@@ -1,0 +1,19 @@
+
+.lm-contact{max-width:1150px;margin:18px auto 10px;padding:27px 18px 22px;color:#eef8f7;border-top:1px solid #42697a;text-align:center}
+.lm-contact h2{font-size:clamp(20px,2.8vw,28px);font-weight:950;color:#fff;margin:0 0 4px}
+.lm-contact>p{font-size:14px;color:#c8dcdf;margin:0 0 18px}
+.lm-social-list{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.lm-social{display:flex;direction:rtl;align-items:center;gap:11px;text-decoration:none!important;color:#fff!important;border:1px solid #63818c;background:#143e50;min-width:190px;flex:0 1 214px;padding:12px;border-radius:16px;transition:background .15s}
+.lm-social:hover,.lm-social:focus-visible{background:#246478}
+.lm-social-icon{display:grid;place-items:center;flex:0 0 38px;width:38px;height:38px;border-radius:12px;color:#153647;background:#d7f6ee}
+.lm-social-snap .lm-social-icon{background:#ffeb51}
+.lm-social-tiktok .lm-social-icon{background:#f6c1d1}
+.lm-social-instagram .lm-social-icon{background:#d7d5f9}
+.lm-social-whatsapp .lm-social-icon{background:#85ebc4}
+.lm-social-text{display:flex;flex-direction:column;align-items:flex-start;text-align:right;gap:3px;min-width:0}
+.lm-social-text strong{font-size:14px;color:white}
+.lm-social-text small{font-size:12px;color:#cadde2;font-weight:800;direction:ltr}
+.lm-contact-phone{margin:18px auto 0;display:flex;justify-content:center;align-items:center;gap:8px;font-size:14px;color:#c9e5e5}
+.lm-contact-phone a{font-weight:900;color:#84ebd5;text-decoration:none}
+.lm-contact-phone span{color:#f0f7f7}
+@media(max-width:500px){.lm-contact{padding:21px 7px}.lm-social-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.lm-social{min-width:0;padding:8px;gap:7px}.lm-social-icon{width:31px;height:31px;flex-basis:31px}.lm-social-text strong{font-size:12px}.lm-social-text small{font-size:10px}.lm-contact-phone{flex-wrap:wrap}}
