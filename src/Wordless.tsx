@@ -1,6 +1,7 @@
 import React from 'react';
 import QRCode from 'qrcode';
 import './wordless.css';
+import OfficialLogo from './OfficialLogo';
 
 const API='https://lamna-wordless-sync.onrender.com';
 type Room={id:string;hostKey:string;duration:number;phoneUrl:string};
@@ -56,7 +57,7 @@ export function WordlessPhone(){
  };
  const left=room?.startedAt?remaining(room.startedAt,room.duration):null;
  return <main className="wl-phone" dir="rtl">
-   <header className="wl-phone-header"><strong>لمنا</strong><span>ولا كلمة — البطاقة السرية</span></header>
+   <header className="wl-phone-header"><OfficialLogo/><span>ولا كلمة — البطاقة السرية</span></header>
    {!room?<div className="wl-phone-message">{error||'جارٍ فتح البطاقة…'}</div>:room.startedAt===null?
     <div className="wl-phone-secret">
       <span className="wl-phone-eyebrow">هذه الصورة لك فقط، لا توريها فريقك</span>
