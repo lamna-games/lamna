@@ -171,7 +171,7 @@ const wordlessModes = [
 ];
 export const wordlessModeCount = new Set(wordlessModes.map(x => x.mode)).size;
 export function getQuestion(categoryIndex: number, row: number): QuizItem {
-  const [prompt, answer, hint] = rows[categoryIndex]?.[row] ?? rows[0][row];
+  const [prompt, answer, hint] = (rows[categoryIndex]?.[row] ?? rows[0][row]).split('|');
   const base: QuizItem = { prompt, answer, hint };
   if (categoryIndex === 1) return { ...base, ...wordlessModes[row] };
   return base;
