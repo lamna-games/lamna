@@ -1,6 +1,7 @@
 import React from 'react';
 import { Trophy, Volume2, VolumeX, RotateCcw, DoorOpen, Sparkles } from 'lucide-react';
 import './winner.css';
+import OfficialLogo from './OfficialLogo';
 
 type Props = { teams:string[]; scores:number[]; answered:number; total:number; onReplay:()=>void; onExit:()=>void; onSetup:()=>void; };
 const confetti=Array.from({length:35},(_,i)=>({
@@ -40,7 +41,7 @@ export default function WinnerScreen({teams,scores,answered,total,onReplay,onExi
    }}/>)}
   </div>
   <header className="lamna-finale-header">
-   <span className="lamna-finale-brand">لمنا <small>ألعاب تجمعنا</small></span>
+   <span className="lamna-finale-brand"><OfficialLogo/></span>
    <button type="button" className="lamna-finale-sound" title="صوت الاحتفال" aria-label={muted?'تشغيل صوت الاحتفال':'كتم صوت الاحتفال'} onClick={()=>{
     setMuted(v=>!v);if(muted)celebrateSound();
    }}>{muted?<VolumeX size={23}/>:<Volume2 size={23}/>}</button>
