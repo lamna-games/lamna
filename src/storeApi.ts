@@ -10,6 +10,11 @@ export async function storeRequest<T>(path:string,method:'GET'|'POST'='GET',payl
  if(method==='POST')headers['Content-Type']='application/json';
  const response=await fetch(BASE+'/api/store/'+path,{method,headers,cache:'no-store',body:method==='POST'?JSON.stringify(payload||{}):undefined});
  const data=await response.json().catch(()=>({}));
+ if(response.status===401){
+  sessionStorage.removeItem('lamna-session');
+  sessionStorage.removeItem('lamna-account-name');
+  localStorage.removeItem('lamna-current-match-id');
+ }
  if(!response.ok)throw Error(data.message||'تعذر الاتصال بخدمة لمنا.');
  return data as T;
 }
