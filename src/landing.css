@@ -103,3 +103,15 @@
  .lm-team-heading p{font-size:13px}
 }
 @media(prefers-reduced-motion:reduce){.lm-landing *{scroll-behavior:auto!important;transition:none!important}}
+
+/* Low-key contact details */
+.lamna-site-footer{margin-top:42px;padding:34px 15px 28px;text-align:center;background:#102d40;color:#f3fbfa}
+.lamna-site-footer .brand{margin:auto;justify-content:center}
+.lamna-site-footer>p{margin:7px 0 23px;color:#c3dade}
+.lamna-contact{max-width:560px;margin:0 auto 23px;display:flex;flex-direction:column;align-items:center;gap:9px;padding:20px 12px;border:1px solid #42636e;border-radius:16px;background:#193e52}
+.lamna-contact strong{font-size:22px;color:#fff}
+.lamna-contact>span{color:#cbdee4;font-size:14px}
+.lamna-contact-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:5px}
+.lamna-contact-actions>a{display:inline-flex;align-items:center;justify-content:center;min-height:45px;min-width:159px;padding:9px 13px;border-radius:11px;font-size:15px;font-weight:900;text-decoration:none!important}
+.lamna-contact-actions>a:first-child{background:#89ebd0;color:#103c3d!important}
+.lamna-contact-actions>a:last-child{border:1px solid #80acae;color:#f6ffff!important}
