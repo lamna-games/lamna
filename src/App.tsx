@@ -11,6 +11,7 @@ import SocialLinks from './SocialLinks';
 import AuthScreen from './AuthScreen';
 import { Plus, ArrowLeft, Sparkles, UsersRound, Grid2X2, Trophy, ChevronLeft, Check, Play } from 'lucide-react';
 import './landing.css';
+import './brandTheme.css';
 const categories = [
   'معلومات عامة',
   'ولا كلمة',
