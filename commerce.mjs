@@ -47,8 +47,10 @@ async function setup(pool){
   kind TEXT NOT NULL CHECK(kind IN('free','paid')),
   selected INTEGER[] NOT NULL,questions JSONB NOT NULL,
   match_name TEXT NOT NULL DEFAULT '',
+  progress JSONB NOT NULL DEFAULT '{}'::jsonb,
   status TEXT NOT NULL DEFAULT 'active' CHECK(status IN('active','completed')),
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),finished_at TIMESTAMPTZ)`);
+ await pool.query("ALTER TABLE lamna_matches ADD COLUMN IF NOT EXISTS progress JSONB NOT NULL DEFAULT '{}'::jsonb");
  await pool.query(`CREATE TABLE IF NOT EXISTS lamna_seen_questions(
   account_id BIGINT NOT NULL REFERENCES lamna_accounts(id) ON DELETE CASCADE,
   question_id TEXT NOT NULL,match_id UUID NOT NULL REFERENCES lamna_matches(id),
@@ -106,7 +108,7 @@ export async function handleStore(req,res,url,pool,ensureAccounts){
  if(route.startsWith('/api/store/matches/')&&req.method==='GET'){
   const id=route.slice('/api/store/matches/'.length);
   if(!/^[a-f0-9-]{36}$/i.test(id)){send(req,res,400,{message:'معرف غير صحيح'});return true;}
-  const record=await pool.query('SELECT id,kind,selected,questions,match_name,status FROM lamna_matches WHERE id=$1 AND account_id=$2',[id,user.id]);
+  const record=await pool.query('SELECT id,kind,selected,questions,match_name,status,progress FROM lamna_matches WHERE id=$1 AND account_id=$2',[id,user.id]);
   if(!record.rowCount){send(req,res,404,{message:'المباراة غير موجودة'});return true;}
   send(req,res,200,{match:record.rows[0]});return true;
  }
@@ -119,13 +121,19 @@ export async function handleStore(req,res,url,pool,ensureAccounts){
    send(req,res,400,{message:'اختر ست فئات مختلفة.'});return true;
   }
   const matchName=String(data.matchName||'').trim().slice(0,50);
-  if(!matchName){send(req,res,400,{message:'اكتب اسم المباراة.'});return true;}
+  const teams=Array.isArray(data.teams)?data.teams.map(t=>String(t||'').trim().slice(0,25)):[];
+  const aids=Array.isArray(data.chosenAids)?data.chosenAids:[];
+  const validAids=['phone','two','rest','pit','trap'];
+  if(!matchName||teams.length!==2||teams.some(t=>!t)||aids.length!==2||aids.some(list=>!Array.isArray(list)||list.length!==3||new Set(list).size!==3||list.some(id=>!validAids.includes(id)))){
+   send(req,res,400,{message:'اكتب اسم المباراة واسم الفريقين واختر ثلاث وسائل مختلفة لكل فريق.'});return true;
+  }
+  const initialProgress={teams,chosenAids:aids,scores:[0,0],used:[],turn:0,usedAids:[[],[]],history:[]};
   const client=await pool.connect();
   try{
    await client.query('BEGIN');
    await client.query('INSERT INTO lamna_entitlements(account_id) VALUES ($1) ON CONFLICT DO NOTHING',[user.id]);
    const row=(await client.query('SELECT free_used,credits FROM lamna_entitlements WHERE account_id=$1 FOR UPDATE',[user.id])).rows[0];
-   const active=await client.query("SELECT id,kind,selected,questions,match_name,status FROM lamna_matches WHERE account_id=$1 AND status='active' ORDER BY created_at DESC LIMIT 1",[user.id]);
+   const active=await client.query("SELECT id,kind,selected,questions,match_name,status,progress FROM lamna_matches WHERE account_id=$1 AND status='active' ORDER BY created_at DESC LIMIT 1",[user.id]);
    if(active.rowCount){await client.query('ROLLBACK');send(req,res,409,{code:'active_match',message:'عندك مباراة قائمة. كمّلها أولًا قبل بدء مباراة جديدة.',match:active.rows[0]});return true;}
    const kind=row.free_used?'paid':'free';
    if(kind==='paid' && row.credits===0){await client.query('ROLLBACK');send(req,res,402,{code:'no_credit',message:'انتهت المباراة المجانية. اختر باقة لإضافة رصيد.'});return true;}
@@ -149,7 +157,7 @@ export async function handleStore(req,res,url,pool,ensureAccounts){
     questions.push(shuffled);
    }
    const id=crypto.randomUUID();
-   await client.query('INSERT INTO lamna_matches(id,account_id,kind,selected,questions,match_name) VALUES($1,$2,$3,$4,$5,$6)',[id,user.id,kind,selected,JSON.stringify(questions),matchName]);
+   await client.query('INSERT INTO lamna_matches(id,account_id,kind,selected,questions,match_name,progress) VALUES($1,$2,$3,$4,$5,$6,$7)',[id,user.id,kind,selected,JSON.stringify(questions),matchName,JSON.stringify(initialProgress)]);
    if(kind==='free')await client.query('UPDATE lamna_entitlements SET free_used=TRUE,updated_at=now() WHERE account_id=$1',[user.id]);
    else {
     await client.query('UPDATE lamna_entitlements SET credits=credits-1,updated_at=now() WHERE account_id=$1',[user.id]);
@@ -157,11 +165,26 @@ export async function handleStore(req,res,url,pool,ensureAccounts){
      await client.query('INSERT INTO lamna_seen_questions(account_id,question_id,match_id) VALUES($1,$2,$3)',[user.id,question.id,id]);
     }
    }
-   await client.query('COMMIT');send(req,res,201,{match:{id,kind,selected,questions,match_name:matchName,status:'active'},...(await readMe(pool,user.id))});return true;
+   await client.query('COMMIT');send(req,res,201,{match:{id,kind,selected,questions,match_name:matchName,status:'active',progress:initialProgress},...(await readMe(pool,user.id))});return true;
   }catch{
    await client.query('ROLLBACK').catch(()=>{});
    send(req,res,503,{message:'تعذر بدء المباراة. لم يُخصم رصيدك.'});return true;
   }finally{client.release();}
+ }
+ if(route==='/api/store/progress'){
+  const id=String(data.matchId||'');
+  const progress=data.progress;
+  if(!/^[a-f0-9-]{36}$/i.test(id)||!progress||typeof progress!=='object'||Array.isArray(progress)||
+    !Array.isArray(progress.scores)||progress.scores.length!==2||progress.scores.some(n=>!Number.isInteger(n)||n<0||n>999999)||
+    !Array.isArray(progress.used)||progress.used.length>36||progress.used.some(n=>!Number.isInteger(n)||n<0||n>35)||
+    !Array.isArray(progress.teams)||progress.teams.length!==2||progress.teams.some(t=>typeof t!=='string'||t.length>25)||
+    !Array.isArray(progress.chosenAids)||progress.chosenAids.length!==2||
+    JSON.stringify(progress).length>6500){
+    send(req,res,400,{message:'بيانات المباراة غير صحيحة'});return true;
+  }
+  const r=await pool.query("UPDATE lamna_matches SET progress=$1::jsonb WHERE id=$2 AND account_id=$3 AND status='active' RETURNING id",[JSON.stringify(progress),id,user.id]);
+  if(!r.rowCount){send(req,res,404,{message:'المباراة غير متاحة'});return true;}
+  send(req,res,200,{ok:true});return true;
  }
  if(route==='/api/store/finish'){
   const id=String(data.matchId||'');
