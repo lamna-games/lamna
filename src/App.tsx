@@ -130,10 +130,11 @@ function App() {
     setPage(p);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-  const choose = (i: number) =>
-    setSelected(v =>
-      v.includes(i) ? v.filter(x => x !== i) : v.length < 6 ? [...v, i] : v
-    );
+  const choose = (i: number) => {
+    const completesLineup = page==='home' && selected.length===5 && !selected.includes(i);
+    setSelected(v => v.includes(i) ? v.filter(x => x !== i) : v.length < 6 ? [...v, i] : v);
+    if(completesLineup) window.setTimeout(() => document.getElementById('lm-setup-teams')?.scrollIntoView({behavior:'smooth',block:'start'}), 280);
+  };
   const scrollToGames = () => {
     if (page === 'home') {
       document.getElementById('lm-all-games')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -174,6 +175,53 @@ function App() {
         </div>
       )}
     </div>
+  );
+  const setupFields = (
+          <div className="aid-setup-panel">
+            <label className="aid-match-field">
+              <strong>اسم اللعبة</strong>
+              <input value={matchName} maxLength={35} placeholder="مثال: تحدّي العائلة" onChange={e=>setMatchName(e.target.value)}/>
+            </label>
+            {teams.map((team,i)=>(
+              <div className="aid-team-setup" key={i}>
+                <h2>الفريق {i===0?'الأول':'الثاني'}</h2>
+                <input
+                  aria-label={'اسم الفريق '+(i+1)}
+                  value={team} maxLength={25}
+                  placeholder={'اسم الفريق '+(i+1)}
+                  onChange={e=>setTeams(v=>v.map((t,j)=>j===i?e.target.value:t))}
+                />
+                <div className="aid-team-title">
+                  <strong>{team.trim()||'الفريق '+(i+1)}: اختر 3 وسائل مساعدة</strong>
+                  <span className={chosenAids[i].length===3?'aid-count complete':'aid-count'}>{chosenAids[i].length} / 3</span>
+                </div>
+                <div className="aid-pick-grid">
+                  {aidCatalog.map(aid=>{
+                    const picked=chosenAids[i].includes(aid.id);
+                    return <button key={aid.id} type="button" aria-pressed={picked}
+                      className={'aid-pick-card '+(picked?'selected':'') }
+                      disabled={!picked&&chosenAids[i].length===3}
+                      title={aid.info} onClick={()=>toggleAid(i,aid.id)}>
+                      <span className="aid-pick-check">{picked?'✓':''}</span>
+                      <strong>{aid.name}</strong>
+                      <AidGlyph id={aid.id} size={33}/>
+                      <small>{aid.info}</small>
+                    </button>;
+                  })}
+                </div>
+              </div>
+            ))}
+            <p className="muted aid-setup-note">هذه نسخة تجريبية؛ تظهر الوسائل المختارة تحت كل فريق ويُمكن استعمال كل وسيلة مرة واحدة أثناء السؤال.</p>
+            <button className="primary aid-start-button"
+              disabled={!matchName.trim()||teams.some(t=>!t.trim())||chosenAids.some(list=>list.length!==3)}
+              onClick={()=>{
+                setScores([0,0]);setShowResult(false);setHistory([]);setShowHint(false);
+                setUsed([]);setTurn(0);setHelp([2,2]);setVarUsed([false,false]);
+                setActive(null);setPhase('question');setSeconds(60);setPaused(false);
+                setUsedAids([[],[]]);setAidEffect(null);setAidOwner(null);setShowHelp(false);
+                go('game');
+              }}>ابدأ اللعب ←</button>
+          </div>
   );
   return (
     <div className={"site"+(page==="game"?" in-match":"")+(page==="home"?" has-landing":"")} dir="rtl">
@@ -278,11 +326,21 @@ function App() {
               ))}
             </div>
             <div className="lm-library-bottom">
-              <span>{selected.length===6?'اكتمل الاختيار، جاهزين للتحدّي!':'اختر '+(6-selected.length)+' فئات '+(selected.length?'إضافية':'لبداية اللعب')}</span>
-              <button type="button" className="lm-library-next" disabled={selected.length!==6} onClick={()=>go('setup')}>
-                تجهيز الفريقين <ArrowLeft size={19}/>
+              <span>{selected.length===6?'تشكيلتكم جاهزة! كمّلوا معلومات الفرق تحت.':'اختر '+(6-selected.length)+' فئات '+(selected.length?'إضافية':'لبداية اللعب')}</span>
+              <button type="button" className="lm-library-next" disabled={selected.length!==6}
+                onClick={()=>document.getElementById('lm-setup-teams')?.scrollIntoView({behavior:'smooth',block:'start'})}>
+                معلومات الفرق <ArrowLeft size={19}/>
               </button>
             </div>
+          </section>
+          {selected.length===6&&<section id="lm-setup-teams" className="lm-team-details" aria-label="حدد معلومات الفرق">
+            <div className="lm-team-heading">
+              <span className="lm-library-eyebrow"><span/> باقي خطوة ونبدأ</span>
+              <h2>حدد <em>معلومات الفرق.</em></h2>
+              <p>سمّ المباراة، اكتب أسماء الفريقين، واختار ثلاث وسائل مساعدة لكل فريق.</p>
+            </div>
+            {setupFields}
+          </section>}
           </section>
           <section className="lm-bottom-invite">
             <div><span>جاهزين للتحدّي؟</span><h2>الليلة، <em>اللّمة لمنا.</em></h2></div>
@@ -290,7 +348,8 @@ function App() {
           </section>
           {selected.length>0&&<div className="lm-selection-dock" role="status" aria-live="polite">
             <div className="lm-selection-dock-progress"><strong>{selected.length}/6</strong><span>فئات مختارة</span></div>
-            <button type="button" disabled={selected.length!==6} onClick={()=>go('setup')}>تجهيز الفريقين <ArrowLeft size={19}/></button>
+            <button type="button" disabled={selected.length!==6}
+              onClick={()=>document.getElementById('lm-setup-teams')?.scrollIntoView({behavior:'smooth',block:'start'})}>معلومات الفرق <ArrowLeft size={19}/></button>
           </div>}
         </div>
       )}
@@ -338,51 +397,8 @@ function App() {
           <span className="kicker">جهّزوا المباراة</span>
           <h1>الأسماء ووسائل المساعدة</h1>
           <p className="muted">كل فريق يختار 3 وسائل من أصل 5 قبل أن يبدأ التحدي.</p>
-          <div className="aid-setup-panel">
-            <label className="aid-match-field">
-              <strong>اسم اللعبة</strong>
-              <input value={matchName} maxLength={35} placeholder="مثال: تحدّي العائلة" onChange={e=>setMatchName(e.target.value)}/>
-            </label>
-            {teams.map((team,i)=>(
-              <div className="aid-team-setup" key={i}>
-                <h2>الفريق {i===0?'الأول':'الثاني'}</h2>
-                <input
-                  aria-label={'اسم الفريق '+(i+1)}
-                  value={team} maxLength={25}
-                  placeholder={'اسم الفريق '+(i+1)}
-                  onChange={e=>setTeams(v=>v.map((t,j)=>j===i?e.target.value:t))}
-                />
-                <div className="aid-team-title">
-                  <strong>{team.trim()||'الفريق '+(i+1)}: اختر 3 وسائل مساعدة</strong>
-                  <span className={chosenAids[i].length===3?'aid-count complete':'aid-count'}>{chosenAids[i].length} / 3</span>
-                </div>
-                <div className="aid-pick-grid">
-                  {aidCatalog.map(aid=>{
-                    const picked=chosenAids[i].includes(aid.id);
-                    return <button key={aid.id} type="button" aria-pressed={picked}
-                      className={'aid-pick-card '+(picked?'selected':'') }
-                      disabled={!picked&&chosenAids[i].length===3}
-                      title={aid.info} onClick={()=>toggleAid(i,aid.id)}>
-                      <span className="aid-pick-check">{picked?'✓':''}</span>
-                      <strong>{aid.name}</strong>
-                      <AidGlyph id={aid.id} size={33}/>
-                      <small>{aid.info}</small>
-                    </button>;
-                  })}
-                </div>
-              </div>
-            ))}
-            <p className="muted aid-setup-note">هذه نسخة تجريبية؛ تظهر الوسائل المختارة تحت كل فريق ويُمكن استعمال كل وسيلة مرة واحدة أثناء السؤال.</p>
-            <button className="primary aid-start-button"
-              disabled={!matchName.trim()||teams.some(t=>!t.trim())||chosenAids.some(list=>list.length!==3)}
-              onClick={()=>{
-                setScores([0,0]);setShowResult(false);setHistory([]);setShowHint(false);
-                setUsed([]);setTurn(0);setHelp([2,2]);setVarUsed([false,false]);
-                setActive(null);setPhase('question');setSeconds(60);setPaused(false);
-                setUsedAids([[],[]]);setAidEffect(null);setAidOwner(null);setShowHelp(false);
-                go('game');
-              }}>ابدأ المباراة ←</button>
-          </div>
+          {setupFields}
+
         </section>
       )}
       {page === 'game' && (
