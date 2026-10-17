@@ -1,19 +1,20 @@
-
-.lm-contact{max-width:1150px;margin:18px auto 10px;padding:27px 18px 22px;color:#eef8f7;border-top:1px solid #42697a;text-align:center}
-.lm-contact h2{font-size:clamp(20px,2.8vw,28px);font-weight:950;color:#fff;margin:0 0 4px}
-.lm-contact>p{font-size:14px;color:#c8dcdf;margin:0 0 18px}
-.lm-social-list{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
-.lm-social{display:flex;direction:rtl;align-items:center;gap:11px;text-decoration:none!important;color:#fff!important;border:1px solid #63818c;background:#143e50;min-width:190px;flex:0 1 214px;padding:12px;border-radius:16px;transition:background .15s}
-.lm-social:hover,.lm-social:focus-visible{background:#246478}
-.lm-social-icon{display:grid;place-items:center;flex:0 0 38px;width:38px;height:38px;border-radius:12px;color:#153647;background:#d7f6ee}
-.lm-social-snap .lm-social-icon{background:#ffeb51}
-.lm-social-tiktok .lm-social-icon{background:#f6c1d1}
-.lm-social-instagram .lm-social-icon{background:#d7d5f9}
-.lm-social-whatsapp .lm-social-icon{background:#85ebc4}
+/* Lamna brand on white — official platform icons, not approximations */
+.lm-contact{max-width:1100px;margin:20px auto 10px;padding:28px 18px 22px;color:#183b4c;border-top:1px solid #e2ecec;text-align:center}
+.lm-contact h2{font-size:clamp(21px,3vw,29px);font-weight:950;color:#16394c;margin:0 0 6px}
+.lm-contact>p{font-size:14px;color:#657d88;margin:0 0 20px}
+.lm-social-list{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;max-width:980px;margin:auto}
+.lm-social{display:flex;direction:rtl;align-items:center;gap:11px;text-decoration:none!important;color:#173b4c!important;border:1px solid #d9e5e6;background:#fff;min-width:0;padding:12px 13px;border-radius:15px;transition:border-color .15s,background .15s,transform .15s}
+.lm-social:hover,.lm-social:focus-visible{background:#f4fbf9;border-color:#59bbab;transform:translateY(-2px)}
+.lm-social-icon{display:grid;place-items:center;flex:0 0 39px;width:39px;height:39px;border-radius:11px;color:#fff;background:#131518}
+.lm-social-snap .lm-social-icon{background:#fffc00;color:#000}
+.lm-social-tiktok .lm-social-icon{background:#0b0d11;color:#fff}
+.lm-social-instagram .lm-social-icon{background:linear-gradient(35deg,#f9ca44,#fa5b3d 35%,#ca2875 65%,#6547b6);color:white}
+.lm-social-whatsapp .lm-social-icon{background:#20c566;color:#fff}
 .lm-social-text{display:flex;flex-direction:column;align-items:flex-start;text-align:right;gap:3px;min-width:0}
-.lm-social-text strong{font-size:14px;color:white}
-.lm-social-text small{font-size:12px;color:#cadde2;font-weight:800;direction:ltr}
-.lm-contact-phone{margin:18px auto 0;display:flex;justify-content:center;align-items:center;gap:8px;font-size:14px;color:#c9e5e5}
-.lm-contact-phone a{font-weight:900;color:#84ebd5;text-decoration:none}
-.lm-contact-phone span{color:#f0f7f7}
-@media(max-width:500px){.lm-contact{padding:21px 7px}.lm-social-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.lm-social{min-width:0;padding:8px;gap:7px}.lm-social-icon{width:31px;height:31px;flex-basis:31px}.lm-social-text strong{font-size:12px}.lm-social-text small{font-size:10px}.lm-contact-phone{flex-wrap:wrap}}
+.lm-social-text strong{font-size:14px;color:#153548;font-weight:900}
+.lm-social-text small{font-size:12px;color:#607c88;font-weight:800;direction:ltr}
+.lm-contact-phone{margin:22px auto 0;display:flex;justify-content:center;align-items:center;gap:9px;font-size:14px;color:#567380}
+.lm-contact-phone a{font-weight:900;color:#126e67;text-decoration:none}
+.lm-contact-phone span{color:#375969}
+@media(max-width:880px){.lm-social-list{grid-template-columns:repeat(2,minmax(0,1fr));max-width:550px}}
+@media(max-width:500px){.lm-contact{padding:20px 10px}.lm-social-list{gap:8px}.lm-social{padding:10px 9px;gap:8px}.lm-social-icon{flex-basis:35px;width:35px;height:35px}.lm-social-text strong{font-size:12px}.lm-social-text small{font-size:10px}.lm-contact-phone{flex-wrap:wrap}}
