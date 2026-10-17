@@ -522,7 +522,7 @@ function App() {
                     ) : reveal ? (
                       <>
                         <button type="button" className="play-action play-action-blue" onClick={()=>setPickWinner(true)}>أي فريق؟</button>
-                        <button type="button" className="play-action play-action-red" onClick={()=>{setReveal(false);setPaused(false);}}>ارجع للسؤال ›</button>
+                        <button type="button" className="play-action play-action-red" onClick={()=>{setReveal(false);setPaused(isWordlessQuestion);}}>ارجع للسؤال ›</button>
                       </>
                     ) : (
                       <>
