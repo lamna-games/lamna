@@ -64,7 +64,10 @@ const cors = {
   'Cache-Control': 'no-store'
 };
 function respond(res, code, data) {
-  res.writeHead(code, {...cors, 'Content-Type':'application/json; charset=utf-8'});
+  const alreadyAllowed=res.getHeader('Access-Control-Allow-Origin');
+  res.writeHead(code, {...cors,
+    ...(alreadyAllowed?{'Access-Control-Allow-Origin':alreadyAllowed}:{}),
+    'Content-Type':'application/json; charset=utf-8'});
   res.end(JSON.stringify(data));
 }
 function body(req) {
@@ -100,7 +103,14 @@ const server = http.createServer(async(req,res)=>{
     catch(e){res.writeHead(503,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});res.end(JSON.stringify({message:'خدمة المباريات غير متاحة الآن.'}));}
     return;
   }
-  if(req.method==='OPTIONS'){res.writeHead(204,cors);res.end();return;}
+  if(req.method==='OPTIONS'){
+    if(u.pathname.startsWith('/api/accounts/')){
+      if(!authCors(req,res))return;
+      res.writeHead(204,{'Access-Control-Allow-Methods':'GET,POST,OPTIONS','Access-Control-Allow-Headers':'Content-Type,Authorization'});
+      res.end();return;
+    }
+    res.writeHead(204,cors);res.end();return;
+  }
   const parts = u.pathname.split('/').filter(Boolean);
 
   if(u.pathname.startsWith('/api/accounts/')) {
@@ -119,6 +129,14 @@ const server = http.createServer(async(req,res)=>{
    try{
     await ensureAccounts();
     const data=await body(req);
+    if(u.pathname==='/api/accounts/logout'){
+     const bearer=/^Bearer ([a-f0-9]{64})$/.exec(String(req.headers.authorization||''));
+     if(bearer){
+      const hashed=crypto.createHash('sha256').update(bearer[1]).digest('hex');
+      await accountsPool.query('DELETE FROM lamna_sessions WHERE token_hash=$1',[hashed]);
+     }
+     respond(res,200,{ok:true});return;
+    }
     if(u.pathname==='/api/accounts/register'){
      const firstName=String(data.firstName||'').trim().slice(0,60);
      const lastName=String(data.lastName||'').trim().slice(0,60);
