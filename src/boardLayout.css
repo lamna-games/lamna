@@ -760,3 +760,14 @@
  .play-brand img{max-height:24px!important}
  .play-brandrow{min-height:28px!important}
 }
+
+/* Make activated lifeline state unmistakable and usable for the adjudicator */
+.play-aid-activated{width:min(100%,470px)!important;margin:12px auto!important;line-height:1.5!important}
+.lamna-second-guess{
+ display:block;border:1px solid #85e4d3!important;border-radius:10px!important;
+ padding:8px 14px!important;background:#c6f9ec!important;color:#0f4550!important;
+ font-size:13px!important;font-weight:900!important;margin:5px auto 0!important;
+}
+.play-choose-teams button:disabled{opacity:.25!important;cursor:not-allowed!important}
+.play-team-controls .play-aid-button.available{background:#236f6f!important;color:#effff8!important;box-shadow:0 0 0 2px #6bdfca90!important}
+.play-team-controls .play-aid-button.spent{opacity:.3!important}
