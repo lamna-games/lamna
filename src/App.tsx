@@ -6,6 +6,8 @@ import CartoonCover from './CartoonCover';
 import { getQuestion, wordlessModeCount } from './quizData';
 import { WordlessTV } from './Wordless';
 import WinnerScreen from './WinnerScreen';
+import { Plus, ArrowLeft, Sparkles, UsersRound, Grid2X2, Trophy, ChevronLeft, Check, Play } from 'lucide-react';
+import './landing.css';
 const categories = [
   'معلومات عامة',
   'ولا كلمة',
@@ -166,8 +168,8 @@ function App() {
     </div>
   );
   return (
-    <div className={"site"+(page==="game"?" in-match":"")} dir="rtl">
-      {page!=="game" && <header className="header">
+    <div className={"site"+(page==="game"?" in-match":"")+(page==="home"?" has-landing":"")} dir="rtl">
+      {page!=="game" && <header className={"header"+(page==="home"?" lm-header":"")}>
         <div onClick={() => go('home')} className="brand-link">
           {brand}
         </div>
@@ -179,99 +181,76 @@ function App() {
         </nav>
       </header>}
       {page === 'home' && (
-        <>
-          <section className="hero">
-            <div className="hero-copy">
-              <span className="eyebrow">تجربة مجانية • ألعاب تجمعنا</span>
-              <h1>
-                جمعتكم أحلى
-                <br />
-                <em>مع لمنا!</em>
-              </h1>
-              <p>
-                اختاروا 6 فئات، قسموا نفسكم فريقين، وخوضوا تحدّي 36 سؤال مليان
-                حماس ووناسة.
-              </p>
-              <div className="actions">
-                {selected.length === 6 && (used.length > 0 || active !== null) && !showResult && <button className="resume-button" onClick={() => { setPaused(true); go('game'); }}>متابعة المباراة المحفوظة ({36 - used.length} سؤال متبقٍ)</button>}
-                <button className="primary" onClick={() => go('categories')}>
-                  ابدأ اللعب مجانًا <span>←</span>
+        <div className="lm-landing" dir="rtl">
+          <section className="lm-hero" aria-label="إنشاء لعبة جديدة">
+            <div className="lm-hero-glow lm-hero-glow-a" aria-hidden="true"/>
+            <div className="lm-hero-glow lm-hero-glow-b" aria-hidden="true"/>
+            <div className="lm-hero-grain" aria-hidden="true"/>
+            <div className="lm-hero-content">
+              <div className="lm-kicker"><span className="lm-kicker-star"><Sparkles size={14}/></span> لمنا <span className="lm-kicker-separator">/</span> ألعاب تجمعنا</div>
+              <h1>اللّمة تصير<br/><span>أحلى بلعبة.</span></h1>
+              <p className="lm-hero-desc">جهّزوا فريقين، اختاروا ست فئات على جوّكم، وخلو المنافسة تبدأ بينكم.</p>
+              <div className="lm-hero-actions">
+                <button type="button" className="lm-create-cta" onClick={()=>go('categories')}>
+                  <span className="lm-create-icon"><Plus size={27} strokeWidth={2.6}/></span>
+                  <span>إنشاء لعبة</span>
+                  <span className="lm-create-arrow"><ArrowLeft size={22}/></span>
                 </button>
-                <button className="outline" onClick={() => go('pricing')}>
-                  شوف الباقات
-                </button>
+                {selected.length===6&&(used.length>0||active!==null)&&!showResult&&
+                  <button type="button" className="lm-resume-link" onClick={()=>{setPaused(true);go('game');}}>
+                    <Play size={17} fill="currentColor"/> متابعة مباراتكم <span>({36-used.length} سؤال)</span>
+                  </button>
+                }
               </div>
-              <div className="facts">
-                <span>٢٠ فئة متنوعة</span>
-                <span>٣٦ سؤال</span>
-                <span>فريقان</span>
+              <div className="lm-hero-facts" aria-label="مميزات اللعبة">
+                <span><span className="lm-fact-mark"/> 20 فئة متنوعة</span>
+                <span><span className="lm-fact-mark"/> 36 سؤالًا</span>
+                <span><span className="lm-fact-mark"/> فريقان</span>
               </div>
             </div>
-            <div className="hero-visual">
-              <div className="shape-yellow" />
-              <div className="shape-coral" />
-              <div className="visual-card">
-                <div className="spark">✦</div>
-                <div className="visual-title">وقت الوناسة!</div>
-                <div className="visual-text">سؤال • تحدّي • ضحك</div>
-                <div className="score-mini">
-                  <span>
-                    الفريق الأول <b>٦٠٠</b>
-                  </span>
-                  <span>
-                    الفريق الثاني <b>٤٠٠</b>
-                  </span>
-                </div>
-              </div>
-              <span className="float a">🏆</span>
-              <span className="float b">🎭</span>
-              <span className="float c">⚡</span>
+            <div className="lm-hero-display" aria-label="نماذج من أغلفة الألعاب داخل لمنا">
+              <div className="lm-display-glow" aria-hidden="true"/>
+              <div className="lm-display-outline" aria-hidden="true"/>
+              <div className="lm-display-cover lm-display-cover-back"><Cover i={4} title={categories[4]}/></div>
+              <div className="lm-display-cover lm-display-cover-main"><Cover i={1} title={categories[1]}/></div>
+              <div className="lm-display-cover lm-display-cover-front"><Cover i={2} title={categories[2]}/></div>
+              <div className="lm-display-floating lm-display-score"><Trophy size={19}/><strong>200</strong><small>نقطة</small></div>
+              <div className="lm-display-floating lm-display-tag"><Sparkles size={16}/> جمعتكم غير!</div>
             </div>
+            <div className="lm-hero-bottom-line" aria-hidden="true"/>
           </section>
-          <section className="section">
-            <div className="section-top">
+
+          <section className="lm-highlights" aria-label="خطوات بدء التحدي">
+            <div className="lm-highlight"><span className="lm-highlight-number">01</span><div><strong>اختاروا الجو</strong><small>6 فئات من مكتبة لمنا</small></div><Grid2X2 size={22}/></div>
+            <div className="lm-highlight"><span className="lm-highlight-number">02</span><div><strong>سمّوا الفريقين</strong><small>أسماءكم ومساعداتكم</small></div><UsersRound size={23}/></div>
+            <div className="lm-highlight"><span className="lm-highlight-number">03</span><div><strong>ولّعوا المنافسة</strong><small>أسئلة ونقاط وضحك</small></div><Trophy size={22}/></div>
+          </section>
+
+          <section className="lm-library" aria-label="من مكتبة ألعاب لمنا">
+            <div className="lm-library-heading">
               <div>
-                <span className="kicker">اختاروا جوكم</span>
-                <h2>فئات تناسب كل جمعة</h2>
+                <span className="lm-library-eyebrow"><span/> من مكتبة لمنا</span>
+                <h2>كل فئة، <em>جوّ ثاني.</em></h2>
+                <p>هذه عيّنة من الألعاب اللي تقدر تختار منها جمعتكم.</p>
               </div>
-              <button className="text-btn" onClick={() => go('categories')}>
-                جميع الفئات ←
-              </button>
+              <button type="button" onClick={()=>go('categories')}>استعرض الفئات <ChevronLeft size={19}/></button>
             </div>
-            <div className="categories">
-              {categories.slice(0, 8).map((c, i) => (
-                <button
-                  className="category"
-                  key={c}
-                  onClick={() => {
-                    setSelected([i]);
-                    go('categories');
-                  }}
-                >
-                  <Cover i={i} title={c}/>
-                  <strong>{c}</strong>
-                  <small>اكتشف الفئة ←</small>
+            <div className="lm-library-grid">
+              {[1,2,3,4,0,5].map((i)=>(
+                <button type="button" className="lm-library-card" key={i}
+                  onClick={()=>{setSelected(v=>v.includes(i)?v:(v.length<6?[...v,i]:[i]));go('categories');}}
+                  aria-label={'اختر فئة '+categories[i]}>
+                  <Cover i={i} title={categories[i]}/>
+                  <span className="lm-library-check"><Check size={15}/></span>
                 </button>
               ))}
             </div>
           </section>
-          <section className="steps">
-            <h2>كيف تلعبون؟</h2>
-            <div className="step-grid">
-              {[
-                ['١', 'اختاروا ٦ فئات', 'من مكتبة ألعاب متنوعة'],
-                ['٢', 'سمّوا الفريقين', 'جهّزوا المنافسة بينكم'],
-                ['٣', 'ابدأوا التحدّي', '٣٦ سؤال بنقاط ٢٠٠ و٤٠٠ و٦٠٠'],
-              ].map(s => (
-                <div className="step" key={s[0]}>
-                  <span>{s[0]}</span>
-                  <h3>{s[1]}</h3>
-                  <p>{s[2]}</p>
-                </div>
-              ))}
-            </div>
+          <section className="lm-bottom-invite">
+            <div><span>جاهزين للتحدّي؟</span><h2>الليلة، <em>اللّمة لمنا.</em></h2></div>
+            <button type="button" onClick={()=>go('categories')}><Plus size={22}/> إنشاء لعبة <ArrowLeft size={19}/></button>
           </section>
-        </>
+        </div>
       )}
       {page === 'categories' && (
         <section className="section narrow">
