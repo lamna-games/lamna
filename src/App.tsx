@@ -10,6 +10,9 @@ import OfficialLogo from './OfficialLogo';
 import SocialLinks from './SocialLinks';
 import AuthScreen from './AuthScreen';
 import StoreInformation from './StoreInformation';
+import StoreCommerce from './StoreCommerce';
+import QuestionReport from './QuestionReport';
+import {storeRequest, token, type ServerMatch, type Wallet} from './storeApi';
 import { Plus, ArrowLeft, Sparkles, UsersRound, Grid2X2, Trophy, ChevronLeft, Check, Play } from 'lucide-react';
 import './landing.css';
 import './brandTheme.css';
@@ -100,6 +103,10 @@ function App() {
     return()=>{mounted=false};
   },[]);
 
+  const [wallet,setWallet]=useState<Wallet|null>(null);
+  const [activeSession,setActiveSession]=useState<ServerMatch|null>(null);
+  const [matchError,setMatchError]=useState('');
+  const [starting,setStarting]=useState(false);
   const [selected, setSelected] = useState<number[]>([]);
   const [teams, setTeams] = useState(['الفريق الأول', 'الفريق الثاني']);
   const [matchName,setMatchName] = useState('');
@@ -145,7 +152,8 @@ function App() {
       }));
     } catch { /* Private mode may block storage. */ }
   }, [hydrated, selected, teams, turn, scores, used, history, help, varUsed, active, phase, seconds, stealFrom, showResult, matchName, chosenAids, usedAids, aidEffect, aidOwner]);
-  const currentQuestion = active === null ? null : getQuestion(selected[Math.floor(active / 6)], active % 6);
+  const currentQuestion = active === null ? null
+   : (activeSession?.questions[Math.floor(active/6)]?.[active%6] ?? getQuestion(selected[Math.floor(active / 6)], active % 6));
   const isWordlessQuestion = active!==null && selected[Math.floor(active/6)]===1;
   const toggleAid = (team:number,aid:AidId) => {
     setChosenAids(prev=>prev.map((list,i)=>i!==team?list:list.includes(aid)?list.filter(x=>x!==aid):list.length<3?[...list,aid]:list));
@@ -159,6 +167,50 @@ function App() {
     if(aid==='phone'){setSeconds(v=>v+30);setPaused(false);}
     if(aid==='trap'){setStealFrom(team);setPhase('steal');setSeconds(10);setPaused(false);}
   };
+  React.useEffect(()=>{
+    if(!accountsEnabled||page!=='home'||!token())return;
+    let alive=true;
+    storeRequest<Wallet>('me').then(data=>{if(alive)setWallet(data)}).catch(()=>{});
+    return()=>{alive=false};
+  },[accountsEnabled,page]);
+  const applyMatch=(match:ServerMatch)=>{
+    setActiveSession(match);setSelected(match.selected);setMatchName(match.match_name);
+    setScores([0,0]);setShowResult(match.status==='completed');setHistory([]);setShowHint(false);
+    setUsed([]);setTurn(0);setHelp([2,2]);setVarUsed([false,false]);
+    setActive(null);setPhase('question');setSeconds(60);setPaused(false);
+    setUsedAids([[],[]]);setAidEffect(null);setAidOwner(null);setShowHelp(false);
+    localStorage.setItem('lamna-current-match-id',match.id);
+    go('game');
+  };
+  React.useEffect(()=>{
+    if(!accountsEnabled||!hydrated||!token())return;
+    const id=localStorage.getItem('lamna-current-match-id');
+    if(!id)return;
+    let alive=true;
+    storeRequest<{match:ServerMatch}>('matches/'+id)
+      .then(data=>{if(alive&&data.match.status==='active')setActiveSession(data.match)})
+      .catch(()=>{if(alive)localStorage.removeItem('lamna-current-match-id')});
+    return()=>{alive=false};
+  },[accountsEnabled,hydrated]);
+  const beginMatch=async()=>{
+    if(starting)return;setMatchError('');
+    if(!accountsEnabled){setMatchError('يلزم تشغيل الحسابات الآمنة قبل بدء المباريات الجديدة.');return;}
+    if(!token()){setAuthMode('register');go('account');return;}
+    try{
+      setStarting(true);
+      const data=await storeRequest<{match:ServerMatch;credits:number;freeRemaining:boolean}>('matches','POST',{selected,matchName});
+      applyMatch(data.match);
+    }catch(error){setMatchError(error instanceof Error?error.message:'تعذر بدء المباراة.');}
+    finally{setStarting(false);}
+  };
+  React.useEffect(()=>{
+    if(!accountsEnabled||!activeSession||activeSession.status!=='active'||!showResult||active!==null)return;
+    let alive=true;
+    storeRequest<{ok:boolean;credits:number;freeRemaining:boolean}>('finish','POST',{matchId:activeSession.id})
+     .then(()=>{if(alive){setActiveSession(v=>v?{...v,status:'completed'}:v);localStorage.removeItem('lamna-current-match-id')}})
+     .catch(()=>{});
+    return()=>{alive=false};
+  },[accountsEnabled,activeSession?.id,activeSession?.status,showResult,active]);
   const go = (p: Page) => {
     setPage(p);
     const infoPages=['privacy','terms','faq','contact'] as const;
@@ -234,14 +286,9 @@ function App() {
             ))}
             <p className="muted aid-setup-note">اختر ثلاث وسائل مساعدة لكل فريق. تُستخدم كل وسيلة مرة واحدة أثناء المباراة.</p>
             <button className="primary aid-start-button"
-              disabled={!matchName.trim()||teams.some(t=>!t.trim())||chosenAids.some(list=>list.length!==3)}
-              onClick={()=>{
-                setScores([0,0]);setShowResult(false);setHistory([]);setShowHint(false);
-                setUsed([]);setTurn(0);setHelp([2,2]);setVarUsed([false,false]);
-                setActive(null);setPhase('question');setSeconds(60);setPaused(false);
-                setUsedAids([[],[]]);setAidEffect(null);setAidOwner(null);setShowHelp(false);
-                go('game');
-              }}>ابدأ اللعب ←</button>
+              disabled={starting||!matchName.trim()||teams.some(t=>!t.trim())||chosenAids.some(list=>list.length!==3)}
+              onClick={beginMatch}>{starting?'جارٍ تجهيز المباراة…':'ابدأ اللعب ←'}</button>
+            {matchError&&<p className="lm-new-game-note" role="alert">{matchError}</p>}
           </div>
   );
   return (
@@ -257,6 +304,7 @@ function App() {
         {page!=='home'&&<nav>
           <button onClick={() => go('home')}>الرئيسية</button>
           <button onClick={scrollToGames}>الفئات</button>
+          <button onClick={() => go('pricing')}>الباقات</button>
           <button onClick={() => go('faq')}>الأسئلة الشائعة</button>
           {accountsEnabled && <button onClick={() => {setAuthMode('login');go('account');}}>حسابي</button>}
         </nav>}
@@ -278,6 +326,7 @@ function App() {
                   <Play size={17} fill="currentColor"/> متابعة المباراة المحفوظة
                 </button>}
               <div className="lm-hero-meta"><span>ألعاب متنوعة</span><span>6 ألعاب تختارها</span><span>فريقان</span></div>
+              <button type="button" className="lm-hero-bundles" onClick={()=>go('pricing')}>شوف باقات لمنا وأسعارها</button>
             </div>
           </section>
 
@@ -495,6 +544,8 @@ function App() {
 
               <div className="play-content">
                 <div className={'play-stage '+(pickWinner?'play-stage-pick':reveal?'play-stage-answer':'play-stage-question')}>
+                  {activeSession?.kind==='paid'&&!reveal&&!pickWinner&&
+                    <QuestionReport matchId={activeSession.id} questionNumber={active}/>}
                   {!reveal && !pickWinner && (
                     <>
                       <div className="play-timer" aria-label="المؤقت">
@@ -590,13 +641,13 @@ function App() {
           )}
         </section>
       )}
-      {page === 'pricing' && <StoreInformation page="faq" onBack={()=>go('home')}/>}
+      {page === 'pricing' && <StoreCommerce mode="plans" accountsEnabled={accountsEnabled} onBack={()=>go('home')} onLogin={()=>{setAuthMode('login');go('account')}}/>}
       {(page==='privacy'||page==='terms'||page==='faq'||page==='contact')&&
         <StoreInformation page={page} onBack={()=>go('home')}/>}
 
-      {page === 'account' && (accountsEnabled
+      {page === 'account' && (accountsEnabled&&!token()
         ? <AuthScreen initialMode={authMode} onReturn={()=>go('home')}/>
-        : <StoreInformation page="faq" onBack={()=>go('home')}/>)}
+        : <StoreCommerce mode="wallet" accountsEnabled={accountsEnabled} onBack={()=>go('home')} onLogin={()=>{setAuthMode('login');go('account')}} onResume={applyMatch}/>)}
       {page!=='game' && <footer className="lamna-site-footer">
         <div>{brand}</div>
         <p>ألعاب تجمعنا</p>
