@@ -358,42 +358,95 @@ function App() {
           </div>
           {showResult && active===null && <div className="modal-back"><div className="question-modal result-modal"><span className="kicker">نهاية المباراة</span><h2>{scores[0]===scores[1]?'تعادل الفريقين!':'الفائز: '+teams[scores[0]>scores[1]?0:1]+' 🏆'}</h2><p>{teams[0]}: {scores[0]} نقطة — {teams[1]}: {scores[1]} نقطة</p><p>أُنجزت 36 جولة</p><div className="modal-actions"><button className="primary" onClick={()=>{setShowResult(false);go('setup')}}>مباراة جديدة</button><button className="outline" onClick={()=>{setShowResult(false);go('home')}}>الرئيسية</button></div></div></div>}
           {active !== null && (
-            <div className="modal-back">
-              <div className="question-modal">
-                <span className="kicker">
-                  سؤال بقيمة {[200, 400, 600][Math.floor((active % 6) / 2)]}{' '}
-                  نقطة
-                </span>
-                <div className="quiz-timer">{phase==='var'?'مراجعة VAR':phase==='steal'?'فرصة السرقة للفريق الثاني':'وقت السؤال'} — {seconds} ثانية <button className="outline" onClick={()=>setPaused(v=>!v)} disabled={phase==='var'}>{paused?'استئناف':'إيقاف'}</button></div>{currentQuestion?.mode && <div className="wordless-mode"><strong>{currentQuestion.mode}</strong><p>{currentQuestion.instructions}</p><small>بطاقة الأداء: اعرض المطلوب للمؤدي وحده، ولا تُظهر الشاشة لبقية الفريق.</small></div>}<h2>{currentQuestion?.prompt}</h2>
-                <p>الفئة: {categories[selected[Math.floor(active/6)]]} — دور: {teams[phase==='steal'?1-stealFrom:turn]}</p>
-                {reveal ? (
-                  <div className="answer">الإجابة: {currentQuestion?.answer}</div>
-                ) : (
-                  <button className="outline" onClick={() => setReveal(true)}>
-                    عرض الإجابة
-                  </button>
-                )}
-                <div className="modal-actions">{phase==='var'?<div><strong>مراجعة VAR للفريق: {teams[varTeam]}</strong><button className="primary" onClick={()=>{setPhase(phaseBeforeVar);setPaused(false)}}>اعتماد المراجعة والعودة للسؤال</button></div>:null}
-                  <button className="primary" disabled={phase==='var'} onClick={() => award(phase==='steal'?1-stealFrom:turn)}>
-                    إجابة صحيحة ✓
-                  </button>
-                  <button className="outline" disabled={phase==='var'} onClick={() => phase==='question' ? startSteal() : award(null)}>{phase==='question'?'لم يجب الفريق — فرصة للخصم':'لا أحد أجاب'}</button>
-                  {phase==='question'&&<button className="outline" onClick={startSteal}>إجابة خاطئة — سرقة 10 ثوانٍ</button>}{phase==='steal'&&<span>السرقة متاحة للفريق: {teams[1-stealFrom]}</span>}{teams.map((t,i)=><button key={i} className="outline" disabled={varUsed[i]} onClick={()=>openVar(i)}>VAR {t} {varUsed[i]?'(استُخدم)':''}</button>)}<button
-                    className="outline"
-                    onClick={() => {
-                      setActive(null);
-                      setReveal(false);setShowHint(false);setPaused(true);
-                    }}
-                  >
-                    رجوع
-                  </button>
+            <div className="play-screen" dir="rtl" role="dialog" aria-modal="true" aria-label="شاشة السؤال">
+              <header className="play-header">
+                <div className="play-header-actions">
+                  <button type="button" onClick={() => {setActive(null);setReveal(false);setPaused(true);}}>▦ الرجوع للوحة</button>
+                  <button type="button" onClick={() => {setActive(null);setReveal(false);setPaused(true);go('home');}}>↪ الخروج</button>
                 </div>
-                <button className="help" onClick={() => setShowHelp(v => !v)}>
-                  وسائل المساعدة ({help[phase==='steal'?1-stealFrom:turn]})
-                </button>
-                {showHint && <div className="answer">تلميح: {currentQuestion?.hint}</div>}
-                {showHelp && <div className="help-options"><p>تلميح واحد مقابل مساعدة واحدة. لا يكشف الإجابة.</p><button className="outline" disabled={help[phase==='steal'?1-stealFrom:turn]===0||showHint} onClick={()=>{const t=phase==='steal'?1-stealFrom:turn;setHelp(v=>v.map((x,i)=>i===t?x-1:x));setShowHint(true);setShowHelp(false)}}>استخدم مساعدة — عرض تلميح</button></div>}
+                <div className="play-header-middle">
+                  <div className="play-turn">دور فريق: <strong>{teams[phase==='steal'?1-stealFrom:turn]}</strong></div>
+                  <div className="play-brand">لمنا <span>ألعاب تجمعنا</span></div>
+                </div>
+                <div className="play-category-name">{categories[selected[Math.floor(active / 6)]]}</div>
+              </header>
+
+              <main className="play-main">
+                <div className="play-stage">
+                  <div className="play-timer" aria-label="مؤقت السؤال">
+                    <button type="button" aria-label={paused?'تشغيل المؤقت':'إيقاف المؤقت'} disabled={phase==='var'} onClick={() => setPaused(v=>!v)}>{paused?'▶':'Ⅱ'}</button>
+                    <span>{phase==='var'?'VAR':`00:${String(seconds).padStart(2,'0')}`}</span>
+                    <button type="button" aria-label="إعادة المؤقت" disabled={phase==='var'} onClick={() => {setSeconds(phase==='steal'?10:60);setPaused(false);}}>↻</button>
+                  </div>
+                  <div className="play-point-tag">{[200,400,600][Math.floor((active % 6) / 2)]} نقطة</div>
+
+                  <div className="play-stage-center">
+                    {phase==='var' && <div className="play-mode">مراجعة VAR — {teams[varTeam]}</div>}
+                    {phase==='steal' && <div className="play-mode">فرصة السرقة — {teams[1-stealFrom]} — 10 ثوانٍ</div>}
+                    {reveal ? (
+                      <div className="play-answer-view" aria-live="polite">
+                        <span className="play-answer-heading">الإجابة</span>
+                        <div className="play-answer-text">{currentQuestion?.answer}</div>
+                        <span className="play-answer-question">{currentQuestion?.prompt}</span>
+                      </div>
+                    ) : (
+                      <div className="play-question-view">
+                        {currentQuestion?.mode && <div className="play-mode">{currentQuestion.mode}</div>}
+                        <h2>{currentQuestion?.prompt}</h2>
+                        {currentQuestion?.instructions && <p className="play-instructions">{currentQuestion.instructions}</p>}
+                      </div>
+                    )}
+                    {showHint && <div className="play-hint">تلميح: {currentQuestion?.hint}</div>}
+                  </div>
+
+                  <div className="play-stage-bottom">
+                    <button type="button" className="play-reveal" onClick={() => setReveal(v=>!v)}>
+                      {reveal?'السؤال':'الإجابة'}
+                    </button>
+                    <button type="button" className="play-no-points" disabled={phase==='var'} onClick={() => phase==='question' ? startSteal() : award(null)}>
+                      {phase==='question'?'فرصة للخصم':'بدون نقاط'}
+                    </button>
+                  </div>
+                </div>
+              </main>
+
+              <div className="play-decision-bar">
+                {phase==='var' ? (
+                  <button type="button" className="play-correct" onClick={() => {setPhase(phaseBeforeVar);setPaused(false)}}>✓ اعتماد المراجعة والعودة</button>
+                ) : (
+                  <>
+                    <button type="button" className="play-correct" onClick={() => award(phase==='steal'?1-stealFrom:turn)}>
+                      ✓ إجابة صحيحة +{[200,400,600][Math.floor((active % 6) / 2)]}
+                    </button>
+                    <button type="button" className="play-wrong" onClick={() => phase==='question'?startSteal():award(null)}>
+                      {phase==='question'?'إجابة خاطئة — سرقة':'لم يجب الخصم'}
+                    </button>
+                  </>
+                )}
               </div>
+
+              <footer className="play-bottom-bar">
+                <div className="play-teams">
+                  {teams.map((t,i)=>(
+                    <div className={'play-team'+(i===(phase==='steal'?1-stealFrom:turn)?' active':'')} key={i}>
+                      <div className="play-team-name">{t||'فريق '+(i+1)}</div>
+                      <div className="play-team-score">{scores[i]}</div>
+                      <div className="play-team-assists">
+                        <span>وسائل المساعدة</span>
+                        <div className="play-assist-controls">
+                          <button type="button" aria-label={'مساعدة '+t} disabled={i!==(phase==='steal'?1-stealFrom:turn)||help[i]===0||showHint} onClick={()=>setShowHelp(v=>!v)}>؟ <small>{help[i]}</small></button>
+                          <button type="button" disabled={varUsed[i]||phase==='var'} onClick={()=>openVar(i)}>VAR</button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {showHelp && <div className="play-help-popup">
+                  <span>تلميح للفريق الحالي، يُخصم من وسائل المساعدة</span>
+                  <button type="button" disabled={help[phase==='steal'?1-stealFrom:turn]===0||showHint} onClick={()=>{const i=phase==='steal'?1-stealFrom:turn;setHelp(v=>v.map((x,j)=>j===i?x-1:x));setShowHint(true);setShowHelp(false);}}>استخدم التلميح</button>
+                  <button type="button" onClick={()=>setShowHelp(false)}>إغلاق</button>
+                </div>}
+              </footer>
             </div>
           )}
         </section>
