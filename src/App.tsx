@@ -229,57 +229,31 @@ function App() {
         <div onClick={() => go('home')} className="brand-link">
           {brand}
         </div>
-        <nav>
+        {page!=='home'&&<nav>
           <button onClick={() => go('home')}>الرئيسية</button>
           <button onClick={scrollToGames}>الفئات</button>
           <button onClick={() => go('pricing')}>الباقات</button>
           <button onClick={() => go('account')}>حسابي</button>
-        </nav>
+        </nav>}
       </header>}
       {page === 'home' && (
         <div className="lm-landing" dir="rtl">
-          <section className="lm-hero" aria-label="إنشاء لعبة جديدة">
-            <div className="lm-hero-glow lm-hero-glow-a" aria-hidden="true"/>
-            <div className="lm-hero-glow lm-hero-glow-b" aria-hidden="true"/>
-            <div className="lm-hero-grain" aria-hidden="true"/>
+          <section className="lm-hero" aria-label="ابدأ إنشاء لعبة لمنا">
             <div className="lm-hero-content">
-              <div className="lm-kicker"><span className="lm-kicker-star"><Sparkles size={14}/></span> لمنا <span className="lm-kicker-separator">/</span> ألعاب تجمعنا</div>
-              <h1>اللّمة تصير<br/><span>أحلى بلعبة.</span></h1>
-              <p className="lm-hero-desc">جهّزوا فريقين، اختاروا ست فئات على جوّكم، وخلو المنافسة تبدأ بينكم.</p>
-              <div className="lm-hero-actions">
-                <button type="button" className="lm-create-cta" onClick={scrollToGames}>
-                  <span className="lm-create-icon"><Plus size={27} strokeWidth={2.6}/></span>
-                  <span>إنشاء لعبة</span>
-                  <span className="lm-create-arrow"><ArrowLeft size={22}/></span>
-                </button>
-                {selected.length===6&&(used.length>0||active!==null)&&!showResult&&
-                  <button type="button" className="lm-resume-link" onClick={()=>{setPaused(true);go('game');}}>
-                    <Play size={17} fill="currentColor"/> متابعة مباراتكم <span>({36-used.length} سؤال)</span>
-                  </button>
-                }
-              </div>
-              <div className="lm-hero-facts" aria-label="مميزات اللعبة">
-                <span><span className="lm-fact-mark"/> 20 فئة متنوعة</span>
-                <span><span className="lm-fact-mark"/> 36 سؤالًا</span>
-                <span><span className="lm-fact-mark"/> فريقان</span>
-              </div>
+              <span className="lm-kicker">ألعاب تجمعنا</span>
+              <h1>جاهزين <em>للّمة؟</em></h1>
+              <p>جمعتكم، أسئلتكم، تحدّيكم. اختاروا الألعاب وابدأوا الوناسة.</p>
+              <button type="button" className="lm-create-cta" onClick={scrollToGames}>
+                <span className="lm-create-icon"><Plus size={26}/></span>
+                <span>إنشاء لعبة</span>
+                <ArrowLeft size={24}/>
+              </button>
+              {selected.length===6&&(used.length>0||active!==null)&&!showResult&&
+                <button type="button" className="lm-resume-link" onClick={()=>{setPaused(true);go('game');}}>
+                  <Play size={17} fill="currentColor"/> متابعة المباراة المحفوظة
+                </button>}
+              <div className="lm-hero-meta"><span>20 فئة</span><span>6 ألعاب تختارها</span><span>فريقان</span></div>
             </div>
-            <div className="lm-hero-display" aria-label="نماذج من أغلفة الألعاب داخل لمنا">
-              <div className="lm-display-glow" aria-hidden="true"/>
-              <div className="lm-display-outline" aria-hidden="true"/>
-              <div className="lm-display-cover lm-display-cover-back"><Cover i={4} title={categories[4]}/></div>
-              <div className="lm-display-cover lm-display-cover-main"><Cover i={1} title={categories[1]}/></div>
-              <div className="lm-display-cover lm-display-cover-front"><Cover i={2} title={categories[2]}/></div>
-              <div className="lm-display-floating lm-display-score"><Trophy size={19}/><strong>200</strong><small>نقطة</small></div>
-              <div className="lm-display-floating lm-display-tag"><Sparkles size={16}/> جمعتكم غير!</div>
-            </div>
-            <div className="lm-hero-bottom-line" aria-hidden="true"/>
-          </section>
-
-          <section className="lm-highlights" aria-label="خطوات بدء التحدي">
-            <div className="lm-highlight"><span className="lm-highlight-number">01</span><div><strong>اختاروا الجو</strong><small>6 فئات من مكتبة لمنا</small></div><Grid2X2 size={22}/></div>
-            <div className="lm-highlight"><span className="lm-highlight-number">02</span><div><strong>سمّوا الفريقين</strong><small>أسماءكم ومساعداتكم</small></div><UsersRound size={23}/></div>
-            <div className="lm-highlight"><span className="lm-highlight-number">03</span><div><strong>ولّعوا المنافسة</strong><small>أسئلة ونقاط وضحك</small></div><Trophy size={22}/></div>
           </section>
 
           <section id="lm-all-games" className="lm-library" aria-label="جميع ألعاب لمنا">
@@ -341,16 +315,6 @@ function App() {
             </div>
             {setupFields}
           </section>}
-          </section>
-          <section className="lm-bottom-invite">
-            <div><span>جاهزين للتحدّي؟</span><h2>الليلة، <em>اللّمة لمنا.</em></h2></div>
-            <button type="button" onClick={scrollToGames}><Plus size={22}/> إنشاء لعبة <ArrowLeft size={19}/></button>
-          </section>
-          {selected.length>0&&<div className="lm-selection-dock" role="status" aria-live="polite">
-            <div className="lm-selection-dock-progress"><strong>{selected.length}/6</strong><span>فئات مختارة</span></div>
-            <button type="button" disabled={selected.length!==6}
-              onClick={()=>document.getElementById('lm-setup-teams')?.scrollIntoView({behavior:'smooth',block:'start'})}>معلومات الفرق <ArrowLeft size={19}/></button>
-          </div>}
         </div>
       )}
       {page === 'categories' && (
