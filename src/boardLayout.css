@@ -279,3 +279,143 @@
  .play-team{gap:2px;}
  .play-team-controls{margin-top:2px;}
 }
+
+
+/* LAMNA ORIGINAL VISUAL IDENTITY | midnight navy + sea glass + sand.
+   Layout and game controls remain fixed across all three views. */
+.play-screen{
+ --lamna-night:#0d1c2c;
+ --lamna-surface:#142c42;
+ --lamna-surface-light:#1d3b53;
+ --lamna-mint:#58d3c2;
+ --lamna-mint-dark:#147f7b;
+ --lamna-amber:#edaf73;
+ --lamna-blue:#457ba7;
+ --lamna-violet:#7766b0;
+ --lamna-text:#f5f7fc;
+ color:var(--lamna-text);
+ background:
+  radial-gradient(ellipse 95% 49% at 100% 4%,#24496177,transparent 70%),
+  linear-gradient(175deg,#112b40 0%,#0d1c2c 65%,#122439 100%);
+}
+.play-header{
+ background:linear-gradient(115deg,#0f2639 0%,#183a50 56%,#102e41 100%);
+ border-bottom:1px solid #408ca17d;
+}
+.play-nav button{color:#d9edee;font-weight:750;letter-spacing:0;}
+.play-nav button:hover{color:var(--lamna-mint);}
+.play-brand{
+ color:var(--lamna-mint);text-shadow:0 3px 14px #17394e;
+ font-weight:900;
+}
+.play-turn{
+ color:#062d34;background:var(--lamna-mint);
+ box-shadow:0 5px 16px #010b183d;
+ font-weight:850;
+}
+.play-category{color:#eef6f8;font-weight:750;}
+.play-content{background:transparent;}
+.play-stage{
+ border:3px solid var(--lamna-mint);
+ border-radius:20px;
+ background:linear-gradient(155deg,#18354b 0%,#102337 74%);
+ box-shadow:inset 0 1px 0 #ebffff24,0 12px 30px #02121c42;
+}
+.play-stage::before{
+ content:'';position:absolute;inset:10px;
+ border-radius:12px;border:1px solid #ffffff10;
+ pointer-events:none;
+}
+.play-timer{
+ background:#e3f5f2;color:#173349;
+ border:1px solid #8dcfc4;
+ box-shadow:0 3px 15px #020d1a38;
+ font-weight:850;
+}
+.play-timer button{color:#173349;}
+.play-point-tag{
+ background:#efb578;color:#203347;
+ box-shadow:0 4px 16px #06112054;
+ font-weight:900;
+}
+.play-question-view h2,.play-answer-view h2,.play-pick-view h2{
+ color:#f7fbfd!important;
+ text-shadow:0 2px 17px #010d1a30;
+}
+.play-answer-view h2{color:#b2f4de!important;font-weight:800;}
+.play-pick-view h2{color:#f3f7fe!important;}
+.play-status{color:#f9d1a0;}
+.play-context{color:#91d9d5;font-weight:700;}
+.play-instructions{color:#cfdeed;}
+.play-hint{background:#d8f4f0;color:#174a4d;border:1px solid #7bcbb9;}
+.play-choose-teams button{
+ border-radius:17px;
+ background:#237d8e;color:#fff;
+ box-shadow:0 4px 12px #0003;
+ border:1px solid #5cb5bc;
+ font-weight:850;
+}
+.play-choose-pair button:nth-child(2){
+ background:#595e9e;border-color:#969ad0;
+}
+.play-choose-teams .play-choose-none{
+ background:#314357;border:1px solid #72879e;
+}
+.play-choose-teams button:hover:not(:disabled){
+ filter:brightness(1.16);transform:translateY(-1px);
+}
+.play-action{
+ border-radius:15px;
+ box-shadow:0 3px 15px #020f1e3d;
+ font-weight:850;
+}
+.play-action-green{background:#168b80;color:#fff;}
+.play-action-blue{background:#427eab;color:#fff;}
+.play-action-red{background:#645b9a;color:#fff;}
+.play-action-category{
+ background:#edaf73;color:#173346;
+ font-weight:900;border:1px solid #f7cd99;
+}
+.play-score-footer{background:transparent;color:#edf6fa;}
+.play-team-name{
+ border-radius:14px 14px 5px 5px;
+ background:#1a8c91;color:#fff;
+ box-shadow:0 3px 12px #0003;
+}
+.play-team:nth-child(2) .play-team-name{background:#615b9e;}
+.play-team-score{color:#fff;font-weight:950;}
+.play-team-help-label{color:#d4e2e9;}
+.play-team-controls button{
+ border:2px solid #4b8392;border-radius:13px;
+ color:#a3f0e3;background:#15344b;
+}
+.play-team:nth-child(2) .play-team-controls button{
+ border-color:#7b80b6;color:#c1c6ff;
+}
+.play-team-controls button small{
+ background:#edaf73;color:#24374b;
+ font-weight:900;
+}
+.play-help-popup{
+ border:1px solid #58d3c2;
+ background:#133044;
+ box-shadow:0 12px 30px #010a14ad;
+}
+.play-help-popup button{background:#178b84;color:white;border-radius:9px;}
+.play-var-return{background:#457ba7;border-radius:14px;color:#fff;}
+/* Align surrounding board with Lamna colors while preserving illustrated covers. */
+.game-board{background:#112b40!important;}
+.board-points button,.board-column .board-points button{
+ background:#28435b!important;
+ color:#f2f8fa!important;
+}
+.board-points button:disabled,.board-column .board-points button:disabled{
+ background:#1a3145!important;color:#68889d!important;
+}
+.board-points button:hover:not(:disabled){
+ background:#258d8f!important;color:#fff!important;
+}
+@media(max-width:360px){
+ .play-stage{border-width:3px;}
+ .play-stage::before{inset:7px;}
+}
