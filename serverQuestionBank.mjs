@@ -1,3 +1,6 @@
+import {extra20to29} from './extraQuestions20to29.mjs';
+import {extra30to39} from './extraQuestions30to39.mjs';
+import {extra40to49} from './extraQuestions40to49.mjs';
 export const freeRows = [
   [
     'ما عاصمة المملكة العربية السعودية؟|الرياض|مدينة في وسط المملكة',
@@ -443,4 +446,11 @@ export const paidRows = [
     "ما لون الموز الناضج عادة؟|أصفر|فاكهة"
   ]
 ];
-export const catalogByCategory = (category,kind='paid')=> ((kind==='free'?freeRows:paidRows)[category]||[]).map((line,index)=>({id:kind+'-'+category+'-'+index,category,prompt:line.split('|')[0],answer:line.split('|')[1],hint:line.split('|')[2]||''}));
+const expansionBank = {...extra20to29,...extra30to39,...extra40to49};
+export const catalogByCategory = (category,kind='paid')=>{
+ const lines=category<20 ? ((kind==='free'?freeRows:paidRows)[category]||[]) : (expansionBank[category]?.[kind==='free'?'free':'paid']||[]);
+ return lines.map((line,index)=>{
+  const [prompt,answer,hint='']=line.split('|');
+  return {id:kind+'-'+category+'-'+index,category,prompt,answer,hint};
+ });
+};
