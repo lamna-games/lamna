@@ -134,6 +134,14 @@ function App() {
     setSelected(v =>
       v.includes(i) ? v.filter(x => x !== i) : v.length < 6 ? [...v, i] : v
     );
+  const scrollToGames = () => {
+    if (page === 'home') {
+      document.getElementById('lm-all-games')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      go('home');
+      window.setTimeout(() => document.getElementById('lm-all-games')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 90);
+    }
+  };
   const award = (team: number | null) => {
     if(active===null)return;
     const pts=[200,400,600][Math.floor((active%6)/2)];
@@ -175,7 +183,7 @@ function App() {
         </div>
         <nav>
           <button onClick={() => go('home')}>الرئيسية</button>
-          <button onClick={() => go('categories')}>الفئات</button>
+          <button onClick={scrollToGames}>الفئات</button>
           <button onClick={() => go('pricing')}>الباقات</button>
           <button onClick={() => go('account')}>حسابي</button>
         </nav>
@@ -191,7 +199,7 @@ function App() {
               <h1>اللّمة تصير<br/><span>أحلى بلعبة.</span></h1>
               <p className="lm-hero-desc">جهّزوا فريقين، اختاروا ست فئات على جوّكم، وخلو المنافسة تبدأ بينكم.</p>
               <div className="lm-hero-actions">
-                <button type="button" className="lm-create-cta" onClick={()=>go('categories')}>
+                <button type="button" className="lm-create-cta" onClick={scrollToGames}>
                   <span className="lm-create-icon"><Plus size={27} strokeWidth={2.6}/></span>
                   <span>إنشاء لعبة</span>
                   <span className="lm-create-arrow"><ArrowLeft size={22}/></span>
@@ -226,30 +234,46 @@ function App() {
             <div className="lm-highlight"><span className="lm-highlight-number">03</span><div><strong>ولّعوا المنافسة</strong><small>أسئلة ونقاط وضحك</small></div><Trophy size={22}/></div>
           </section>
 
-          <section className="lm-library" aria-label="من مكتبة ألعاب لمنا">
+          <section id="lm-all-games" className="lm-library" aria-label="جميع ألعاب لمنا">
             <div className="lm-library-heading">
               <div>
-                <span className="lm-library-eyebrow"><span/> من مكتبة لمنا</span>
-                <h2>كل فئة، <em>جوّ ثاني.</em></h2>
-                <p>هذه عيّنة من الألعاب اللي تقدر تختار منها جمعتكم.</p>
+                <span className="lm-library-eyebrow"><span/> هنا تبدأ جمعتكم</span>
+                <h2>اختاروا <em>ألعابكم.</em></h2>
+                <p>قدامك كل الفئات العشرين. اختر 6 فئات عشان نجهّز المباراة.</p>
               </div>
-              <button type="button" onClick={()=>go('categories')}>استعرض الفئات <ChevronLeft size={19}/></button>
+              <div className="lm-library-selected" aria-live="polite"><span>{selected.length}</span> من 6 فئات</div>
+            </div>
+            <div className="lm-library-progress" role="progressbar" aria-label="الفئات المختارة" aria-valuemin={0} aria-valuemax={6} aria-valuenow={selected.length}>
+              <span style={{ width: (selected.length / 6) * 100 + '%' }}/>
             </div>
             <div className="lm-library-grid">
-              {[1,2,3,4,0,5].map((i)=>(
-                <button type="button" className="lm-library-card" key={i}
-                  onClick={()=>{setSelected(v=>v.includes(i)?v:(v.length<6?[...v,i]:[i]));go('categories');}}
-                  aria-label={'اختر فئة '+categories[i]}>
-                  <Cover i={i} title={categories[i]}/>
-                  <span className="lm-library-check"><Check size={15}/></span>
+              {categories.map((name,i)=>(
+                <button type="button"
+                  className={'lm-library-card'+(selected.includes(i)?' lm-is-selected':'')}
+                  key={i}
+                  onClick={()=>choose(i)}
+                  aria-label={(selected.includes(i)?'إلغاء اختيار ':'اختيار ')+name}
+                  aria-pressed={selected.includes(i)}>
+                  <Cover i={i} title={name}/>
+                  <span className="lm-library-check"><Check size={17} strokeWidth={3}/></span>
                 </button>
               ))}
+            </div>
+            <div className="lm-library-bottom">
+              <span>{selected.length===6?'اكتمل الاختيار، جاهزين للتحدّي!':'اختر '+(6-selected.length)+' فئات '+(selected.length?'إضافية':'لبداية اللعب')}</span>
+              <button type="button" className="lm-library-next" disabled={selected.length!==6} onClick={()=>go('setup')}>
+                تجهيز الفريقين <ArrowLeft size={19}/>
+              </button>
             </div>
           </section>
           <section className="lm-bottom-invite">
             <div><span>جاهزين للتحدّي؟</span><h2>الليلة، <em>اللّمة لمنا.</em></h2></div>
-            <button type="button" onClick={()=>go('categories')}><Plus size={22}/> إنشاء لعبة <ArrowLeft size={19}/></button>
+            <button type="button" onClick={scrollToGames}><Plus size={22}/> إنشاء لعبة <ArrowLeft size={19}/></button>
           </section>
+          {selected.length>0&&<div className="lm-selection-dock" role="status" aria-live="polite">
+            <div className="lm-selection-dock-progress"><strong>{selected.length}/6</strong><span>فئات مختارة</span></div>
+            <button type="button" disabled={selected.length!==6} onClick={()=>go('setup')}>تجهيز الفريقين <ArrowLeft size={19}/></button>
+          </div>}
         </div>
       )}
       {page === 'categories' && (
