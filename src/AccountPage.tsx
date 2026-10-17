@@ -9,8 +9,9 @@ const flag=(c:string)=>[...c].map(x=>String.fromCodePoint(127397+x.charCodeAt(0)
 const countryNames=new Intl.DisplayNames(['ar'],{type:'region'});
 const countries=getCountries().sort((a,b)=>a==='SA'?-1:b==='SA'?1:(countryNames.of(a)||a).localeCompare(countryNames.of(b)||b,'ar'));
 type Screen='register'|'login';
-export default function AccountPage({onBack}:{onBack:()=>void}){
- const [screen,setScreen]=React.useState<Screen>('login');
+export default function AccountPage({onBack,initialMode='login'}:{onBack:()=>void;initialMode?:Screen}){
+ const [screen,setScreen]=React.useState<Screen>(initialMode);
+ React.useEffect(()=>setScreen(initialMode),[initialMode]);
  const [country,setCountry]=React.useState<CountryCode>('SA');
  const [first,setFirst]=React.useState('');
  const [last,setLast]=React.useState('');
