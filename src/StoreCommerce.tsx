@@ -3,9 +3,9 @@ import { ArrowRight, Ticket, ShieldCheck, UserRound, LogOut, LockKeyhole } from 
 import { storeRequest, token, type Wallet, type ServerMatch } from './storeApi';
 import AdminReports from './AdminReports';
 import './storeCommerce.css';
-type Props={mode:'plans'|'wallet';accountsEnabled:boolean;onBack:()=>void;onLogin:()=>void;onResume?:(match:ServerMatch)=>void};
+type Props={mode:'plans'|'wallet';accountsEnabled:boolean;onBack:()=>void;onLogin:()=>void;onSignedOut?:()=>void;onResume?:(match:ServerMatch)=>void};
 const offers=[{games:1,price:'9.99',name:'لعبة واحدة'},{games:3,price:'19.99',name:'3 ألعاب'},{games:5,price:'29.99',name:'5 ألعاب'}];
-export default function StoreCommerce({mode,accountsEnabled,onBack,onLogin,onResume}:Props){
+export default function StoreCommerce({mode,accountsEnabled,onBack,onLogin,onSignedOut,onResume}:Props){
  const [wallet,setWallet]=React.useState<Wallet|null>(null);
  const [message,setMessage]=React.useState('');
  const [loading,setLoading]=React.useState(false);
@@ -53,7 +53,7 @@ export default function StoreCommerce({mode,accountsEnabled,onBack,onLogin,onRes
         }catch{}
         finally{
          sessionStorage.removeItem('lamna-session');sessionStorage.removeItem('lamna-account-name');
-         localStorage.removeItem('lamna-current-match-id');setWallet(null);onBack();
+         localStorage.removeItem('lamna-current-match-id');setWallet(null);(onSignedOut||onBack)();
         }
        }}><LogOut size={16}/> تسجيل الخروج</button>
       </div>:null}
