@@ -1,106 +1,109 @@
-/* Match board: approved current cover inside each game; score buttons on both sides. */
-.game-board {
- display:grid !important;
- grid-template-columns:repeat(3,minmax(0,1fr)) !important;
- gap:18px !important;
- padding:18px !important;
+/* Lamna match board: same 20 approved game covers, two games per row on phones. */
+.game-section{max-width:1280px!important;}
+.game-board{
+ background:#292b2f!important;
+ border-radius:25px!important;
+ display:grid!important;
+ grid-template-columns:repeat(3,minmax(0,1fr))!important;
+ column-gap:18px!important;
+ row-gap:16px!important;
+ padding:22px 18px!important;
+ width:100%!important;
+ height:auto!important;
+ min-height:0!important;
+ align-content:start!important;
 }
-.board-column {
- position:relative !important;
- display:grid !important;
- grid-template-columns:minmax(0,1fr) minmax(0,1.38fr) minmax(0,1fr) !important;
- grid-template-rows:42px 258px !important;
- gap:8px !important;
- min-width:0 !important;
+.board-column{
+ position:relative!important;
+ display:grid!important;
+ min-width:0!important;
+ grid-template-columns:minmax(0,1fr) minmax(0,1.28fr) minmax(0,1fr)!important;
+ grid-template-rows:238px!important;
+ gap:0!important;
+ align-items:stretch!important;
 }
-.board-cat {
- grid-column:1/-1 !important;
- grid-row:1 !important;
- min-height:0 !important;
- display:grid !important;
- place-items:center !important;
- padding:4px 8px !important;
- background:#f87950 !important;
- color:#fff !important;
- text-align:center !important;
- font-size:17px !important;
- font-weight:900 !important;
- border-radius:11px !important;
+.board-cat{display:none!important;}
+.board-cover{
+ grid-row:1!important;
+ grid-column:2!important;
+ width:100%!important;
+ height:100%!important;
+ min-width:0!important;
+ min-height:0!important;
+ max-width:none!important;
+ max-height:none!important;
+ overflow:hidden!important;
+ border-radius:0!important;
+ justify-self:stretch!important;
+ align-self:stretch!important;
+ z-index:1!important;
 }
-.board-cover {
- grid-column:2 !important;
- grid-row:2 !important;
- width:100% !important;
- height:100% !important;
- min-width:0 !important;
- max-width:none !important;
- min-height:0 !important;
- overflow:hidden !important;
- justify-self:stretch !important;
- align-self:stretch !important;
- z-index:1 !important;
- border-radius:11px !important;
+.board-cover>.lamna-cover{
+ width:100%!important;
+ height:100%!important;
+ min-height:0!important;
+ border-radius:0!important;
 }
-.board-cover > .lamna-cover {
- width:100% !important;
- height:100% !important;
- min-height:0 !important;
- border-radius:11px !important;
+.board-cover .lamna-cover-label{flex:0 0 18%!important;min-height:0!important;padding:4px 2px!important;}
+.board-cover .lamna-cover-label strong{font-size:clamp(9px,1.04vw,14px)!important;line-height:1.15!important;}
+.board-points{
+ grid-row:1!important;
+ grid-column:1/-1!important;
+ display:grid!important;
+ min-width:0!important;
+ min-height:0!important;
+ grid-template-columns:minmax(0,1fr) minmax(0,1.28fr) minmax(0,1fr)!important;
+ grid-template-rows:repeat(3,minmax(0,1fr))!important;
+ gap:6px 0!important;
+ padding:0!important;
+ margin:0!important;
+ pointer-events:none!important;
+ align-items:stretch!important;
+ z-index:2!important;
 }
-.board-cover .lamna-cover-label {
- flex:0 0 25% !important;
- min-height:0 !important;
- padding:5px 3px !important;
+.board-points button,
+.board-column .board-points button{
+ display:grid!important;place-items:center!important;
+ margin:0!important;
+ padding:0!important;
+ width:100%!important;
+ height:100%!important;
+ min-width:0!important;
+ min-height:0!important;
+ border:0!important;
+ border-radius:13px!important;
+ background:#44464b!important;
+ color:#fff!important;
+ font-size:clamp(15px,1.9vw,24px)!important;
+ font-weight:800!important;
+ line-height:1!important;
+ pointer-events:auto!important;
 }
-.board-cover .lamna-cover-label strong {
- font-size:clamp(11px,1.14vw,16px) !important;
- line-height:1.15 !important;
+.board-points button:nth-child(odd){grid-column:1!important;}
+.board-points button:nth-child(even){grid-column:3!important;}
+.board-points button:nth-child(1),.board-points button:nth-child(2){grid-row:1!important;}
+.board-points button:nth-child(3),.board-points button:nth-child(4){grid-row:2!important;}
+.board-points button:nth-child(5),.board-points button:nth-child(6){grid-row:3!important;}
+.board-points button:disabled{color:#85878d!important;background:#35373b!important;}
+.board-points button:hover:not(:disabled){background:#f87950!important;}
+@media(max-width:900px){
+ .game-board{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:13px 12px!important;padding:15px 12px!important;}
+ .board-column{grid-template-rows:235px!important;}
+ .board-points button,.board-column .board-points button{font-size:19px!important;}
+ .board-cover .lamna-cover-label strong{font-size:11px!important;}
 }
-.board-points {
- grid-column:1/-1 !important;
- grid-row:2 !important;
- display:grid !important;
- grid-template-columns:minmax(0,1fr) minmax(0,1.38fr) minmax(0,1fr) !important;
- grid-template-rows:repeat(3,minmax(0,1fr)) !important;
- gap:8px !important;
- padding:0 !important;
- align-items:stretch !important;
- min-width:0 !important;
- pointer-events:none !important;
+@media(max-width:600px){
+ .game-section{padding:0 5px!important;margin:12px auto!important;}
+ .game-board{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px 9px!important;padding:12px 8px!important;border-radius:19px!important;}
+ .board-column{grid-template-columns:minmax(0,1fr) minmax(0,1.25fr) minmax(0,1fr)!important;grid-template-rows:210px!important;}
+ .board-points{grid-template-columns:minmax(0,1fr) minmax(0,1.25fr) minmax(0,1fr)!important;gap:6px 0!important;}
+ .board-points button,.board-column .board-points button{font-size:17px!important;border-radius:9px!important;}
+ .board-cover .lamna-cover-label{flex-basis:20%!important;padding:2px 2px!important;}
+ .board-cover .lamna-cover-label strong{font-size:10px!important;line-height:1.13!important;overflow-wrap:anywhere!important;}
+ .board-points button:disabled{font-size:17px!important;}
 }
-.board-points button {
- margin:0 !important;
- padding:2px !important;
- width:100% !important;
- min-width:0 !important;
- min-height:0 !important;
- border:2px solid #343943 !important;
- border-radius:10px !important;
- background:#414650 !important;
- color:white !important;
- font-size:clamp(16px,2vw,24px) !important;
- font-weight:900 !important;
- pointer-events:auto !important;
- cursor:pointer !important;
-}
-.board-points button:nth-child(odd) {grid-column:1 !important;}
-.board-points button:nth-child(even) {grid-column:3 !important;}
-.board-points button:nth-child(1),.board-points button:nth-child(2) {grid-row:1 !important;}
-.board-points button:nth-child(3),.board-points button:nth-child(4) {grid-row:2 !important;}
-.board-points button:nth-child(5),.board-points button:nth-child(6) {grid-row:3 !important;}
-.board-points button:disabled {background:#333840 !important;color:#858e99 !important;}
-.board-points button:hover:not(:disabled) {background:#f87950 !important;}
-@media(max-width:850px) {
- .game-board {grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:12px !important;padding:12px !important;}
- .board-column {grid-template-rows:39px 226px !important;gap:6px !important;}
- .board-cat {font-size:15px !important;}
- .board-points {gap:5px !important;}
-}
-@media(max-width:610px) {
- .game-board {grid-template-columns:1fr !important;gap:16px !important;padding:13px !important;}
- .board-column {grid-template-rows:40px 254px !important;gap:8px !important;}
- .board-cat {font-size:17px !important;}
- .board-points {gap:8px !important;}
- .board-points button {font-size:25px !important;}
- .board-cover .lamna-cover-label strong {font-size:14px !important;}
+@media(max-width:365px){
+ .board-column{grid-template-rows:186px!important;}
+ .board-points button,.board-column .board-points button{font-size:15px!important;}
+ .board-cover .lamna-cover-label strong{font-size:9px!important;}
 }
