@@ -3,6 +3,7 @@ import crypto from 'node:crypto';
 
 /* Secure accounts API. Remains unavailable until DATABASE_URL is configured privately. */
 import pg from 'pg';
+import { handleStore } from './commerce.mjs';
 const { Pool } = pg;
 const accountsPool = process.env.DATABASE_URL ? new Pool({
  connectionString: process.env.DATABASE_URL,
@@ -93,8 +94,13 @@ function clean() {
 }
 setInterval(clean, 60000).unref();
 const server = http.createServer(async(req,res)=>{
-  if(req.method==='OPTIONS'){res.writeHead(204,cors);res.end();return;}
   const u = new URL(req.url, 'http://localhost');
+  if(u.pathname.startsWith('/api/store/')){
+    try{await handleStore(req,res,u,accountsPool,ensureAccounts);}
+    catch(e){res.writeHead(503,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});res.end(JSON.stringify({message:'خدمة المباريات غير متاحة الآن.'}));}
+    return;
+  }
+  if(req.method==='OPTIONS'){res.writeHead(204,cors);res.end();return;}
   const parts = u.pathname.split('/').filter(Boolean);
 
   if(u.pathname.startsWith('/api/accounts/')) {
