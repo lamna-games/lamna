@@ -115,3 +115,11 @@
 .lamna-contact-actions>a{display:inline-flex;align-items:center;justify-content:center;min-height:45px;min-width:159px;padding:9px 13px;border-radius:11px;font-size:15px;font-weight:900;text-decoration:none!important}
 .lamna-contact-actions>a:first-child{background:#89ebd0;color:#103c3d!important}
 .lamna-contact-actions>a:last-child{border:1px solid #80acae;color:#f6ffff!important}
+
+/* Final footer: white backing preserves dark ink in the genuine Lamna artwork */
+.site:not(.in-match) .lamna-site-footer{background:#fff!important;color:#173d4e!important;margin-top:35px;padding:40px 14px 30px;border-top:1px solid #e4edef;box-shadow:none!important}
+.lamna-site-footer>.brand,.lamna-site-footer>div:first-child{display:flex;justify-content:center;align-items:center;margin:auto}
+.lamna-site-footer .brand{width:210px!important;min-height:66px}
+.lamna-site-footer .brand img{width:200px!important;max-width:100%!important;max-height:78px!important;object-fit:contain!important;object-position:center!important}
+.lamna-site-footer>p{color:#5d7582!important;font-size:16px}
+.lamna-site-footer>small{color:#80949c!important;font-size:12px}
