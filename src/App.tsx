@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Phone, Hand, Repeat2, Bomb, MessageSquareText } from 'lucide-react';
 import './site.css';
 import './boardLayout.css';
 import CartoonCover from './CartoonCover';
@@ -49,10 +50,30 @@ const icons = [
 ];
 type Page = 'home' | 'categories' | 'setup' | 'game' | 'pricing' | 'account';
 function Cover({i,title}:{i:number,title:string}) { return <CartoonCover i={i} title={title}/>; }
+type AidId = 'phone' | 'two' | 'rest' | 'pit' | 'trap';
+const aidCatalog: { id: AidId; name: string; info: string }[] = [
+  { id:'phone', name:'اتصال بصديق', info:'استعن بصديق 30 ثانية أثناء السؤال' },
+  { id:'two', name:'جاوب جوابين', info:'يسمح للفريق بمحاولتين بدل محاولة' },
+  { id:'rest', name:'استريح', info:'امنع لاعبًا من الخصم من المشاركة في هذا السؤال' },
+  { id:'pit', name:'الحفرة', info:'إذا أجبت صح يُخصم مثل نقاط السؤال من الخصم' },
+  { id:'trap', name:'الفخ', info:'حوّل السؤال للخصم؛ إذا لم يجب تُخصم منه نقاط السؤال' },
+];
+function AidGlyph({ id, size=26 }: { id:AidId; size?:number }) {
+  if(id==='phone')return <Phone size={size}/>;
+  if(id==='two')return <MessageSquareText size={size}/>;
+  if(id==='rest')return <Hand size={size}/>;
+  if(id==='pit')return <Repeat2 size={size}/>;
+  return <Bomb size={size}/>;
+}
 function App() {
   const [page, setPage] = useState<Page>('home');
   const [selected, setSelected] = useState<number[]>([]);
   const [teams, setTeams] = useState(['الفريق الأول', 'الفريق الثاني']);
+  const [matchName,setMatchName] = useState('');
+  const [chosenAids,setChosenAids] = useState<AidId[][]>([[],[]]);
+  const [usedAids,setUsedAids] = useState<AidId[][]>([[],[]]);
+  const [aidEffect,setAidEffect] = useState<AidId|null>(null);
+  const [aidOwner,setAidOwner] = useState<number|null>(null);
   const [turn, setTurn] = useState(0);
   const [scores, setScores] = useState([0, 0]);
   const [used, setUsed] = useState<number[]>([]);
@@ -61,7 +82,7 @@ function App() {
   const [pickWinner, setPickWinner] = useState(false);
   const [logoOk, setLogoOk] = useState(true);
   const [help, setHelp] = useState([2, 2]);
-  const [showHelp, setShowHelp] = useState(false); const [showHint,setShowHint]=useState(false); const [hydrated,setHydrated]=useState(false); const [showResult,setShowResult]=useState(false); const [history,setHistory]=useState<{team:number|null;points:number;question:number}[]>([]); const [phase,setPhase]=useState<'question'|'steal'|'var'>('question'); const [seconds,setSeconds]=useState(60); const [paused,setPaused]=useState(false); const [varUsed,setVarUsed]=useState([false,false]); const [varTeam,setVarTeam]=useState(0); const [phaseBeforeVar,setPhaseBeforeVar]=useState<'question'|'steal'>('question'); const [stealFrom,setStealFrom]=useState(0); React.useEffect(()=>{if(active===null||paused||phase==='var')return;const id=window.setInterval(()=>setSeconds(s=>Math.max(0,s-1)),1000);return()=>window.clearInterval(id)},[active,paused,phase]); React.useEffect(()=>{if(active===null||seconds!==0)return;if(phase==='question'){setStealFrom(turn);setPhase('steal');setSeconds(10)}else if(phase==='steal'){award(null)}},[seconds,active,phase]); const startSteal=()=>{setStealFrom(turn);setPhase('steal');setSeconds(10);setPaused(false)}; const openVar=(i:number)=>{if(varUsed[i])return;setVarTeam(i);setVarUsed(v=>v.map((x,j)=>j===i?true:x));setPhaseBeforeVar(phase==='steal'?'steal':'question');setPhase('var');setPaused(true)};
+  const [showHelp, setShowHelp] = useState(false); const [showHint,setShowHint]=useState(false); const [hydrated,setHydrated]=useState(false); const [showResult,setShowResult]=useState(false); const [history,setHistory]=useState<{team:number|null;points:number;question:number;changes?:number[]}[]>([]); const [phase,setPhase]=useState<'question'|'steal'|'var'>('question'); const [seconds,setSeconds]=useState(60); const [paused,setPaused]=useState(false); const [varUsed,setVarUsed]=useState([false,false]); const [varTeam,setVarTeam]=useState(0); const [phaseBeforeVar,setPhaseBeforeVar]=useState<'question'|'steal'>('question'); const [stealFrom,setStealFrom]=useState(0); React.useEffect(()=>{if(active===null||paused||phase==='var')return;const id=window.setInterval(()=>setSeconds(s=>Math.max(0,s-1)),1000);return()=>window.clearInterval(id)},[active,paused,phase]); React.useEffect(()=>{if(active===null||seconds!==0)return;if(phase==='question'){setStealFrom(turn);setPhase('steal');setSeconds(10)}else if(phase==='steal'){award(null)}},[seconds,active,phase]); const startSteal=()=>{setStealFrom(turn);setPhase('steal');setSeconds(10);setPaused(false)}; const openVar=(i:number)=>{if(varUsed[i])return;setVarTeam(i);setVarUsed(v=>v.map((x,j)=>j===i?true:x));setPhaseBeforeVar(phase==='steal'?'steal':'question');setPhase('var');setPaused(true)};
   React.useEffect(() => {
     try {
       const saved = JSON.parse(localStorage.getItem('lamna-demo-match-v2') || 'null');
@@ -69,6 +90,10 @@ function App() {
         setSelected(saved.selected); setTeams(saved.teams); setTurn(saved.turn);
         setScores(saved.scores); setUsed(saved.used); setHistory(saved.history || []);
         setHelp(saved.help || [2, 2]); setVarUsed(saved.varUsed || [false, false]);
+        if(typeof saved.matchName==='string')setMatchName(saved.matchName);
+        if(Array.isArray(saved.chosenAids)&&saved.chosenAids.length===2)setChosenAids(saved.chosenAids);
+        if(Array.isArray(saved.usedAids)&&saved.usedAids.length===2)setUsedAids(saved.usedAids);
+        setAidEffect(saved.aidEffect||null);setAidOwner(saved.aidOwner??null);
         setActive(saved.active ?? null); setPhase(saved.phase || 'question');
         setSeconds(saved.seconds ?? 60); setStealFrom(saved.stealFrom ?? 0);
         setShowResult(!!saved.showResult); setPaused(true);
@@ -81,11 +106,21 @@ function App() {
     try {
       localStorage.setItem('lamna-demo-match-v2', JSON.stringify({
         selected, teams, turn, scores, used, history, help, varUsed,
-        active, phase, seconds, stealFrom, showResult
+        active, phase, seconds, stealFrom, showResult, matchName, chosenAids, usedAids, aidEffect, aidOwner
       }));
     } catch { /* Private mode may block storage. */ }
-  }, [hydrated, selected, teams, turn, scores, used, history, help, varUsed, active, phase, seconds, stealFrom, showResult]);
+  }, [hydrated, selected, teams, turn, scores, used, history, help, varUsed, active, phase, seconds, stealFrom, showResult, matchName, chosenAids, usedAids, aidEffect, aidOwner]);
   const currentQuestion = active === null ? null : getQuestion(selected[Math.floor(active / 6)], active % 6);
+  const toggleAid = (team:number,aid:AidId) => {
+    setChosenAids(prev=>prev.map((list,i)=>i!==team?list:list.includes(aid)?list.filter(x=>x!==aid):list.length<3?[...list,aid]:list));
+  };
+  const activateAid = (team:number,aid:AidId) => {
+    if(active===null||reveal||pickWinner||phase==='var'||usedAids[team]?.includes(aid)||!chosenAids[team]?.includes(aid)||team!==(phase==='steal'?1-stealFrom:turn)||aidEffect!==null)return;
+    setUsedAids(prev=>prev.map((list,i)=>i===team?[...list,aid]:list));
+    setAidEffect(aid);setAidOwner(team);setShowHelp(false);
+    if(aid==='phone'){setSeconds(v=>v+30);setPaused(false);}
+    if(aid==='trap'){setStealFrom(team);setPhase('steal');setSeconds(10);setPaused(false);}
+  };
   const go = (p: Page) => {
     setPage(p);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -95,15 +130,21 @@ function App() {
       v.includes(i) ? v.filter(x => x !== i) : v.length < 6 ? [...v, i] : v
     );
   const award = (team: number | null) => {
-    if (active === null) return;
-    const pts = [200, 400, 600][Math.floor((active % 6) / 2)];
-    if (team !== null)
-      setScores(v => v.map((x, i) => (i === team ? x + pts : x)));
-    setHistory(v=>[...v,{team,points:pts,question:active}]); setUsed(v => [...v, active]);
-    setActive(null);
-    setReveal(false);setPickWinner(false);
-    setTurn(v => 1 - v);
-    setShowHelp(false);setShowHint(false);setPhase('question');setSeconds(60);setPaused(false); if(used.length===35)setShowResult(true);
+    if(active===null)return;
+    const pts=[200,400,600][Math.floor((active%6)/2)];
+    const change=[0,0];
+    if(team!==null)change[team]+=pts;
+    if(aidEffect==='pit'&&aidOwner!==null&&team===aidOwner)change[1-team]-=pts;
+    if(aidEffect==='trap'&&aidOwner!==null&&team===null)change[1-aidOwner]-=pts;
+    const updatedScores=scores.map((score,i)=>Math.max(0,score+change[i]));
+    const actualChanges=updatedScores.map((score,i)=>score-scores[i]);
+    setScores(updatedScores);
+    setHistory(v=>[...v,{team,points:pts,question:active,changes:actualChanges}]);
+    setUsed(v=>[...v,active]);setActive(null);
+    setReveal(false);setPickWinner(false);setTurn(v=>1-v);
+    setShowHelp(false);setShowHint(false);setPhase('question');setSeconds(60);setPaused(false);
+    setAidEffect(null);setAidOwner(null);
+    if(used.length===35)setShowResult(true);
   };
   const brand = (
     <div className="brand">
@@ -269,42 +310,54 @@ function App() {
         </section>
       )}
       {page === 'setup' && (
-        <section className="section narrow">
-          <span className="kicker">قبل البداية</span>
-          <h1>مين بيتحدّى مين؟</h1>
-          <div className="setup-card">
-            <label>
-              اسم الفريق الأول
-              <input
-                value={teams[0]}
-                maxLength={25}
-                onChange={e => setTeams(v => [e.target.value, v[1]])}
-              />
+        <section className="section narrow aid-setup-section" dir="rtl">
+          <span className="kicker">جهّزوا المباراة</span>
+          <h1>الأسماء ووسائل المساعدة</h1>
+          <p className="muted">كل فريق يختار 3 وسائل من أصل 5 قبل أن يبدأ التحدي.</p>
+          <div className="aid-setup-panel">
+            <label className="aid-match-field">
+              <strong>اسم اللعبة</strong>
+              <input value={matchName} maxLength={35} placeholder="مثال: تحدّي العائلة" onChange={e=>setMatchName(e.target.value)}/>
             </label>
-            <label>
-              اسم الفريق الثاني
-              <input
-                value={teams[1]}
-                maxLength={25}
-                onChange={e => setTeams(v => [v[0], e.target.value])}
-              />
-            </label>
-            <p className="muted">
-              هذه مباراة تجريبية بأسئلة نموذجية للتأكد من طريقة اللعب، وليست
-              مكتبة الأسئلة النهائية.
-            </p>
-            <button
-              className="primary"
-              onClick={() => {
-                setScores([0, 0]);setShowResult(false);setHistory([]);setShowHint(false);
-                setUsed([]);
-                setTurn(0);
-                setHelp([2, 2]);setVarUsed([false,false]);setActive(null);setPhase('question');setSeconds(60);
+            {teams.map((team,i)=>(
+              <div className="aid-team-setup" key={i}>
+                <h2>الفريق {i===0?'الأول':'الثاني'}</h2>
+                <input
+                  aria-label={'اسم الفريق '+(i+1)}
+                  value={team} maxLength={25}
+                  placeholder={'اسم الفريق '+(i+1)}
+                  onChange={e=>setTeams(v=>v.map((t,j)=>j===i?e.target.value:t))}
+                />
+                <div className="aid-team-title">
+                  <strong>{team.trim()||'الفريق '+(i+1)}: اختر 3 وسائل مساعدة</strong>
+                  <span className={chosenAids[i].length===3?'aid-count complete':'aid-count'}>{chosenAids[i].length} / 3</span>
+                </div>
+                <div className="aid-pick-grid">
+                  {aidCatalog.map(aid=>{
+                    const picked=chosenAids[i].includes(aid.id);
+                    return <button key={aid.id} type="button" aria-pressed={picked}
+                      className={'aid-pick-card '+(picked?'selected':'') }
+                      disabled={!picked&&chosenAids[i].length===3}
+                      title={aid.info} onClick={()=>toggleAid(i,aid.id)}>
+                      <span className="aid-pick-check">{picked?'✓':''}</span>
+                      <strong>{aid.name}</strong>
+                      <AidGlyph id={aid.id} size={33}/>
+                      <small>{aid.info}</small>
+                    </button>;
+                  })}
+                </div>
+              </div>
+            ))}
+            <p className="muted aid-setup-note">هذه نسخة تجريبية؛ تظهر الوسائل المختارة تحت كل فريق ويُمكن استعمال كل وسيلة مرة واحدة أثناء السؤال.</p>
+            <button className="primary aid-start-button"
+              disabled={!matchName.trim()||teams.some(t=>!t.trim())||chosenAids.some(list=>list.length!==3)}
+              onClick={()=>{
+                setScores([0,0]);setShowResult(false);setHistory([]);setShowHint(false);
+                setUsed([]);setTurn(0);setHelp([2,2]);setVarUsed([false,false]);
+                setActive(null);setPhase('question');setSeconds(60);setPaused(false);
+                setUsedAids([[],[]]);setAidEffect(null);setAidOwner(null);setShowHelp(false);
                 go('game');
-              }}
-            >
-              ابدأ المباراة ←
-            </button>
+              }}>ابدأ المباراة ←</button>
           </div>
         </section>
       )}
