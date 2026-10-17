@@ -300,3 +300,77 @@ html,body,#root,.site,.site.has-landing{background:var(--lm-brand-paper)!importa
  .site .header nav{grid-column:1!important;grid-row:3!important;max-width:100%!important;gap:5px!important;}
  .site .header nav button{padding:8px!important;font-size:12px!important}
 }
+
+/* iPhone / small tablet header: account actions must never collide.
+   Match Lamna approved light palette; untouched logo file. */
+@media (max-width: 820px){
+ .site .header,
+ .site.has-landing .lm-header{
+   display:grid!important;
+   grid-template-columns:minmax(0,1fr)!important;
+   grid-template-rows:auto auto auto!important;
+   justify-items:center!important;
+   row-gap:12px!important;
+   height:auto!important;
+   min-height:0!important;
+   padding:14px 12px 16px!important;
+ }
+ .site .header .brand-link,
+ .site.has-landing .lm-header .brand-link{
+   grid-column:1!important;
+   grid-row:1!important;
+   justify-self:center!important;
+   margin:0!important;
+ }
+ .site .header .lm-header-accounts,
+ .site.has-landing .lm-header .lm-header-accounts{
+   grid-column:1!important;
+   grid-row:2!important;
+   display:flex!important;
+   flex-direction:row!important;
+   flex-wrap:nowrap!important;
+   justify-content:center!important;
+   align-items:center!important;
+   gap:12px!important;
+   width:100%!important;
+   max-width:365px!important;
+   margin:0 auto!important;
+   min-width:0!important;
+ }
+ .site .header .lm-header-accounts button,
+ .site.has-landing .lm-header .lm-header-accounts button{
+   display:inline-flex!important;
+   justify-content:center!important;
+   align-items:center!important;
+   min-height:44px!important;
+   width:auto!important;
+   min-width:0!important;
+   max-width:none!important;
+   flex:1 1 0!important;
+   margin:0!important;
+   padding:10px 9px!important;
+   border:1px solid #cce5e6!important;
+   border-radius:12px!important;
+   background:#fff!important;
+   color:#10364c!important;
+   font-size:clamp(12px,3.3vw,15px)!important;
+   font-weight:850!important;
+   line-height:1.25!important;
+   text-align:center!important;
+   white-space:nowrap!important;
+ }
+ .site .header .lm-header-accounts button:first-child,
+ .site.has-landing .lm-header .lm-header-accounts button:first-child{
+   background:#fff2eb!important;
+   border-color:#f6bfb0!important;
+   color:#a94531!important;
+ }
+ .site .header nav,
+ .site.has-landing .lm-header nav{
+   grid-column:1!important;
+   grid-row:3!important;
+   width:100%!important;
+   max-width:100%!important;
+   justify-content:center!important;
+ }
+}
