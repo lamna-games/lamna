@@ -1,0 +1,35 @@
+
+/* ولا كلمة — secret picture on phone, QR and waiting on television */
+.wl-tv{width:100%;height:100%;min-height:0;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:8px;color:#f6fafc;direction:rtl;text-align:center;}
+.wl-tv>h2{font-size:clamp(18px,4.6vw,32px)!important;margin:0!important;color:#a8efe2!important;}
+.wl-tv-grid{width:100%;height:100%;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:12px;align-items:center;justify-items:center;}
+.wl-qr-card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;height:100%;min-height:0;max-width:100%;}
+.wl-qr{display:block;max-height:min(100%,270px);width:auto;max-width:min(100%,270px);aspect-ratio:1;background:white;padding:8px;border:2px solid #58d3c2;border-radius:13px;object-fit:contain;}
+.wl-qr-card span{font-size:clamp(11px,2.8vw,15px);color:#e5f5f6;font-weight:800;}
+.wl-link-copy{background:#1f6772!important;border:1px solid #77e8d9!important;color:#f7fff9!important;border-radius:10px!important;font-size:12px!important;padding:5px 12px!important;}
+.wl-loading{padding:12px;color:#eefafa;font-size:14px;}
+.wl-tv-instructions{text-align:right;width:100%;display:flex;flex-direction:column;gap:9px;justify-content:center;}
+.wl-tv-instructions h3{font-size:clamp(15px,4vw,25px);color:#58d3c2;margin:0;}
+.wl-tv-instructions p{font-size:clamp(12px,3vw,17px);line-height:1.5;margin:0;}
+.wl-tv-instructions p b{background:#eeb67f;color:#15304a;border-radius:50%;display:inline-grid;place-items:center;width:21px;height:21px;margin-left:5px;}
+.wl-tv-status{border:1px solid #5aa8aa;border-radius:13px;padding:9px;color:#fff;font-weight:800;background:#17485a;}
+.wl-tv-status strong{font-size:20px;color:#b7f9e1;font-variant-numeric:tabular-nums;}
+.wl-tv-instructions small{color:#b7ccdb;font-size:12px;}
+.wl-phone{position:fixed;inset:0;min-height:100vh;min-height:100dvh;overflow-y:auto;background:linear-gradient(165deg,#112e44,#10233b);color:#fff;direction:rtl;font-family:inherit;text-align:center;padding:0 15px 25px;box-sizing:border-box;}
+.wl-phone-header{display:flex;justify-content:space-between;align-items:center;padding:17px 8px;border-bottom:1px solid #4c839a;}
+.wl-phone-header strong{font-size:26px;color:#7de4d4;}.wl-phone-header span{font-size:15px;}
+.wl-phone-secret,.wl-phone-clock-page{margin:20px auto;max-width:580px;display:flex;align-items:center;flex-direction:column;gap:14px;}
+.wl-phone-eyebrow{background:#245a67;color:#fff;padding:12px 15px;border-radius:16px;font-size:15px;font-weight:900;}
+.wl-phone-art-wrap{width:100%;max-width:550px;border:6px solid #f1b780;background:white;border-radius:23px;overflow:hidden;box-shadow:0 15px 30px #00121c90;}
+.wl-art{width:100%;height:auto;display:block;max-height:44vh;}
+.wl-phone-secret h2{font-size:clamp(24px,6vw,36px);color:#ffe1a8;margin:3px 0;}
+.wl-phone-secret p{font-size:17px;line-height:1.65;color:#eaf3f6;margin:0;}
+.wl-phone-ready{font-size:23px;font-weight:950;min-height:56px;width:100%;border:0;border-radius:17px;color:#123b42;background:#6de0c7;}
+.wl-phone-ready:disabled{opacity:.5;}
+.wl-phone-message{font-size:20px;padding:60px 10px;}
+.wl-phone-clock-page{justify-content:center;min-height:65dvh;}
+.wl-phone-clock{color:#e4fff5;background:#15394b;border:5px solid #67deca;border-radius:30px;padding:15px 24px;font-size:clamp(65px,18vw,124px);font-weight:950;line-height:1.2;font-variant-numeric:tabular-nums;}
+.wl-phone-clock.urgent{color:#ffb5a7;border-color:#f78c74;}
+.wl-phone-small-art{width:45%;max-width:240px;opacity:.72;border-radius:15px;overflow:hidden;}
+@media(max-width:480px){.wl-tv{gap:4px;}.wl-tv-grid{grid-template-columns:1fr 1.2fr;gap:6px;}.wl-qr{max-width:100%;max-height:min(31dvh,230px);padding:3px;}.wl-tv-instructions{gap:3px;}.wl-tv-instructions p{font-size:11px;line-height:1.2;}.wl-tv-instructions h3{font-size:12px;}.wl-tv-status{font-size:11px;padding:4px;}.wl-tv-instructions small{font-size:10px;}.wl-link-copy{font-size:10px!important;padding:3px 5px!important;}}
+@media(max-height:530px){.wl-tv>h2{font-size:15px!important;}.wl-tv-grid{grid-template-columns:1fr 1.3fr;gap:8px;}.wl-qr{max-height:min(34dvh,180px);}.wl-tv-instructions{gap:2px;}.wl-tv-instructions p{font-size:12px;line-height:1.1;}.wl-tv-instructions h3{font-size:14px;}.wl-tv-status{padding:3px;font-size:11px;}.wl-qr-card span{font-size:11px;}}
