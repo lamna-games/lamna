@@ -2,6 +2,7 @@ import React from 'react';
 import { Eye, EyeOff, Mail, LockKeyhole, UserRound, Phone, AlertCircle } from 'lucide-react';
 import { getCountries, getCountryCallingCode, type CountryCode } from 'libphonenumber-js';
 import OfficialLogo from './OfficialLogo';
+import AccountPage from './AccountPage';
 import './authScreen.css';
 
 type Mode='register'|'login';
@@ -19,8 +20,19 @@ export default function AuthScreen({initialMode,onReturn}:Props){
  const [country,setCountry]=React.useState<CountryCode>('SA');
  const [visible,setVisible]=React.useState(false);
  const [accepted,setAccepted]=React.useState(false);
+ const [accountsEnabled,setAccountsEnabled]=React.useState(false);
+ React.useEffect(()=>{
+  let valid=true;
+  fetch('https://lamna-wordless-sync.onrender.com/api/accounts/status',{cache:'no-store'})
+    .then(response=>response.ok?response.json():{enabled:false})
+    .then(result=>{if(valid)setAccountsEnabled(result.enabled===true)})
+    .catch(()=>{if(valid)setAccountsEnabled(false)});
+  return()=>{valid=false};
+ },[]);
+
  React.useEffect(()=>setMode(initialMode),[initialMode]);
  const code=getCountryCallingCode(country);
+ if(accountsEnabled)return <AccountPage initialMode={mode} onBack={onReturn}/>;
  return <section className="lm-auth-view" dir="rtl" aria-label={mode==='register'?'التسجيل في لمنا':'تسجيل دخول لمنا'}>
   <div className="lm-auth-card">
    <div className="lm-auth-head">
