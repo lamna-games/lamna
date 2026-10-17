@@ -90,10 +90,11 @@ export function WordlessTV({index,points,onStart,onTick}:{index:number;points:nu
  const duration=durationOf(points);
  const startRef=React.useRef(onStart);
  const tickRef=React.useRef(onTick);
+ const startedNotifiedRef=React.useRef(false);
  React.useEffect(()=>{startRef.current=onStart;tickRef.current=onTick;},[onStart,onTick]);
  React.useEffect(()=>{
   let cancelled=false;let source:EventSource|null=null;let timer:number|undefined;
-  setRoom(null);setQR('');setError('');setStarted(null);
+  setRoom(null);setQR('');setError('');setStarted(null);startedNotifiedRef.current=false;
   const open=async()=>{
    try{
     const resp=await fetch(API+'/api/rooms',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({itemIndex:index,duration})});
@@ -108,7 +109,7 @@ export function WordlessTV({index,points,onStart,onTick}:{index:number;points:nu
      if(cancelled)return;
      try{const state=JSON.parse(event.data);
       if(state.status==='running'&&typeof state.startedAt==='number'){
-       setStarted(current=>{if(current===null)startRef.current(state.duration);return state.startedAt;});
+       if(!startedNotifiedRef.current){startedNotifiedRef.current=true;startRef.current(state.duration);}setStarted(state.startedAt);
       }
      }catch{}
     };
@@ -117,7 +118,7 @@ export function WordlessTV({index,points,onStart,onTick}:{index:number;points:nu
      if(cancelled)return;
      try{const r=await fetch(API+'/api/rooms/'+data.id+'/state?hostKey='+data.hostKey,{cache:'no-store'});
       if(r.ok){const state=await r.json();if(state.status==='running'&&typeof state.startedAt==='number'){
-       setStarted(current=>{if(current===null)startRef.current(state.duration);return state.startedAt;});
+       if(!startedNotifiedRef.current){startedNotifiedRef.current=true;startRef.current(state.duration);}setStarted(state.startedAt);
       }}
      }catch{}
     },3500);
