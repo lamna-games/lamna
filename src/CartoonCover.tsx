@@ -1,5 +1,7 @@
 import React from 'react';
 import './CartoonCover.css';
+import LamnaCoverArt from './LamnaCoverArt';
+import {LAMNA_OFFICIAL_LOGO} from './brandLogo';
 
 type CoverProps = { i: number; title: string };
 const palettes = [
@@ -151,21 +153,33 @@ function FeaturedArt({i}:{i:number}){
 }
 
 export default function CartoonCover({i,title}:CoverProps){
- const p = palettes[i] || palettes[0];
- const features = [2,8,9,11,12,13,14,16,18,19].includes(i);
- const pose = i===1?'quiet':i===4?'cheer':i===7?'point':'think';
- const shirt = i===4?'#329b70':i===5?'#8655b8':i===10?'#f1ead7':i===15?'#f4f4f4':p[2];
+ const featured = [2,8,9,11,12,13,14,16,18,19].includes(i);
+ const p = palettes[i%palettes.length];
  return <div className="lamna-cover" role="img" aria-label={`غلاف لعبة ${title}`}>
-  <div className="lamna-cover-picture" style={{background:p[0]}}>
-   <svg viewBox="0 0 400 350" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-    <defs><linearGradient id={`lamna-bg-${i}`} x1="0" x2="1" y1="0" y2="1"><stop stopColor={p[1]}/><stop offset="1" stopColor={p[0]}/></linearGradient></defs>
-    <rect width="400" height="350" fill={`url(#lamna-bg-${i})`}/>
-    <circle cx="18" cy="10" r="180" fill="#ffffff" opacity=".26"/>
-    <path d="M-60 290 Q74 189 175 269 Q266 345 465 238 V400 H-60Z" fill="#ffffff" opacity=".27"/>
-    <circle cx="334" cy="50" r="52" fill="#ffffff" opacity=".35"/>
-    {features?<FeaturedArt i={i}/>:<><SceneExtras i={i}/><Person shirt={shirt} pose={pose} hair={i!==7} hat={i===15}/></>}
-   </svg>
-  </div>
-  <div className="lamna-cover-label"><strong>{title}</strong></div>
+   <div className="lamna-cover-picture">
+    <svg viewBox="0 0 400 350" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+     <defs>
+      <linearGradient id={`lamna-newsky-${i}`} x1="0" x2="1" y1="0" y2="1">
+       <stop stopColor="#bde9ff"/><stop offset=".55" stopColor="#def4ff"/><stop offset="1" stopColor="#b6e1fa"/>
+      </linearGradient>
+      <radialGradient id={`lamna-sunglow-${i}`}>
+       <stop stopColor="#fffbe1" stopOpacity=".95"/><stop offset="1" stopColor="#fff0bd" stopOpacity="0"/>
+      </radialGradient>
+     </defs>
+     <rect width="400" height="350" fill={`url(#lamna-newsky-${i})`}/>
+     <circle cx="303" cy="69" r="87" fill={`url(#lamna-sunglow-${i})`}/>
+     <circle cx="320" cy="61" r="32" fill="#ffdb65" opacity=".95"/>
+     <path d="M30 80q5-18 25-15 9-23 32-15 18-5 28 19 26-2 31 13zM257 120q8-17 25-14 11-22 31-14 17-4 28 17 16 0 21 13z" fill="#ffffff" opacity=".85"/>
+     <circle cx="47" cy="15" r="118" fill="#fff" opacity=".12"/>
+     <path d="M-30 323Q85 272 160 310q112-71 265-13v80H-30Z" fill={i%3===0?"#9bdcc0":i%3===1?"#c5e8ce":"#c0e9ed"} opacity=".52"/>
+     <path d="M-20 338q81-40 141-11 71-38 146-8 77-22 155-7v44H-20Z" fill="#79c2a8" opacity=".42"/>
+     {featured?<FeaturedArt i={i}/>:<LamnaCoverArt i={i}/>}
+    </svg>
+    <span className="lamna-cover-info" aria-hidden="true">i</span>
+    <span className="lamna-cover-symbol" aria-hidden="true">
+      <img src={LAMNA_OFFICIAL_LOGO} alt="" loading="lazy" draggable={false}/>
+    </span>
+   </div>
+   <div className="lamna-cover-label"><strong>{title}</strong></div>
  </div>;
 }
