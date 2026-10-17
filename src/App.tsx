@@ -4,6 +4,7 @@ import './site.css';
 import './boardLayout.css';
 import CartoonCover from './CartoonCover';
 import { getQuestion, wordlessModeCount } from './quizData';
+import { WordlessTV } from './Wordless';
 const categories = [
   'معلومات عامة',
   'ولا كلمة',
@@ -82,7 +83,7 @@ function App() {
   const [pickWinner, setPickWinner] = useState(false);
   const [logoOk, setLogoOk] = useState(true);
   const [help, setHelp] = useState([2, 2]);
-  const [showHelp, setShowHelp] = useState(false); const [showHint,setShowHint]=useState(false); const [hydrated,setHydrated]=useState(false); const [showResult,setShowResult]=useState(false); const [history,setHistory]=useState<{team:number|null;points:number;question:number;changes?:number[]}[]>([]); const [phase,setPhase]=useState<'question'|'steal'|'var'>('question'); const [seconds,setSeconds]=useState(60); const [paused,setPaused]=useState(false); const [varUsed,setVarUsed]=useState([false,false]); const [varTeam,setVarTeam]=useState(0); const [phaseBeforeVar,setPhaseBeforeVar]=useState<'question'|'steal'>('question'); const [stealFrom,setStealFrom]=useState(0); React.useEffect(()=>{if(active===null||paused||phase==='var')return;const id=window.setInterval(()=>setSeconds(s=>Math.max(0,s-1)),1000);return()=>window.clearInterval(id)},[active,paused,phase]); React.useEffect(()=>{if(active===null||seconds!==0)return;if(phase==='question'){setStealFrom(turn);setPhase('steal');setSeconds(10)}else if(phase==='steal'){award(null)}},[seconds,active,phase]); const startSteal=()=>{setStealFrom(turn);setPhase('steal');setSeconds(10);setPaused(false)}; const openVar=(i:number)=>{if(varUsed[i])return;setVarTeam(i);setVarUsed(v=>v.map((x,j)=>j===i?true:x));setPhaseBeforeVar(phase==='steal'?'steal':'question');setPhase('var');setPaused(true)};
+  const [showHelp, setShowHelp] = useState(false); const [showHint,setShowHint]=useState(false); const [hydrated,setHydrated]=useState(false); const [showResult,setShowResult]=useState(false); const [history,setHistory]=useState<{team:number|null;points:number;question:number;changes?:number[]}[]>([]); const [phase,setPhase]=useState<'question'|'steal'|'var'>('question'); const [seconds,setSeconds]=useState(60); const [paused,setPaused]=useState(false); const [varUsed,setVarUsed]=useState([false,false]); const [varTeam,setVarTeam]=useState(0); const [phaseBeforeVar,setPhaseBeforeVar]=useState<'question'|'steal'>('question'); const [stealFrom,setStealFrom]=useState(0); React.useEffect(()=>{if(active===null||paused||phase==='var')return;const id=window.setInterval(()=>setSeconds(s=>Math.max(0,s-1)),1000);return()=>window.clearInterval(id)},[active,paused,phase]); React.useEffect(()=>{if(active===null||seconds!==0||selected[Math.floor(active/6)]===1)return;if(phase==='question'){setStealFrom(turn);setPhase('steal');setSeconds(10)}else if(phase==='steal'){award(null)}},[seconds,active,phase]); const startSteal=()=>{setStealFrom(turn);setPhase('steal');setSeconds(10);setPaused(false)}; const openVar=(i:number)=>{if(varUsed[i])return;setVarTeam(i);setVarUsed(v=>v.map((x,j)=>j===i?true:x));setPhaseBeforeVar(phase==='steal'?'steal':'question');setPhase('var');setPaused(true)};
   React.useEffect(() => {
     try {
       const saved = JSON.parse(localStorage.getItem('lamna-demo-match-v2') || 'null');
@@ -111,6 +112,7 @@ function App() {
     } catch { /* Private mode may block storage. */ }
   }, [hydrated, selected, teams, turn, scores, used, history, help, varUsed, active, phase, seconds, stealFrom, showResult, matchName, chosenAids, usedAids, aidEffect, aidOwner]);
   const currentQuestion = active === null ? null : getQuestion(selected[Math.floor(active / 6)], active % 6);
+  const isWordlessQuestion = active!==null && selected[Math.floor(active/6)]===1;
   const toggleAid = (team:number,aid:AidId) => {
     setChosenAids(prev=>prev.map((list,i)=>i!==team?list:list.includes(aid)?list.filter(x=>x!==aid):list.length<3?[...list,aid]:list));
   };
@@ -396,7 +398,7 @@ function App() {
                       disabled={used.includes(n)||active!==null}
                       onClick={() => {
                         setActive(n);setAidEffect(null);setAidOwner(null);
-                        setReveal(false);setPickWinner(false);setShowHelp(false);setShowHint(false);setPhase('question');setSeconds(60);setPaused(false);
+                        setReveal(false);setPickWinner(false);setShowHelp(false);setShowHint(false);setPhase('question');setSeconds(selected[col]===1?[90,60,40][Math.floor(row/2)]:60);setPaused(selected[col]===1);
                       }}
                       key={n}
                     >
@@ -460,9 +462,9 @@ function App() {
                   {!reveal && !pickWinner && (
                     <>
                       <div className="play-timer" aria-label="المؤقت">
-                        <button type="button" aria-label={paused?'تشغيل المؤقت':'إيقاف المؤقت'} disabled={phase==='var'} onClick={()=>setPaused(v=>!v)}>{paused?'▶':'Ⅱ'}</button>
-                        <span>{String(Math.floor(seconds/60)).padStart(2,'0')}:{String(seconds%60).padStart(2,'0')}</span>
-                        <button type="button" aria-label="إعادة بدء المؤقت" disabled={phase==='var'} onClick={()=>{setSeconds(phase==='steal'?10:60);setPaused(false);}}>↺</button>
+                        <button type="button" aria-label={paused?'تشغيل المؤقت':'إيقاف المؤقت'} disabled={phase==='var'||isWordlessQuestion} onClick={()=>setPaused(v=>!v)}>{paused?'▶':'Ⅱ'}</button>
+                        <span>{isWordlessQuestion&&paused&&seconds>0?'ابدأ من الجوال':String(Math.floor(seconds/60)).padStart(2,'0')+':'+String(seconds%60).padStart(2,'0')}</span>
+                        <button type="button" aria-label="إعادة بدء المؤقت" disabled={phase==='var'||isWordlessQuestion} onClick={()=>{setSeconds(phase==='steal'?10:60);setPaused(false);}}>↺</button>
                       </div>
                       <div className="play-point-tag">{[200,400,600][Math.floor((active%6)/2)]} نقطة</div>
                     </>
@@ -488,14 +490,19 @@ function App() {
                     <div className="play-stage-inner play-question-view">
                       {phase==='steal'&&<div className="play-status">فرصة السرقة للفريق: {teams[1-stealFrom]} — 10 ثوانٍ</div>}
                       {phase==='var'&&<div className="play-status">مراجعة VAR للفريق: {teams[varTeam]}</div>}
-                      <h2>{currentQuestion?.prompt}</h2>
+                      {isWordlessQuestion ? (
+                        <WordlessTV index={active%6}
+                          points={[200,400,600][Math.floor((active%6)/2)]}
+                          onStart={(n)=>{setSeconds(n);setPaused(true);}}
+                          onTick={(n)=>{setSeconds(n);}}/>
+                      ) : <h2>{currentQuestion?.prompt}</h2>}
                       {aidEffect!==null&&<div className="play-aid-activated">
                         <strong>{aidCatalog.find(x=>x.id===aidEffect)?.name}</strong>
                         <span>{aidEffect==='phone'?'زاد وقت السؤال 30 ثانية للتشاور مع صديق':aidEffect==='two'?'يُسمح بمحاولتين للإجابة بدل محاولة واحدة':aidEffect==='rest'?'حدّد لاعبًا من الخصم يستريح عن المشاركة في هذا السؤال':aidEffect==='pit'?'إذا أجاب فريقك صح تخصم نقاط السؤال أيضًا من الخصم':'السؤال الآن عند الخصم: إذا لم يجب تُخصم منه نقاط السؤال'}</span>
                       </div>}
-                      {currentQuestion?.mode && <p className="play-context">{currentQuestion.mode}</p>}
-                      {currentQuestion?.instructions && <p className="play-instructions">{currentQuestion.instructions}</p>}
-                      {showHint && <p className="play-hint">تلميح: {currentQuestion?.hint}</p>}
+                      {!isWordlessQuestion&&currentQuestion?.mode && <p className="play-context">{currentQuestion.mode}</p>}
+                      {!isWordlessQuestion&&currentQuestion?.instructions && <p className="play-instructions">{currentQuestion.instructions}</p>}
+                      {showHint&&!isWordlessQuestion && <p className="play-hint">تلميح: {currentQuestion?.hint}</p>}
                     </div>
                   )}
 
