@@ -14,7 +14,8 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "qrcode": "^1.5.4",
-    "libphonenumber-js": "^1.12.27"
+    "libphonenumber-js": "^1.12.16",
+    "pg": "^8.13.3"
   },
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "^4.0.0"
