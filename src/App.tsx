@@ -598,10 +598,18 @@ function App() {
           </div>
         </section>
       )}
-      {page!=='game' && <footer>
+      {page!=='game' && <footer className="lamna-site-footer">
         <div>{brand}</div>
         <p>ألعاب تجمعنا</p>
-        <small>نسخة مستقلة تجريبية • بدون دفع أو تسجيل حقيقي</small>
+        <div className="lamna-contact">
+          <strong>تواصل معنا</strong>
+          <span>عندك استفسار؟ حياك على واتساب أو اتصل علينا.</span>
+          <div className="lamna-contact-actions">
+            <a href="https://wa.me/966531360039" target="_blank" rel="noopener noreferrer">تواصل عبر واتساب ↗</a>
+            <a href="tel:+966531360039" dir="ltr">053 136 0039</a>
+          </div>
+        </div>
+        <small>نسخة تجريبية • بدون دفع أو تسجيل حقيقي</small>
       </footer>}
     </div>
   );
