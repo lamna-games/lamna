@@ -340,7 +340,7 @@ function App() {
                 <span>إنشاء لعبة</span>
                 <ArrowLeft size={24}/>
               </button>
-              {selected.length===6&&(used.length>0||active!==null)&&!showResult&&
+              {Boolean(token())&&activeSession?.status==='active'&&selected.length===6&&(used.length>0||active!==null)&&!showResult&&
                 <button type="button" className="lm-resume-link" onClick={()=>{setPaused(true);go('game');}}>
                   <Play size={17} fill="currentColor"/> متابعة المباراة المحفوظة
                 </button>}
@@ -667,7 +667,8 @@ function App() {
       {page === 'account' && (!token()
         ? <AuthScreen key={authMode+'-'+sessionVersion} initialMode={authMode} onReturn={()=>go('home')}
              onAuthenticated={()=>{setSessionVersion(v=>v+1);setAuthMode('login');go('account')}}/>
-        : <StoreCommerce mode="wallet" accountsEnabled={accountsEnabled} onBack={()=>{setSessionVersion(v=>v+1);go('home')}}
+        : <StoreCommerce mode="wallet" accountsEnabled={accountsEnabled} onBack={()=>go('home')}
+             onSignedOut={()=>{setActiveSession(null);setActive(null);setUsed([]);setHistory([]);setShowResult(false);setSessionVersion(v=>v+1);go('home')}}
              onLogin={()=>{setAuthMode('login');setSessionVersion(v=>v+1);go('account')}} onResume={applyMatch}/>)}
       {page!=='game' && <footer className="lamna-site-footer">
         <div>{brand}</div>
