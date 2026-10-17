@@ -42,7 +42,18 @@ export default function StoreCommerce({mode,accountsEnabled,onBack,onLogin,onRes
        <div className="lm-commerce-stats"><div><small>المجانية</small><strong>{wallet.freeRemaining?'متاحة':'استُخدمت'}</strong></div><div><small>رصيد المباريات</small><strong>{wallet.credits}</strong></div></div>
        <h2>مبارياتك</h2>
        {wallet.matches.length===0?<p>ما عندك مباريات سابقة بعد.</p>:wallet.matches.map(m=><div className="lm-commerce-match" key={m.id}><div><strong>{m.match_name||'مباراة لمنا'}</strong><small>{m.kind==='free'?'مجانية':'مدفوعة'} — {m.status==='active'?'لم تنتهِ':'مكتملة'}</small></div>{m.status==='active'&&<button type="button" disabled={loading} onClick={()=>resume(m.id)}>متابعة</button>}</div>)}
-       <button className="lm-commerce-signout" onClick={()=>{sessionStorage.removeItem('lamna-session');sessionStorage.removeItem('lamna-account-name');setWallet(null);onBack();}}><LogOut size={16}/> تسجيل الخروج</button>
+       <button className="lm-commerce-signout" onClick={async()=>{
+        try{
+         const sessionToken=token();
+         if(sessionToken)await fetch('https://lamna-wordless-sync.onrender.com/api/accounts/logout',{
+          method:'POST',headers:{Authorization:'Bearer '+sessionToken,'Content-Type':'application/json'},body:'{}'
+         });
+        }catch{}
+        finally{
+         sessionStorage.removeItem('lamna-session');sessionStorage.removeItem('lamna-account-name');
+         localStorage.removeItem('lamna-current-match-id');setWallet(null);onBack();
+        }
+       }}><LogOut size={16}/> تسجيل الخروج</button>
       </div>:null}
     {message&&<p className="lm-commerce-error" role="alert">{message}</p>}
    </>}
