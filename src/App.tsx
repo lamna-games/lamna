@@ -3,6 +3,7 @@ import { Phone, Hand, Repeat2, Bomb, MessageSquareText, LogOut, LayoutGrid, Flag
 import './site.css';
 import './boardLayout.css';
 import CartoonCover from './CartoonCover';
+import {categories,categorySections} from './gameCatalog';
 import { getQuestion, wordlessModeCount } from './quizData';
 import { WordlessTV } from './Wordless';
 import WinnerScreen from './WinnerScreen';
@@ -15,51 +16,8 @@ import QuestionReport from './QuestionReport';
 import {storeRequest, token, type ServerMatch, type Wallet} from './storeApi';
 import { Plus, ArrowLeft, Sparkles, UsersRound, Grid2X2, Trophy, ChevronLeft, Check, Play } from 'lucide-react';
 import './landing.css';
+import './gameSections.css';
 import './brandTheme.css';
-const categories = [
-  'معلومات عامة',
-  'ولا كلمة',
-  'زووم',
-  'مسلسلات وأفلام',
-  'كرة القدم',
-  'أغاني وفنانين',
-  'أمثال شعبية',
-  'من أنا؟',
-  'ترتيب الأحداث',
-  'ألغاز وذكاء',
-  'تاريخ السعودية',
-  'أعلام ودول',
-  'وش الناقص؟',
-  'خمن الشعار',
-  'صح أو خطأ',
-  'أكلات ومطاعم',
-  'ذاكرة الصورة',
-  'أكمل العبارة',
-  'رياضة منوعة',
-  'تحدي السرعة',
-];
-const icons = [
-  '🎭',
-  '🔎',
-  '💡',
-  '🎬',
-  '⚽',
-  '🎵',
-  '📜',
-  '🕵️',
-  '🔢',
-  '🧩',
-  '🇸🇦',
-  '🌍',
-  '🧠',
-  '🎯',
-  '⚡',
-  '🍽️',
-  '🖼️',
-  '✍️',
-  '🏆',
-  '⏱️',
-];
 type Page = 'home' | 'categories' | 'setup' | 'game' | 'pricing' | 'account' | 'privacy' | 'terms' | 'faq' | 'contact';
 function Cover({i,title}:{i:number,title:string}) { return <CartoonCover i={i} title={title}/>; }
 type AidId = 'phone' | 'two' | 'rest' | 'pit' | 'trap';
@@ -109,6 +67,7 @@ function App() {
   const [matchError,setMatchError]=useState('');
   const [starting,setStarting]=useState(false);
   const [selected, setSelected] = useState<number[]>([]);
+  const [expandedSection,setExpandedSection]=useState<number|null>(0);
   const [teams, setTeams] = useState(['الفريق الأول', 'الفريق الثاني']);
   const [matchName,setMatchName] = useState('');
   const [chosenAids,setChosenAids] = useState<AidId[][]>([[],[]]);
@@ -354,7 +313,7 @@ function App() {
               <div>
                 <span className="lm-library-eyebrow"><span/> هنا تبدأ جمعتكم</span>
                 <h2>اختاروا <em>ألعابكم.</em></h2>
-                <p>تصفّح الألعاب واختر 6 فئات عشان نجهّز المباراة.</p>
+                <p>10 أقسام، في كل قسم 5 ألعاب. افتح أي قسم واختر 6 فئات لمباراتكم من نفس الصفحة.</p>
               </div>
               <div className="lm-library-selected" aria-live="polite"><span>{selected.length}</span> من 6 فئات</div>
             </div>
@@ -379,18 +338,48 @@ function App() {
             <div className="lm-library-progress" role="progressbar" aria-label="الفئات المختارة" aria-valuemin={0} aria-valuemax={6} aria-valuenow={selected.length}>
               <span style={{ width: (selected.length / 6) * 100 + '%' }}/>
             </div>
-            <div className="lm-library-grid">
-              {categories.map((name,i)=>(
-                <button type="button"
-                  className={'lm-library-card'+(selected.includes(i)?' lm-is-selected':'')}
-                  key={i}
-                  onClick={()=>choose(i)}
-                  aria-label={(selected.includes(i)?'إلغاء اختيار ':'اختيار ')+name}
-                  aria-pressed={selected.includes(i)}>
-                  <Cover i={i} title={name}/>
-                  <span className="lm-library-selection-index" aria-hidden="true">{selected.includes(i)?String(selected.indexOf(i)+1).padStart(2,'0'):'+'}</span>
+            <nav className="lm-section-shortcuts" aria-label="انتقل إلى قسم الألعاب">
+              {categorySections.map((section,index)=>(
+                <button type="button" key={section.name} className={expandedSection===index?'is-current':''}
+                 aria-pressed={expandedSection===index}
+                 onClick={()=>{setExpandedSection(index);document.getElementById('lm-section-'+index)?.scrollIntoView({behavior:'smooth',block:'start'});}}>
+                  {section.name}
                 </button>
               ))}
+            </nav>
+            <div className="lm-category-groups">
+              {categorySections.map((section,index)=>{
+                const isOpen=expandedSection===index;
+                const picks=section.ids.filter(id=>selected.includes(id)).length;
+                return <section className={'lm-category-group'+(isOpen?' is-open':'')} key={section.name}
+                    id={'lm-section-'+index} aria-label={section.name}>
+                  <button type="button" className="lm-category-heading" aria-expanded={isOpen}
+                    aria-controls={'lm-section-games-'+index}
+                    onClick={()=>setExpandedSection(isOpen?null:index)}>
+                    <span className="lm-category-heading-copy">
+                      <strong>{section.name}</strong>
+                      <small>{section.description}</small>
+                    </span>
+                    <span className="lm-category-heading-meta">
+                      <span className="lm-category-count">{picks?('اخترت '+picks+' / 5'):'5 ألعاب'}</span>
+                      <span className="lm-category-expand" aria-hidden="true">{isOpen?'−':'+'}</span>
+                    </span>
+                  </button>
+                  {isOpen&&<div className="lm-category-content" id={'lm-section-games-'+index}>
+                    <div className="lm-library-grid">
+                      {section.ids.map(i=>(
+                        <button type="button" className={'lm-library-card'+(selected.includes(i)?' lm-is-selected':'')}
+                         key={i} onClick={()=>choose(i)}
+                         aria-label={(selected.includes(i)?'إلغاء اختيار ':'اختيار ')+categories[i]}
+                         aria-pressed={selected.includes(i)}>
+                          <Cover i={i} title={categories[i]}/>
+                          <span className="lm-library-selection-index" aria-hidden="true">{selected.includes(i)?String(selected.indexOf(i)+1).padStart(2,'0'):'+'}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>}
+                </section>;
+              })}
             </div>
             <div className="lm-library-bottom">
               <span>{selected.length===6?'تشكيلتكم جاهزة! كمّلوا معلومات الفرق تحت.':'اختر '+(6-selected.length)+' فئات '+(selected.length?'إضافية':'لبداية اللعب')}</span>
