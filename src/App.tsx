@@ -6,6 +6,7 @@ import CartoonCover from './CartoonCover';
 import { getQuestion, wordlessModeCount } from './quizData';
 import { WordlessTV } from './Wordless';
 import WinnerScreen from './WinnerScreen';
+import OfficialLogo from './OfficialLogo';
 import { Plus, ArrowLeft, Sparkles, UsersRound, Grid2X2, Trophy, ChevronLeft, Check, Play } from 'lucide-react';
 import './landing.css';
 const categories = [
@@ -160,22 +161,7 @@ function App() {
     setAidEffect(null);setAidOwner(null);
     if(used.length===35)setShowResult(true);
   };
-  const brand = (
-    <div className="brand">
-      {logoOk ? (
-        <img
-          src="/resources/lamna-original.webp"
-          alt="شعار لمنا"
-          onError={() => setLogoOk(false)}
-        />
-      ) : (
-        <div className="brand-fallback">
-          <strong>لمنا</strong>
-          <span>ألعاب تجمعنا</span>
-        </div>
-      )}
-    </div>
-  );
+  const brand = <div className="brand"><OfficialLogo/></div>;
   const setupFields = (
           <div className="aid-setup-panel">
             <label className="aid-match-field">
@@ -383,7 +369,7 @@ function App() {
               </nav>
               <div className="lamna-match-topline">
                 <span className="lamna-match-current">دور فريق: <strong>{teams[turn]||'الفريق '+(turn+1)}</strong></span>
-                <div className="lamna-match-logo">لمنا</div>
+                <div className="lamna-match-logo"><OfficialLogo/></div>
               </div>
               <div className="lamna-match-title">{matchName||'لوحة التحدّي'}</div>
             </header>
@@ -463,7 +449,7 @@ function App() {
                 </div>
                 <div className="play-brandrow">
                   <div className="play-turn">دور فريق: <strong>{teams[phase==='steal'?1-stealFrom:turn]}</strong></div>
-                  <div className="play-brand">لمنا</div>
+                  <div className="play-brand"><OfficialLogo/></div>
                 </div>
                 <div className="play-category">{categories[selected[Math.floor(active/6)]]}</div>
               </div>
@@ -614,7 +600,7 @@ function App() {
       )}
       {page!=='game' && <footer>
         <div>{brand}</div>
-        <p>لمنا — ألعاب تجمعنا</p>
+        <p>ألعاب تجمعنا</p>
         <small>نسخة مستقلة تجريبية • بدون دفع أو تسجيل حقيقي</small>
       </footer>}
     </div>
