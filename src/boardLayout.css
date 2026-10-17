@@ -497,3 +497,207 @@
  .play-team-name{font-size:15px!important;}
  .play-team-help-label{font-size:12px!important;}
 }
+
+/* LAMNA MATCH: native-height one-screen board in portrait and landscape.
+   Deliberately no scrolling or document footers during a match. */
+.site.in-match{height:100dvh!important;min-height:0!important;overflow:hidden!important;background:#0c2337!important;}
+.in-match .lamna-match-screen{
+ position:fixed!important;inset:0!important;z-index:80;
+ width:100vw!important;height:100vh!important;height:100dvh!important;
+ margin:0!important;padding:0!important;min-width:0!important;min-height:0!important;
+ overflow:hidden!important;
+ background:#0f2638!important;color:#f5fbff!important;
+ direction:rtl;text-align:center;isolation:isolate;
+}
+.lamna-match-screen *{box-sizing:border-box;}
+.lamna-match-shell{
+ display:flex!important;flex-direction:column!important;
+ width:100%!important;height:100%!important;max-width:100%!important;
+ min-width:0!important;min-height:0!important;overflow:hidden!important;
+}
+.lamna-match-header{
+ flex:0 0 auto!important;min-height:0!important;
+ padding:calc(5px + env(safe-area-inset-top,0px)) 12px 5px!important;
+ background:linear-gradient(100deg,#11293e,#193c50);
+ border-bottom:1px solid #386d79;
+}
+.lamna-match-nav{
+ display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+ gap:4px!important;align-items:center!important;
+}
+.lamna-match-nav button{
+ min-width:0!important;min-height:25px!important;max-width:100%!important;
+ border:0!important;background:transparent!important;
+ padding:2px!important;color:#dcf7f3!important;font-size:clamp(10px,2.8vw,15px)!important;font-weight:750!important;
+ white-space:nowrap!important;
+}
+.lamna-match-nav button:disabled{opacity:.32!important;}
+.lamna-match-topline{display:flex!important;justify-content:center!important;align-items:center!important;min-height:26px!important;position:relative!important;margin-top:2px!important;}
+.lamna-match-current{
+ display:inline-block!important;max-width:75%!important;
+ overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;
+ padding:4px 17px!important;border-radius:25px!important;
+ background:#58d3c2!important;color:#10374b!important;font-size:clamp(11px,3vw,15px)!important;font-weight:700!important;
+}
+.lamna-match-logo{position:absolute!important;right:4px!important;top:50%!important;transform:translateY(-50%)!important;font-size:clamp(14px,4vw,23px)!important;line-height:1!important;font-weight:950!important;color:#58d3c2!important;}
+.lamna-match-title{font-size:clamp(12px,3.25vw,18px)!important;line-height:1.12!important;font-weight:800!important;color:#f8fdff!important;margin:4px 0 1px!important;overflow:hidden!important;white-space:nowrap!important;text-overflow:ellipsis!important;}
+.lamna-match-playfield{
+ display:flex!important;flex:1 1 0%!important;min-height:0!important;min-width:0!important;
+ overflow:hidden!important;padding:6px 9px!important;background:#112b40!important;
+}
+.in-match .lamna-match-playfield .game-board{
+ flex:1 1 auto!important;display:grid!important;
+ width:100%!important;max-width:100%!important;
+ height:100%!important;min-height:0!important;max-height:100%!important;
+ margin:0!important;
+ padding:0!important;
+ background:transparent!important;border-radius:0!important;
+ grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ grid-template-rows:repeat(3,minmax(0,1fr))!important;
+ gap:5px 10px!important;
+ align-content:stretch!important;
+ justify-items:stretch!important;align-items:stretch!important;
+}
+.in-match .game-board .board-column{
+ display:grid!important;position:relative!important;
+ width:100%!important;height:100%!important;min-height:0!important;min-width:0!important;
+ grid-template-columns:minmax(0,1fr) minmax(0,2fr) minmax(0,1fr)!important;
+ grid-template-rows:minmax(0,1fr)!important;
+ gap:0!important;align-items:stretch!important;
+ overflow:hidden!important;
+}
+.in-match .game-board .board-cat{display:none!important;}
+.in-match .game-board .board-cover{
+ grid-row:1!important;grid-column:2!important;
+ width:100%!important;height:100%!important;min-height:0!important;
+ min-width:0!important;max-width:none!important;
+ position:relative!important;border-radius:7px!important;
+ overflow:hidden!important;align-self:stretch!important;
+}
+.in-match .game-board .board-cover>.lamna-cover{
+ width:100%!important;height:100%!important;min-height:0!important;border-radius:7px!important;
+}
+.in-match .game-board .board-cover .lamna-cover-label{
+ flex-basis:20%!important;min-height:0!important;
+ padding:1px!important;overflow:hidden!important;
+}
+.in-match .game-board .board-cover .lamna-cover-label strong{
+ font-size:clamp(7px,2.4vw,12px)!important;line-height:1.1!important;
+ max-height:100%!important;overflow:hidden!important;
+}
+.in-match .game-board .board-points{
+ grid-row:1!important;grid-column:1/-1!important;
+ display:grid!important;position:relative!important;
+ grid-template-columns:minmax(0,1fr) minmax(0,2fr) minmax(0,1fr)!important;
+ grid-template-rows:repeat(3,minmax(0,1fr))!important;
+ width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;
+ gap:3px 0!important;overflow:hidden!important;
+ pointer-events:none!important;
+}
+.in-match .game-board .board-points button{
+ display:grid!important;place-items:center!important;
+ margin:0!important;padding:0!important;border:0!important;
+ width:100%!important;height:100%!important;
+ min-width:0!important;min-height:0!important;line-height:1!important;
+ font-size:clamp(11px,3.3vw,21px)!important;
+ border-radius:12px!important;
+ background:#28435b!important;color:#f4fafb!important;
+ pointer-events:auto!important;
+}
+.in-match .game-board .board-points button:disabled{background:#1d3348!important;color:#607b8e!important;}
+.in-match .game-board .board-points button:nth-child(odd){grid-column:1!important;}
+.in-match .game-board .board-points button:nth-child(even){grid-column:3!important;}
+.in-match .game-board .board-points button:nth-child(-n+2){grid-row:1!important;}
+.in-match .game-board .board-points button:nth-child(3),.in-match .game-board .board-points button:nth-child(4){grid-row:2!important;}
+.in-match .game-board .board-points button:nth-child(n+5){grid-row:3!important;}
+.lamna-match-footer{
+ flex:0 0 auto!important;min-height:0!important;
+ background:#173246!important;
+ border-top:1px solid #3e8290!important;
+ padding:5px 10px calc(5px + env(safe-area-inset-bottom,0px))!important;
+}
+.lamna-match-teams{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;}
+.lamna-match-team{min-width:0!important;display:flex!important;flex-direction:column!important;align-items:center!important;gap:3px!important;}
+.lamna-match-team-name{
+ background:#1a8c91;color:white;
+ border-radius:18px!important;
+ width:100%!important;
+ padding:5px 3px!important;
+ font-size:clamp(12px,3.6vw,18px)!important;line-height:1.1!important;
+ font-weight:900!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;
+}
+.lamna-match-team:nth-child(2) .lamna-match-team-name{background:#615b9e!important;}
+.lamna-match-scorebox{
+ display:flex!important;justify-content:space-between!important;align-items:center!important;
+ width:100%!important;height:32px!important;min-height:0!important;
+ border:2px solid #50798a;border-radius:25px!important;padding:2px 4px!important;
+ background:#203c50!important;
+}
+.lamna-match-scorebox strong{font-size:clamp(13px,3.7vw,19px)!important;color:white!important;line-height:1!important;}
+.lamna-match-scorebox button{
+ display:grid!important;place-items:center!important;flex:0 0 auto!important;
+ width:25px!important;height:25px!important;border:0!important;border-radius:50%!important;
+ background:#58d3c2!important;color:#0b3440!important;font-size:20px!important;
+ font-weight:900!important;padding:0!important;line-height:1!important;
+}
+.lamna-match-help-title{color:#eaf7f8!important;font-size:clamp(11px,3vw,15px)!important;font-weight:850!important;line-height:1.05!important;}
+.lamna-match-help-icons{display:flex!important;gap:8px!important;justify-content:center!important;align-items:center!important;min-height:25px!important;}
+.lamna-match-help-icon{
+ display:grid!important;place-items:center!important;
+ width:25px!important;height:25px!important;border:2px solid #509ea1!important;
+ border-radius:10px!important;background:#174255!important;color:#baf8ea!important;
+}
+.lamna-match-team:nth-child(2) .lamna-match-help-icon{border-color:#807fc1!important;color:#dbd4ff!important;}
+.lamna-match-help-icon.spent{opacity:.35!important;filter:grayscale(1)!important;}
+.lamna-match-help-icon svg{width:16px!important;height:16px!important;}
+/* Landscape phone: three game categories across and two down, all in the same viewport. */
+@media(orientation:landscape) and (max-height:640px){
+ .lamna-match-header{padding:2px 12px 2px!important;}
+ .lamna-match-nav button{min-height:18px!important;font-size:clamp(10px,1.4vw,13px)!important;padding:0!important;}
+ .lamna-match-topline{min-height:19px!important;margin-top:0!important;}
+ .lamna-match-current{padding:1px 12px!important;font-size:clamp(11px,1.6vw,14px)!important;}
+ .lamna-match-title{margin:1px 0!important;font-size:clamp(10px,1.6vw,14px)!important;}
+ .lamna-match-playfield{padding:3px 10px!important;}
+ .in-match .lamna-match-playfield .game-board{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  grid-template-rows:repeat(2,minmax(0,1fr))!important;
+  gap:4px 12px!important;
+ }
+ .in-match .game-board .board-column,.in-match .game-board .board-points{
+  grid-template-columns:minmax(0,1fr) minmax(0,1.65fr) minmax(0,1fr)!important;
+ }
+ .in-match .game-board .board-points button{font-size:clamp(11px,1.9vw,17px)!important;border-radius:9px!important;}
+ .in-match .game-board .board-cover .lamna-cover-label strong{font-size:clamp(7px,1.4vw,10px)!important;}
+ .lamna-match-footer{padding:3px 16px calc(3px + env(safe-area-inset-bottom,0px))!important;}
+ .lamna-match-team{gap:1px!important;}
+ .lamna-match-team-name{padding:2px!important;font-size:clamp(10px,1.7vw,13px)!important;}
+ .lamna-match-scorebox{height:24px!important;padding:1px 3px!important;}
+ .lamna-match-scorebox button{width:19px!important;height:19px!important;font-size:15px!important;}
+ .lamna-match-scorebox strong{font-size:clamp(12px,1.8vw,16px)!important;}
+ .lamna-match-help-title{font-size:clamp(10px,1.5vw,12px)!important;line-height:1!important;}
+ .lamna-match-help-icons{min-height:18px!important;gap:6px!important;}
+ .lamna-match-help-icon{width:20px!important;height:20px!important;border-radius:7px!important;border-width:1px!important;}
+ .lamna-match-help-icon svg{width:14px!important;height:14px!important;}
+}
+@media(max-width:340px) and (orientation:portrait){
+ .lamna-match-header{padding-left:5px!important;padding-right:5px!important;}
+ .lamna-match-nav button{font-size:10px!important;}
+ .lamna-match-playfield{padding:4px!important;}
+ .in-match .lamna-match-playfield .game-board{gap:3px 5px!important;}
+ .in-match .game-board .board-points button{font-size:11px!important;border-radius:7px!important;}
+ .lamna-match-footer{padding-left:5px!important;padding-right:5px!important;}
+}
+@media(max-height:640px) and (orientation:portrait){
+ .lamna-match-header{padding-top:3px!important;padding-bottom:2px!important;}
+ .lamna-match-nav button{min-height:18px!important;font-size:11px!important;}
+ .lamna-match-title{margin:1px 0!important;}
+ .lamna-match-playfield{padding-top:3px!important;padding-bottom:3px!important;}
+ .lamna-match-footer{padding-top:2px!important;padding-bottom:2px!important;}
+ .lamna-match-team-name{padding:2px!important;}
+ .lamna-match-team{gap:1px!important;}
+ .lamna-match-scorebox{height:25px!important;}
+ .lamna-match-scorebox button{width:19px!important;height:19px!important;font-size:15px!important;}
+ .lamna-match-help-title{font-size:11px!important;}
+ .lamna-match-help-icons{min-height:18px!important;gap:4px!important;}
+ .lamna-match-help-icon{width:20px!important;height:20px!important;}
+}
