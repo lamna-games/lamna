@@ -313,7 +313,7 @@ function App() {
               <div>
                 <span className="lm-library-eyebrow"><span/> هنا تبدأ جمعتكم</span>
                 <h2>اختاروا <em>ألعابكم.</em></h2>
-                <p>10 أقسام، في كل قسم 5 ألعاب. افتح أي قسم واختر 6 فئات لمباراتكم من نفس الصفحة.</p>
+                <p>تصفّح الأقسام وافتح أو أقفل أي قسم براحتك، واختر 6 ألعاب لمباراتكم من نفس الصفحة.</p>
               </div>
               <div className="lm-library-selected" aria-live="polite"><span>{selected.length}</span> من 6 فئات</div>
             </div>
@@ -350,7 +350,6 @@ function App() {
             <div className="lm-category-groups">
               {categorySections.map((section,index)=>{
                 const isOpen=openSections.includes(index);
-                const picks=section.ids.filter(id=>selected.includes(id)).length;
                 return <section className={'lm-category-group'+(isOpen?' is-open':'')} key={section.name}
                     id={'lm-section-'+index} aria-label={section.name}>
                   <button type="button" className="lm-category-heading" aria-expanded={isOpen}
@@ -361,7 +360,6 @@ function App() {
                       <small>{section.description}</small>
                     </span>
                     <span className="lm-category-heading-meta">
-                      <span className="lm-category-count">{picks?('اخترت '+picks+' / 5'):'5 ألعاب'}</span>
                       <span className="lm-category-expand" aria-hidden="true">{isOpen?'−':'+'}</span>
                     </span>
                   </button>
