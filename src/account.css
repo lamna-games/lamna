@@ -32,3 +32,10 @@
 .lm-account-bottom{text-align:center;color:#586f7b;margin:23px 0 2px}
 .lm-account-bottom button{border:0;background:none;color:#087f76;text-decoration:underline;font-weight:900;font-size:15px}
 @media(max-width:420px){.lm-account{padding:16px 10px 40px}.lm-account-shell{padding:16px 15px}.lm-form-double{gap:8px}.lm-account-form label>span{font-size:14px}}
+
+/* One-time signup consent and clear focus feedback. */
+.lm-account-form .lm-account-consent{display:flex;flex-direction:row;align-items:flex-start;gap:9px;padding:12px 13px;border:1px solid #d5e5e6;border-radius:12px;background:#f8fcfc;font-weight:500}
+.lm-account-consent input[type=checkbox]{flex:0 0 19px;width:19px;height:19px;padding:0;min-width:19px;min-height:19px;margin:2px 0 0;accent-color:#169e9f;cursor:pointer}
+.lm-account-consent span{display:block;font-size:13px;font-weight:650;line-height:1.65;color:#466776}
+.lm-account-consent a{color:#096f7b;font-weight:900;text-decoration:underline;text-underline-offset:3px}
+.lm-account-form button:focus-visible,.lm-account-form a:focus-visible{outline:3px solid #19a4af;outline-offset:3px}
