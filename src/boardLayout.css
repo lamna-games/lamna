@@ -95,8 +95,8 @@
 @media(max-width:600px){
  .game-section{padding:0 5px!important;margin:12px auto!important;}
  .game-board{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px 9px!important;padding:12px 8px!important;border-radius:19px!important;}
- .board-column{grid-template-columns:minmax(0,1fr) minmax(0,1.25fr) minmax(0,1fr)!important;grid-template-rows:210px!important;}
- .board-points{grid-template-columns:minmax(0,1fr) minmax(0,1.25fr) minmax(0,1fr)!important;gap:6px 0!important;}
+ .board-column{grid-template-columns:minmax(0,1fr) minmax(0,2.1fr) minmax(0,1fr)!important;grid-template-rows:216px!important;}
+ .board-points{grid-template-columns:minmax(0,1fr) minmax(0,2.1fr) minmax(0,1fr)!important;gap:6px 0!important;}
  .board-points button,.board-column .board-points button{font-size:17px!important;border-radius:9px!important;}
  .board-cover .lamna-cover-label{flex-basis:20%!important;padding:2px 2px!important;}
  .board-cover .lamna-cover-label strong{font-size:10px!important;line-height:1.13!important;overflow-wrap:anywhere!important;}
