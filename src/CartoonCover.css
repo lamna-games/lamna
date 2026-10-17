@@ -77,3 +77,67 @@
  .board-cover .lamna-cover-picture .lamna-cover-symbol{width:18px;height:19px;top:1px;right:0;}
  .board-cover .lamna-cover-symbol img{width:62px!important;right:-5px!important;top:-3px!important;}
 }
+
+
+/* 2026-10-18: Keep the original official emblem as a quiet printed corner mark,
+   NOT a bright white sticker. Do not change the underlying original logo file. */
+.lamna-cover-picture .lamna-cover-symbol{
+  top:9px!important;
+  right:9px!important;
+  width:36px!important;
+  height:34px!important;
+  background:transparent!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  opacity:.78!important;
+  filter:none!important;
+  isolation:isolate;
+}
+.lamna-cover-picture .lamna-cover-symbol img{
+  width:119px!important;
+  height:auto!important;
+  max-width:none!important;
+  right:-10px!important;
+  top:-6px!important;
+  filter:none!important;
+  opacity:1!important;
+}
+.board-cover .lamna-cover-picture .lamna-cover-symbol{
+  top:3px!important;
+  right:3px!important;
+  width:17px!important;
+  height:16px!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  opacity:.78!important;
+}
+.board-cover .lamna-cover-picture .lamna-cover-symbol img{
+  width:56px!important;
+  right:-5px!important;
+  top:-3px!important;
+}
+@media(max-width:650px){
+  .lamna-cover-picture .lamna-cover-symbol{
+    top:8px!important;
+    right:8px!important;
+    width:30px!important;
+    height:29px!important;
+  }
+  .lamna-cover-picture .lamna-cover-symbol img{
+    width:99px!important;
+    right:-9px!important;
+    top:-5px!important;
+  }
+  .board-cover .lamna-cover-picture .lamna-cover-symbol{
+    width:15px!important;
+    height:14px!important;
+    top:2px!important;
+    right:2px!important;
+  }
+  .board-cover .lamna-cover-picture .lamna-cover-symbol img{
+    width:50px!important;
+    right:-5px!important;
+    top:-3px!important;
+  }
+}
