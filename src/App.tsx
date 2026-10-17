@@ -243,6 +243,24 @@ function App() {
               </div>
               <div className="lm-library-selected" aria-live="polite"><span>{selected.length}</span> من 6 فئات</div>
             </div>
+            <div className="lm-picks" aria-label="تشكيلة لعبتكم">
+              <div className="lm-picks-heading">
+                <div className="lm-picks-title"><Sparkles size={17}/><strong>تشكيلتكم</strong><span>اضغط على الفئة لإزالتها</span></div>
+                <span className="lm-picks-numerator">{selected.length} / 6</span>
+              </div>
+              <div className="lm-picks-grid">
+                {Array.from({length:6},(_,idx)=>{
+                  const item=selected[idx];
+                  return item===undefined
+                    ? <div className="lm-pick-empty" key={'empty-'+idx}><span>{String(idx+1).padStart(2,'0')}</span><Plus size={19}/><small>بانتظار اختيارك</small></div>
+                    : <button type="button" key={item} className="lm-pick-filled" onClick={()=>choose(item)} aria-label={'إزالة '+categories[item]+' من التشكيلة'}>
+                        <span className="lm-pick-ordinal">{String(idx+1).padStart(2,'0')}</span>
+                        <strong>{categories[item]}</strong>
+                        <span className="lm-pick-remove">×</span>
+                      </button>
+                })}
+              </div>
+            </div>
             <div className="lm-library-progress" role="progressbar" aria-label="الفئات المختارة" aria-valuemin={0} aria-valuemax={6} aria-valuenow={selected.length}>
               <span style={{ width: (selected.length / 6) * 100 + '%' }}/>
             </div>
@@ -255,7 +273,7 @@ function App() {
                   aria-label={(selected.includes(i)?'إلغاء اختيار ':'اختيار ')+name}
                   aria-pressed={selected.includes(i)}>
                   <Cover i={i} title={name}/>
-                  <span className="lm-library-check"><Check size={17} strokeWidth={3}/></span>
+                  <span className="lm-library-selection-index" aria-hidden="true">{selected.includes(i)?String(selected.indexOf(i)+1).padStart(2,'0'):'+'}</span>
                 </button>
               ))}
             </div>
