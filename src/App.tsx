@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Phone, Hand, Repeat2, Bomb, MessageSquareText } from 'lucide-react';
+import { Phone, Hand, Repeat2, Bomb, MessageSquareText, LogOut, LayoutGrid, Flag, Undo2 } from 'lucide-react';
 import './site.css';
 import './boardLayout.css';
 import CartoonCover from './CartoonCover';
@@ -367,7 +367,7 @@ function App() {
           <div className="lamna-match-shell">
             <header className="lamna-match-header">
               <nav className="lamna-match-nav" aria-label="التحكم بالمباراة">
-                <button type="button" onClick={()=>go('home')}>↪ الخروج</button>
+                <button type="button" className="lm-action-link" onClick={()=>go('home')}><LogOut size={18} aria-hidden="true"/><span>الخروج</span></button>
                 <button type="button" title="التراجع عن آخر نتيجة" disabled={!history.length||active!==null}
                   onClick={()=>{
                     const last=history[history.length-1];if(!last)return;
@@ -375,8 +375,8 @@ function App() {
                     setTurn(v=>1-v);
                     setScores(v=>v.map((score,i)=>Math.max(0,score-(last.changes?.[i]??(last.team===i?last.points:0)))));
                     setShowResult(false);
-                  }}>↶ تراجع</button>
-                <button type="button" onClick={()=>{setActive(null);setShowResult(true)}}>➜ إنهاء المباراة</button>
+                  }}><Undo2 size={18} aria-hidden="true"/><span>تراجع</span></button>
+                <button type="button" className="lm-action-link" onClick={()=>{setActive(null);setShowResult(true)}}><Flag size={18} aria-hidden="true"/><span>إنهاء المباراة</span></button>
               </nav>
               <div className="lamna-match-topline">
                 <span className="lamna-match-current">دور فريق: <strong>{teams[turn]||'الفريق '+(turn+1)}</strong></span>
@@ -454,9 +454,9 @@ function App() {
             <div className="play-screen" dir="rtl" role="dialog" aria-modal="true" aria-label="شاشة لعب السؤال">
               <div className="play-header">
                 <div className="play-nav">
-                  <button type="button" onClick={()=>{setActive(null);setReveal(false);setPickWinner(false);setPaused(true);go('home');}}>↪ الخروج</button>
-                  <button type="button" onClick={()=>{setActive(null);setReveal(false);setPickWinner(false);setPaused(true);}}>▦ الرجوع للوحة</button>
-                  <button type="button" onClick={()=>{setActive(null);setReveal(false);setPickWinner(false);setPaused(true);go('home');}}>➜ إنهاء اللعبة</button>
+                  <button type="button" className="lm-action-link" onClick={()=>{setActive(null);setReveal(false);setPickWinner(false);setPaused(true);go('home');}}><LogOut size={18} aria-hidden="true"/><span>الخروج</span></button>
+                  <button type="button" className="lm-action-link" onClick={()=>{setActive(null);setReveal(false);setPickWinner(false);setPaused(true);}}><LayoutGrid size={18} aria-hidden="true"/><span>الرجوع للوحة</span></button>
+                  <button type="button" className="lm-action-link" onClick={()=>{setActive(null);setReveal(false);setPickWinner(false);setPaused(true);setShowResult(true);}}><Flag size={18} aria-hidden="true"/><span>إنهاء اللعبة</span></button>
                 </div>
                 <div className="play-brandrow">
                   <div className="play-turn">دور فريق: <strong>{teams[phase==='steal'?1-stealFrom:turn]}</strong></div>
