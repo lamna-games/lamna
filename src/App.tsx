@@ -9,6 +9,7 @@ import WinnerScreen from './WinnerScreen';
 import OfficialLogo from './OfficialLogo';
 import SocialLinks from './SocialLinks';
 import AuthScreen from './AuthScreen';
+import StoreInformation from './StoreInformation';
 import { Plus, ArrowLeft, Sparkles, UsersRound, Grid2X2, Trophy, ChevronLeft, Check, Play } from 'lucide-react';
 import './landing.css';
 import './brandTheme.css';
@@ -56,7 +57,7 @@ const icons = [
   '🏆',
   '⏱️',
 ];
-type Page = 'home' | 'categories' | 'setup' | 'game' | 'pricing' | 'account';
+type Page = 'home' | 'categories' | 'setup' | 'game' | 'pricing' | 'account' | 'privacy' | 'terms' | 'faq' | 'contact';
 function Cover({i,title}:{i:number,title:string}) { return <CartoonCover i={i} title={title}/>; }
 type AidId = 'phone' | 'two' | 'rest' | 'pit' | 'trap';
 const aidCatalog: { id: AidId; name: string; info: string }[] = [
@@ -76,6 +77,16 @@ function AidGlyph({ id, size=26 }: { id:AidId; size?:number }) {
 function App() {
   const [page, setPage] = useState<Page>('home');
   const [authMode,setAuthMode] = useState<'register'|'login'>('register');
+  const [accountsEnabled,setAccountsEnabled] = useState(false);
+  React.useEffect(()=>{
+    let mounted=true;
+    fetch('https://lamna-wordless-sync.onrender.com/api/accounts/status',{cache:'no-store'})
+      .then(r=>r.ok?r.json():{enabled:false})
+      .then(data=>{if(mounted)setAccountsEnabled(data.enabled===true)})
+      .catch(()=>{if(mounted)setAccountsEnabled(false)});
+    return()=>{mounted=false};
+  },[]);
+
   const [selected, setSelected] = useState<number[]>([]);
   const [teams, setTeams] = useState(['الفريق الأول', 'الفريق الثاني']);
   const [matchName,setMatchName] = useState('');
@@ -205,7 +216,7 @@ function App() {
                 </div>
               </div>
             ))}
-            <p className="muted aid-setup-note">هذه نسخة تجريبية؛ تظهر الوسائل المختارة تحت كل فريق ويُمكن استعمال كل وسيلة مرة واحدة أثناء السؤال.</p>
+            <p className="muted aid-setup-note">اختر ثلاث وسائل مساعدة لكل فريق. تُستخدم كل وسيلة مرة واحدة أثناء المباراة.</p>
             <button className="primary aid-start-button"
               disabled={!matchName.trim()||teams.some(t=>!t.trim())||chosenAids.some(list=>list.length!==3)}
               onClick={()=>{
@@ -223,15 +234,15 @@ function App() {
         <div onClick={() => go('home')} className="brand-link">
           {brand}
         </div>
-        <div className="lm-header-accounts">
+        {accountsEnabled && <div className="lm-header-accounts">
           <button type="button" onClick={()=>{setAuthMode('register');go('account');}}>سجّل معنا</button>
           <button type="button" onClick={()=>{setAuthMode('login');go('account');}}>تسجيل الدخول</button>
-        </div>
+        </div>}
         {page!=='home'&&<nav>
           <button onClick={() => go('home')}>الرئيسية</button>
           <button onClick={scrollToGames}>الفئات</button>
-          <button onClick={() => go('pricing')}>الباقات</button>
-          <button onClick={() => go('account')}>حسابي</button>
+          <button onClick={() => go('faq')}>الأسئلة الشائعة</button>
+          {accountsEnabled && <button onClick={() => {setAuthMode('login');go('account');}}>حسابي</button>}
         </nav>}
       </header>}
       {page === 'home' && (
@@ -250,7 +261,7 @@ function App() {
                 <button type="button" className="lm-resume-link" onClick={()=>{setPaused(true);go('game');}}>
                   <Play size={17} fill="currentColor"/> متابعة المباراة المحفوظة
                 </button>}
-              <div className="lm-hero-meta"><span>20 فئة</span><span>6 ألعاب تختارها</span><span>فريقان</span></div>
+              <div className="lm-hero-meta"><span>ألعاب متنوعة</span><span>6 ألعاب تختارها</span><span>فريقان</span></div>
             </div>
           </section>
 
@@ -259,7 +270,7 @@ function App() {
               <div>
                 <span className="lm-library-eyebrow"><span/> هنا تبدأ جمعتكم</span>
                 <h2>اختاروا <em>ألعابكم.</em></h2>
-                <p>قدامك كل الفئات العشرين. اختر 6 فئات عشان نجهّز المباراة.</p>
+                <p>تصفّح الألعاب واختر 6 فئات عشان نجهّز المباراة.</p>
               </div>
               <div className="lm-library-selected" aria-live="polite"><span>{selected.length}</span> من 6 فئات</div>
             </div>
@@ -563,43 +574,24 @@ function App() {
           )}
         </section>
       )}
-      {page === 'pricing' && (
-        <section className="section narrow">
-          <span className="kicker">باقات لمنا</span>
-          <h1>اختار الباقة اللي تناسب جمعتكم</h1>
-          <p className="muted">
-            الأسعار للعرض فقط؛ الدفع غير مفعّل في هذه النسخة.
-          </p>
-          <div className="plans">
-            {[
-              [1, 9],
-              [5, 19],
-              [10, 29],
-            ].map(([count, price], i) => (
-              <div
-                className={'plan ' + (i === 2 ? 'featured' : '')}
-                key={count}
-              >
-                <span>{i === 2 ? 'الأوفر ✨' : 'باقة اللعب'}</span>
-                <h2>
-                  {count} {count === 1 ? 'مباراة' : 'مباريات'}
-                </h2>
-                <div className="price">
-                  {price} <small>ريال</small>
-                </div>
-                <p>اختر ٦ فئات في كل مباراة</p>
-                <button disabled>الدفع قريبًا</button>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-      {page === 'account' && <AuthScreen initialMode={authMode} onReturn={()=>go('home')}/>}
+      {page === 'pricing' && <StoreInformation page="faq" onBack={()=>go('home')}/>}
+      {(page==='privacy'||page==='terms'||page==='faq'||page==='contact')&&
+        <StoreInformation page={page} onBack={()=>go('home')}/>}
+
+      {page === 'account' && (accountsEnabled
+        ? <AuthScreen initialMode={authMode} onReturn={()=>go('home')}/>
+        : <StoreInformation page="faq" onBack={()=>go('home')}/>)}
       {page!=='game' && <footer className="lamna-site-footer">
         <div>{brand}</div>
         <p>ألعاب تجمعنا</p>
         <SocialLinks/>
-        <small>نسخة تجريبية • بدون دفع أو تسجيل حقيقي</small>
+        <nav className="lm-legal-links" aria-label="روابط معلومات لمنا">
+          <button type="button" onClick={()=>go('privacy')}>سياسة الخصوصية</button>
+          <button type="button" onClick={()=>go('terms')}>الشروط والأحكام</button>
+          <button type="button" onClick={()=>go('faq')}>الأسئلة الشائعة</button>
+          <button type="button" onClick={()=>go('contact')}>تواصل معنا</button>
+        </nav>
+        <small>© {new Date().getFullYear()} لمنا — ألعاب تجمعنا</small>
       </footer>}
     </div>
   );
