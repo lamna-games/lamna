@@ -67,7 +67,7 @@ function App() {
   const [matchError,setMatchError]=useState('');
   const [starting,setStarting]=useState(false);
   const [selected, setSelected] = useState<number[]>([]);
-  const [expandedSection,setExpandedSection]=useState<number|null>(0);
+  const [openSections,setOpenSections]=useState<number[]>(()=>categorySections.map((_,index)=>index));
   const [teams, setTeams] = useState(['الفريق الأول', 'الفريق الثاني']);
   const [matchName,setMatchName] = useState('');
   const [chosenAids,setChosenAids] = useState<AidId[][]>([[],[]]);
@@ -340,22 +340,22 @@ function App() {
             </div>
             <nav className="lm-section-shortcuts" aria-label="انتقل إلى قسم الألعاب">
               {categorySections.map((section,index)=>(
-                <button type="button" key={section.name} className={expandedSection===index?'is-current':''}
-                 aria-pressed={expandedSection===index}
-                 onClick={()=>{setExpandedSection(index);document.getElementById('lm-section-'+index)?.scrollIntoView({behavior:'smooth',block:'start'});}}>
+                <button type="button" key={section.name} className={openSections.includes(index)?'is-current':''}
+                 aria-pressed={openSections.includes(index)}
+                 onClick={()=>{setOpenSections(prev=>prev.includes(index)?prev:[...prev,index]);document.getElementById('lm-section-'+index)?.scrollIntoView({behavior:'smooth',block:'start'});}}>
                   {section.name}
                 </button>
               ))}
             </nav>
             <div className="lm-category-groups">
               {categorySections.map((section,index)=>{
-                const isOpen=expandedSection===index;
+                const isOpen=openSections.includes(index);
                 const picks=section.ids.filter(id=>selected.includes(id)).length;
                 return <section className={'lm-category-group'+(isOpen?' is-open':'')} key={section.name}
                     id={'lm-section-'+index} aria-label={section.name}>
                   <button type="button" className="lm-category-heading" aria-expanded={isOpen}
                     aria-controls={'lm-section-games-'+index}
-                    onClick={()=>setExpandedSection(isOpen?null:index)}>
+                    onClick={()=>setOpenSections(prev=>prev.includes(index)?prev.filter(i=>i!==index):[...prev,index])}>
                     <span className="lm-category-heading-copy">
                       <strong>{section.name}</strong>
                       <small>{section.description}</small>
