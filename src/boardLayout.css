@@ -701,3 +701,62 @@
  .lamna-match-help-icons{min-height:18px!important;gap:4px!important;}
  .lamna-match-help-icon{width:20px!important;height:20px!important;}
 }
+
+/* Lamna original: a restrained, bright game header makes the exact brand visible. */
+.in-match .lamna-match-header{
+ background:#fff!important;border-bottom:1px solid #d9e7e8!important;
+ color:#153a4c!important;
+}
+.in-match .lamna-match-nav button{color:#285366!important;font-weight:850!important}
+.in-match .lamna-match-nav button:hover{color:#117c70!important}
+.in-match .lamna-match-nav button:disabled{color:#aebec4!important}
+.in-match .lamna-match-title{color:#123e50!important;text-shadow:none!important}
+.in-match .lamna-match-logo{
+ right:4px!important;width:clamp(76px,18vw,124px)!important;
+ min-height:26px!important;display:flex!important;align-items:center!important;
+ justify-content:center!important;
+}
+.in-match .lamna-match-logo img{
+ width:100%!important;height:auto!important;max-height:33px!important;
+ object-fit:contain!important;filter:none!important;box-shadow:none!important;
+}
+.in-match .lamna-match-current{
+ margin:auto!important;max-width:min(61%,320px)!important;
+ background:#8be9d3!important;color:#113949!important;
+ box-shadow:none!important;border:1px solid #b1e9d7!important;
+}
+.play-header{
+ background:#fff!important;color:#153b4b!important;
+ border-bottom:1px solid #d9e7e8!important;
+}
+.play-nav button{color:#275064!important;font-weight:850!important}
+.play-nav button:hover{color:#117d73!important}
+.play-brand{width:clamp(76px,18vw,126px)!important;min-height:28px!important;
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ color:#173c50!important;text-shadow:none!important
+}
+.play-brand img{width:100%!important;max-height:37px!important;
+ object-fit:contain!important;box-shadow:none!important;filter:none!important}
+.play-turn{background:#8be9d3!important;color:#103a4d!important;box-shadow:none!important}
+.play-category{color:#153c51!important;font-weight:900!important}
+.play-stage{
+ background:linear-gradient(157deg,#16364b 0%,#10283b 72%)!important;
+ border-color:#67dccc!important;
+}
+.play-question-view>h2{font-size:clamp(22px,4.7vw,38px)!important;line-height:1.42!important;max-width:95%;margin-right:auto;margin-left:auto}
+.play-answer-view h2{line-height:1.4!important;overflow-wrap:anywhere}
+.play-point-tag{background:#efbb89!important;color:#153348!important}
+@media(max-width:420px){
+ .play-nav button{font-size:clamp(11px,3vw,14px)!important}
+ .in-match .lamna-match-logo{width:83px!important}
+ .play-brand{width:84px!important;right:3px!important}
+ .play-brand img{max-height:31px!important}
+ .in-match .lamna-match-current{font-size:12px!important;padding:4px 8px!important}
+}
+@media(orientation:landscape) and (max-height:640px){
+ .in-match .lamna-match-logo{width:85px!important}
+ .in-match .lamna-match-logo img{max-height:23px!important}
+ .play-header{padding-top:3px!important;padding-bottom:3px!important}
+ .play-brand img{max-height:24px!important}
+ .play-brandrow{min-height:28px!important}
+}
