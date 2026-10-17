@@ -1,0 +1,225 @@
+/* Lamna approved official-logo palette. COLORS ONLY.
+   Never change card dimensions, grids, spacing, logos, artwork or gameplay.
+   White/light surfaces; navy (#10364c) for readable type and hairline borders only.
+   Coral (#fa7350), turquoise (#24b3bb), yellow (#ffc443) as brand accents. */
+:root{
+ --lm-brand-ink:#10364c;
+ --lm-brand-muted:#547381;
+ --lm-brand-coral:#f46d4c;
+ --lm-brand-coral-soft:#fff0e9;
+ --lm-brand-teal:#16aab4;
+ --lm-brand-teal-dark:#087b86;
+ --lm-brand-teal-soft:#e9f9f8;
+ --lm-brand-yellow:#ffc443;
+ --lm-brand-paper:#fff;
+ --lm-brand-wash:#f7fbfb;
+ --lm-brand-line:#d7e9eb;
+}
+html,body,#root,.site,.site.has-landing{background:var(--lm-brand-paper)!important;color:var(--lm-brand-ink)!important}
+.site .header,.has-landing .lm-header{background:#fff!important;border-color:var(--lm-brand-line)!important}
+.site h1,.site h2,.site h3,.site .heading strong,
+.lm-library h2,.lm-team-details h2,.aid-setup-section>h1,
+.lm-auth-head h1,.lm-account-intro h1{color:var(--lm-brand-ink)!important}
+.site :is(input,select,textarea):focus-visible,
+.site :is(button,a):focus-visible{outline-color:var(--lm-brand-teal)!important}
+.site .primary,.lm-library-next,.lm-team-details .aid-start-button,
+.lm-create-cta,.lm-account-submit,.lm-auth-submit{
+ background:var(--lm-brand-coral)!important;color:#fff!important;
+ border-color:var(--lm-brand-coral)!important;box-shadow:0 5px 18px #f46d4c20!important;
+}
+.site .primary:hover,.lm-library-next:hover:not(:disabled),.lm-create-cta:hover{
+ background:#e95839!important;color:#fff!important;
+}
+.site .outline,.site .text-btn,.site .header nav button,
+.site .lm-header-accounts button{
+ color:var(--lm-brand-ink)!important;border-color:var(--lm-brand-line)!important;
+}
+.site .kicker,.site .eyebrow{background:var(--lm-brand-coral-soft)!important;color:#b84c33!important}
+.site .step,.site .setup-card,.site .team:not(.current),
+.site .hero,.site .plans,.site .plan{background-color:#fff!important}
+.site .progress div,.lm-library-progress>span{background:var(--lm-brand-teal)!important}
+.site .steps,.site .setup-card,.site .sticky-actions,.site .progress,
+.lm-picks,.lm-team-details{background:var(--lm-brand-wash)!important;border-color:var(--lm-brand-line)!important}
+
+/* Existing home structure retained. Just replace former navy gradient with white. */
+.site.has-landing .lm-hero{
+ background:linear-gradient(155deg,#fff 0%,#f7fcfc 68%,#fffaf5 100%)!important;
+ color:var(--lm-brand-ink)!important;
+ border-bottom:1px solid var(--lm-brand-line)!important;
+}
+.lm-hero::before{background-image:radial-gradient(#2bafbb 1px,transparent 1px)!important;opacity:.1!important}
+.lm-hero h1{color:var(--lm-brand-ink)!important}
+.lm-hero h1 em,.lm-library h2 em,.lm-team-details h2 em{color:var(--lm-brand-coral)!important}
+.lm-hero p,.lm-hero-meta{color:var(--lm-brand-muted)!important}
+.lm-kicker{background:var(--lm-brand-teal-soft)!important;color:var(--lm-brand-teal-dark)!important;border-color:#aee0df!important}
+.lm-create-icon{background:#fff7ec!important;color:var(--lm-brand-coral)!important}
+.lm-resume-link{color:var(--lm-brand-teal-dark)!important;border-color:var(--lm-brand-teal)!important}
+.lm-library-eyebrow,.lm-library-selected,.lm-picks-numerator,.lm-picks-title svg{color:var(--lm-brand-teal-dark)!important}
+.lm-picks,.lm-team-details{background:#f9fcfc!important}
+.lm-pick-filled{background:var(--lm-brand-teal-soft)!important;color:var(--lm-brand-ink)!important;border-color:var(--lm-brand-teal)!important}
+.lm-pick-ordinal,.lm-pick-filled strong,.lm-pick-remove{color:var(--lm-brand-ink)!important}
+.lm-library-card.lm-is-selected{border-color:var(--lm-brand-teal)!important;box-shadow:0 0 0 2px #16aab428!important}
+.lm-is-selected .lm-library-selection-index{background:var(--lm-brand-coral)!important;color:#fff!important}
+.lm-library-selected{background:var(--lm-brand-teal-soft)!important}
+.lm-library-card .lamna-cover,
+.in-match .game-board .board-cover .lamna-cover{filter:none!important}
+/* Keep the current game covers and their colorful drawings UNCHANGED. */
+
+/* Team setup and account pages: same border, headings and select color. */
+.aid-team-setup,.lm-team-details .aid-team-setup{background:#fff!important;border-color:var(--lm-brand-line)!important}
+.aid-team-setup h2,.aid-match-field,.aid-team-title,
+.lm-auth-view,.lm-account{color:var(--lm-brand-ink)!important}
+.aid-match-field input,.aid-team-setup>input,
+.lm-auth-form input,.lm-auth-form select,.lm-account-form input,.lm-account-form select{
+ background:#fff!important;border-color:#c9e2e5!important;color:var(--lm-brand-ink)!important;
+}
+.aid-pick-card{background:#fff!important;border-color:var(--lm-brand-line)!important;color:var(--lm-brand-ink)!important}
+.aid-pick-card svg{color:var(--lm-brand-teal-dark)!important}
+.aid-pick-card.selected{background:var(--lm-brand-teal-soft)!important;border-color:var(--lm-brand-teal)!important}
+.aid-pick-card.selected .aid-pick-check{background:var(--lm-brand-coral)!important;border-color:var(--lm-brand-coral)!important}
+.lm-auth-view,.lm-account{background:var(--lm-brand-paper)!important}
+.lm-auth-card,.lm-account-shell{background:#fff!important;border-color:var(--lm-brand-line)!important}
+.lm-auth-tabs button.active,.lm-account-tabs button.selected{background:var(--lm-brand-teal)!important;color:#fff!important}
+.lm-auth-submit,.lm-account-submit{background:var(--lm-brand-coral)!important;color:#fff!important}
+.lm-account-hint,.lm-auth-preview-note{background:#fff8ec!important}
+.lamna-site-footer,.site:not(.in-match) .lamna-site-footer{background:#fff!important;color:var(--lm-brand-ink)!important}
+.lamna-contact,.lm-contact{background:#fff!important;color:var(--lm-brand-ink)!important;border-color:var(--lm-brand-line)!important}
+.lamna-contact strong,.lm-contact h2{color:var(--lm-brand-ink)!important}
+.lamna-contact>span,.lm-contact>p{color:var(--lm-brand-muted)!important}
+
+/* GAME BOARD: same 2x3/3x2 layout and original artwork, now all white. */
+.site.in-match{background:#fff!important}
+.in-match .lamna-match-screen{background:#fff!important;color:var(--lm-brand-ink)!important}
+.in-match .lamna-match-header{background:#fff!important;border-color:var(--lm-brand-line)!important}
+.in-match .lamna-match-nav button{color:var(--lm-brand-ink)!important}
+.in-match .lamna-match-nav button:disabled{color:#a1b4bb!important}
+.in-match .lamna-match-current{background:var(--lm-brand-teal-soft)!important;color:var(--lm-brand-ink)!important;border-color:#b2dfdf!important}
+.in-match .lamna-match-title{color:var(--lm-brand-ink)!important}
+.in-match .lamna-match-playfield{background:#fff!important}
+.in-match .lamna-match-playfield .game-board{background:transparent!important}
+.in-match .game-board .board-points button,
+.in-match .game-board .board-points button:not(:disabled){
+ background:#e9f7f8!important;color:var(--lm-brand-ink)!important;
+ border:1px solid #cee8e9!important;
+}
+.in-match .game-board .board-points button:hover:not(:disabled){background:#c8eff0!important}
+.in-match .game-board .board-points button:disabled{
+ background:#f1f4f4!important;color:#9daeb4!important;
+ border-color:#ecf0f0!important;
+}
+.in-match .lamna-match-footer{background:#fff!important;border-top-color:var(--lm-brand-line)!important}
+.in-match .lamna-match-team-name,
+.in-match .lamna-match-team:first-child .lamna-match-team-name{
+ background:var(--lm-brand-teal)!important;color:#fff!important;
+}
+.in-match .lamna-match-team:nth-child(2) .lamna-match-team-name{
+ background:var(--lm-brand-coral)!important;color:#fff!important;
+}
+.in-match .lamna-match-scorebox{
+ background:#f4fbfb!important;border-color:#cbe4e5!important
+}
+.in-match .lamna-match-scorebox strong{color:var(--lm-brand-ink)!important}
+.in-match .lamna-match-scorebox button{
+ background:var(--lm-brand-teal)!important;color:#fff!important
+}
+.in-match .lamna-match-help-title{color:var(--lm-brand-ink)!important}
+.in-match .lamna-match-help-icon{
+ background:#edf9f8!important;border-color:var(--lm-brand-teal)!important;
+ color:var(--lm-brand-teal-dark)!important;
+}
+.in-match .lamna-match-team:nth-child(2) .lamna-match-help-icon{
+ background:var(--lm-brand-coral-soft)!important;border-color:var(--lm-brand-coral)!important;
+ color:#be523a!important;
+}
+
+/* QUESTION: keep timer, teams and 844x390 landscape panels exactly where they are. */
+.in-match .play-screen{
+ background:#fff!important;color:var(--lm-brand-ink)!important;
+ --lamna-text:var(--lm-brand-ink);
+}
+.play-header{background:#fff!important;color:var(--lm-brand-ink)!important;border-color:var(--lm-brand-line)!important}
+.play-nav button{color:var(--lm-brand-ink)!important}
+.play-category{color:var(--lm-brand-ink)!important}
+.play-turn{background:var(--lm-brand-teal-soft)!important;color:var(--lm-brand-ink)!important}
+.play-content{background:#fff!important}
+.play-stage{
+ background:#fff!important;border-color:var(--lm-brand-teal)!important;
+ box-shadow:0 3px 16px #12878e10!important;
+}
+.play-stage::before{border-color:#d7ecec!important}
+.play-question-view h2,.play-answer-view h2,.play-pick-view h2,
+.play-stage-inner h2{color:var(--lm-brand-ink)!important;text-shadow:none!important}
+.play-answer-view h2{color:var(--lm-brand-teal-dark)!important}
+.play-status{color:#be5437!important}
+.play-context{color:var(--lm-brand-teal-dark)!important}
+.play-instructions{color:var(--lm-brand-muted)!important}
+.play-hint{background:#fff6e4!important;color:var(--lm-brand-ink)!important}
+.play-timer{background:#f0fbfa!important;color:var(--lm-brand-ink)!important;border-color:#a5ddda!important}
+.play-timer button{color:var(--lm-brand-ink)!important}
+.play-point-tag{background:var(--lm-brand-yellow)!important;color:var(--lm-brand-ink)!important}
+.play-choose-teams button,.play-choose-pair button{background:var(--lm-brand-teal)!important;color:#fff!important;border-color:var(--lm-brand-teal)!important}
+.play-choose-pair button:nth-child(2){background:var(--lm-brand-coral)!important;border-color:var(--lm-brand-coral)!important;color:#fff!important}
+.play-choose-teams .play-choose-none{background:#f0f7f7!important;color:var(--lm-brand-ink)!important;border-color:#c7e3e5!important}
+.play-action-green,.play-action-blue{background:var(--lm-brand-teal)!important;color:#fff!important}
+.play-action-red{background:var(--lm-brand-coral)!important;color:#fff!important}
+.play-action-category{background:var(--lm-brand-yellow)!important;color:var(--lm-brand-ink)!important;border-color:#efb62b!important}
+.play-score-footer{background:#fff!important;color:var(--lm-brand-ink)!important;border-color:var(--lm-brand-line)!important}
+.play-team{background:#f9fcfc!important}
+.play-team-name{background:var(--lm-brand-teal)!important;color:#fff!important}
+.play-team:nth-child(2) .play-team-name{background:var(--lm-brand-coral)!important;color:#fff!important}
+.play-team-score,.play-team-help-label{color:var(--lm-brand-ink)!important}
+.play-team-controls .play-aid-button{
+ background:#effbf9!important;border-color:#74cfcf!important;
+ color:var(--lm-brand-teal-dark)!important
+}
+.play-team:nth-child(2) .play-team-controls .play-aid-button{
+ background:#fff2ed!important;border-color:#ffb49d!important;color:#c24e34!important;
+}
+.play-team-controls .play-aid-button.available{
+ background:#daf4f1!important;color:#087782!important;box-shadow:0 0 0 1px #6fc5c560!important;
+}
+.play-team:nth-child(2) .play-team-controls .play-aid-button.available{
+ background:#ffe9e0!important;color:#b3422d!important;
+}
+.play-aid-activated{background:#eafaf8!important;border-color:var(--lm-brand-teal)!important;color:var(--lm-brand-ink)!important}
+.play-aid-activated strong{color:var(--lm-brand-ink)!important}
+.play-help-popup{background:#fff!important;color:var(--lm-brand-ink)!important;border-color:var(--lm-brand-line)!important}
+.play-help-popup button,.play-var-return{background:var(--lm-brand-teal)!important;color:#fff!important}
+.play-team-controls .play-aid-button.spent{opacity:.27!important}
+
+/* Individual-phone secret card and QR view: no navy background. */
+.wl-phone{background:#fff!important;color:var(--lm-brand-ink)!important}
+.wl-phone-header{border-color:var(--lm-brand-line)!important}
+.wl-phone-header strong,.wl-phone-header span,.wl-phone-message{color:var(--lm-brand-ink)!important}
+.wl-phone-eyebrow{background:var(--lm-brand-teal-soft)!important;color:var(--lm-brand-teal-dark)!important}
+.wl-phone-art-wrap{border-color:var(--lm-brand-yellow)!important;box-shadow:0 10px 26px #10415a13!important}
+.wl-phone-secret h2{color:var(--lm-brand-ink)!important}
+.wl-phone-secret p{color:var(--lm-brand-muted)!important}
+.wl-phone-ready{background:var(--lm-brand-coral)!important;color:#fff!important}
+.wl-phone-clock{background:#f2fbfa!important;border-color:var(--lm-brand-teal)!important;color:var(--lm-brand-ink)!important}
+.wl-phone-clock.urgent{color:#cb5136!important;border-color:var(--lm-brand-coral)!important}
+.wl-tv,.wl-tv-instructions,.wl-tv-instructions p,.wl-loading,.wl-qr-card span{color:var(--lm-brand-ink)!important}
+.wl-tv>h2,.wl-tv-instructions h3{color:var(--lm-brand-teal-dark)!important}
+.wl-tv-status{background:#e9faf8!important;color:var(--lm-brand-ink)!important;border-color:var(--lm-brand-teal)!important}
+.wl-tv-status strong{color:var(--lm-brand-teal-dark)!important}
+.wl-tv-instructions small{color:var(--lm-brand-muted)!important}
+.wl-link-copy{background:var(--lm-brand-teal)!important;color:#fff!important;border-color:var(--lm-brand-teal)!important}
+
+/* End-of-game celebration: white base, colorful highlights, no navy gradients. */
+.lamna-finale{
+ background:linear-gradient(155deg,#fff 0%,#fffaf4 100%)!important;
+ color:var(--lm-brand-ink)!important;
+}
+.lamna-finale-brand,.lamna-finale-header,.lamna-finale-kicker,
+.lamna-finale-summary,.lamna-finale-progress{color:var(--lm-brand-muted)!important}
+.lamna-finale-main>h1{color:var(--lm-brand-ink)!important;text-shadow:none!important}
+.lamna-winner-name,.lamna-winner-name svg{color:#b66818!important}
+.lamna-finale-sound{background:#fff!important;color:var(--lm-brand-ink)!important;border-color:var(--lm-brand-line)!important}
+.lamna-trophy-shell{background:var(--lm-brand-yellow)!important;border-color:#f1ba2e!important;color:var(--lm-brand-ink)!important}
+.lamna-final-card{background:#fff!important;color:var(--lm-brand-ink)!important;border-color:#c9e6e8!important;box-shadow:0 6px 20px #0753600d!important}
+.lamna-final-card.is-winner{background:#fff9e8!important;border-color:var(--lm-brand-yellow)!important}
+.lamna-final-team,.lamna-final-card strong,.lamna-final-card small{color:var(--lm-brand-ink)!important}
+.lamna-card-crown{background:var(--lm-brand-yellow)!important;color:var(--lm-brand-ink)!important}
+.lamna-finale-replay{background:var(--lm-brand-teal)!important;color:#fff!important}
+.lamna-finale-exit{background:var(--lm-brand-coral)!important;color:#fff!important}
+.lamna-finale-change,.lamna-finale-cheer{background:#fff!important;color:var(--lm-brand-ink)!important;border-color:var(--lm-brand-line)!important}
