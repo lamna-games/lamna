@@ -133,7 +133,7 @@ export async function handleStore(req,res,url,pool,ensureAccounts){
  try{data=await readJson(req);}catch{send(req,res,400,{message:'الطلب غير صحيح'});return true;}
  if(route==='/api/store/matches'){
   const selected=data.selected;
-  if(!Array.isArray(selected)||selected.length!==6||new Set(selected).size!==6||selected.some(x=>!Number.isInteger(x)||x<0||x>19)){
+  if(!Array.isArray(selected)||selected.length!==6||new Set(selected).size!==6||selected.some(x=>!Number.isInteger(x)||x<0||x>49)){
    send(req,res,400,{message:'اختر ست فئات مختلفة.'});return true;
   }
   const matchName=String(data.matchName||'').trim().slice(0,50);
