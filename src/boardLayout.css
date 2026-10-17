@@ -771,3 +771,143 @@
 .play-choose-teams button:disabled{opacity:.25!important;cursor:not-allowed!important}
 .play-team-controls .play-aid-button.available{background:#236f6f!important;color:#effff8!important;box-shadow:0 0 0 2px #6bdfca90!important}
 .play-team-controls .play-aid-button.spent{opacity:.3!important}
+
+/* Polished, consistent action controls. SVG line icons instead of emoji stickers. */
+.lamna-match-nav .lm-action-link,
+.play-nav .lm-action-link{
+ display:inline-flex!important;flex-direction:row!important;align-items:center!important;
+ justify-content:center!important;gap:6px!important;line-height:1.2!important;
+ vertical-align:middle!important;white-space:nowrap!important;
+}
+.lamna-match-nav .lm-action-link svg,
+.play-nav .lm-action-link svg{width:18px;height:18px;stroke-width:2.2;flex:none}
+.lamna-match-nav button:not(.lm-action-link){display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:5px!important}
+.lamna-match-nav button:not(.lm-action-link) svg{width:17px;height:17px;flex:none}
+.lamna-match-nav button{background:transparent!important;border:0!important}
+.play-nav button{border:0!important;background:transparent!important}
+.lamna-match-nav button:focus-visible,.play-nav button:focus-visible{
+ outline:2px solid #0e938c!important;outline-offset:2px!important;border-radius:8px!important
+}
+/* LANDSCAPE PHONE: a real two-panel view, not tall portrait cards squeezed together.
+   Question on the wide left; both teams, points and aids on the right. */
+@media (orientation:landscape) and (min-width:580px) and (max-height:640px){
+ .in-match .play-screen{
+  display:grid!important;
+  grid-template-columns:minmax(178px,25%) minmax(0,1fr)!important;
+  grid-template-rows:auto minmax(0,1fr)!important;
+  align-items:stretch!important;
+  width:100%!important;height:100dvh!important;
+  overflow:hidden!important;overscroll-behavior:contain;
+ }
+ .play-header{
+  grid-area:1 / 1 / 2 / 3!important;
+  padding:2px 11px 4px!important;
+  min-height:0!important;z-index:4!important;
+ }
+ .play-nav{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:3px!important}
+ .play-nav button{min-height:24px!important;font-size:clamp(11px,1.5vw,14px)!important;padding:2px 4px!important}
+ .play-nav .lm-action-link svg{width:15px!important;height:15px!important}
+ .play-brandrow{min-height:27px!important;margin:0!important;position:relative!important}
+ .play-brand{right:8px!important;width:82px!important;min-height:22px!important}
+ .play-brand img{max-height:27px!important}
+ .play-turn{max-width:63%!important;padding:2px 13px!important;
+   font-size:clamp(11px,1.5vw,15px)!important}
+ .play-category{margin:0!important;line-height:1.08!important;
+   font-size:clamp(12px,1.6vw,15px)!important}
+ .play-content{
+  grid-area:2 / 2 / 3 / 3!important;
+  min-width:0!important;min-height:0!important;
+  width:auto!important;height:100%!important;
+  padding:20px 10px 14px 15px!important;
+  display:flex!important;align-items:stretch!important;overflow:hidden!important;
+ }
+ .play-stage{
+  flex:1 1 auto!important;min-height:0!important;
+  width:100%!important;height:auto!important;
+  border-radius:17px!important;border-width:2px!important;
+  padding:23px 9px 19px!important;
+  overflow:visible!important;
+ }
+ .play-stage::before{inset:6px!important;border-radius:11px!important}
+ .play-stage-inner{flex:1!important;min-height:0!important;gap:5px!important;
+  overflow-x:hidden!important;overflow-y:auto!important;padding:2px 4px!important;
+  overscroll-behavior:contain}
+ .play-question-view>h2,.play-question-view h2{
+  font-size:clamp(16px,2.6vw,25px)!important;line-height:1.3!important;
+  max-width:97%!important;margin:0 auto 2px!important;
+ }
+ .play-answer-view h2{font-size:clamp(18px,3vw,26px)!important;line-height:1.3!important}
+ .play-pick-view h2{font-size:clamp(17px,2.8vw,25px)!important;line-height:1.2!important}
+ .play-context,.play-instructions,.play-hint{font-size:clamp(11px,1.5vw,13px)!important;line-height:1.3!important;margin:0!important}
+ .play-aid-activated{margin:2px auto!important;padding:5px 7px!important;font-size:11px!important;gap:2px!important}
+ .play-aid-activated strong{font-size:12px!important}
+ .play-timer{top:-16px!important;min-width:125px!important;min-height:30px!important;
+  padding:2px 8px!important;gap:7px!important;
+  font-size:16px!important}
+ .play-timer button{font-size:18px!important}
+ .play-point-tag{top:-16px!important;right:10px!important;
+  padding:5px 8px!important;border-radius:12px!important;
+  font-size:clamp(11px,1.55vw,14px)!important}
+ .play-stage-actions{bottom:-9px!important;left:0!important;right:0!important;gap:6px!important}
+ .play-action{min-height:30px!important;max-width:51%!important;
+  font-size:clamp(12px,1.7vw,15px)!important;padding:3px 9px!important;border-radius:11px!important}
+ .play-score-footer{
+  grid-area:2 / 1 / 3 / 2!important;
+  width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;
+  padding:10px 9px 8px!important;border-left:1px solid #365b68!important;
+  overflow-y:auto!important;overflow-x:hidden!important;
+  background:#162f43!important;align-self:stretch!important;
+ }
+ .play-teams{
+  height:100%!important;min-height:0!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  grid-template-rows:repeat(2,minmax(0,1fr))!important;
+  gap:6px!important;
+ }
+ .play-team{
+  min-height:0!important;min-width:0!important;
+  padding:2px 3px!important;gap:2px!important;
+  justify-content:center!important;border-radius:11px!important;
+  background:#ffffff09!important;
+ }
+ .play-team-name{
+  width:100%!important;padding:4px 4px!important;min-height:25px!important;
+  border-radius:9px!important;line-height:1.1!important;
+  font-size:clamp(12px,1.65vw,16px)!important
+ }
+ .play-team-score{font-size:clamp(14px,2vw,19px)!important;line-height:1!important}
+ .play-team-help-label{font-size:clamp(10px,1.4vw,13px)!important;line-height:1!important}
+ .play-team-controls{margin-top:0!important;gap:6px!important;justify-content:center!important}
+ .play-team-controls .play-aid-button{
+   width:clamp(25px,3.5vw,33px)!important;height:clamp(25px,3.5vw,33px)!important;
+   flex:0 0 auto!important;border-width:1.5px!important;border-radius:9px!important
+ }
+ .play-team-controls .play-aid-button svg{width:clamp(14px,2vw,20px)!important;height:clamp(14px,2vw,20px)!important}
+ .play-choose-teams{gap:6px!important;padding:3px!important;margin:auto!important;max-width:340px!important}
+ .play-choose-pair{gap:8px!important}
+ .play-choose-teams button{min-height:33px!important;padding:6px!important;
+  font-size:clamp(12px,1.8vw,16px)!important;border-radius:10px!important}
+ .in-match .lamna-match-header{
+  padding:3px 10px 4px!important
+ }
+ .in-match .lamna-match-nav .lm-action-link svg,
+ .in-match .lamna-match-nav button:not(.lm-action-link) svg{width:14px!important;height:14px!important}
+ .in-match .lamna-match-nav button{min-height:21px!important;font-size:clamp(10px,1.55vw,13px)!important}
+ .in-match .lamna-match-topline{min-height:22px!important}
+ .in-match .lamna-match-title{font-size:clamp(11px,1.8vw,14px)!important;margin:1px 0!important}
+ .in-match .lamna-match-footer{padding-bottom:5px!important}
+}
+@media (orientation:landscape) and (min-width:580px) and (max-height:360px){
+ .play-header{padding:1px 8px 2px!important}
+ .play-nav button{min-height:19px!important;font-size:11px!important}
+ .play-brandrow{min-height:22px!important}
+ .play-category{font-size:12px!important}
+ .play-content{padding:17px 7px 12px 8px!important}
+ .play-stage{padding:20px 7px 15px!important}
+ .play-timer{top:-14px!important;min-height:27px!important}
+ .play-score-footer{padding:3px 6px!important}
+ .play-team{gap:1px!important}
+ .play-team-name{min-height:21px!important;padding:2px!important}
+ .play-team-controls .play-aid-button{width:24px!important;height:24px!important}
+ .play-team-controls .play-aid-button svg{width:15px!important;height:15px!important}
+}
