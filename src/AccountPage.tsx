@@ -9,7 +9,7 @@ const flag=(c:string)=>[...c].map(x=>String.fromCodePoint(127397+x.charCodeAt(0)
 const countryNames=new Intl.DisplayNames(['ar'],{type:'region'});
 const countries=getCountries().sort((a,b)=>a==='SA'?-1:b==='SA'?1:(countryNames.of(a)||a).localeCompare(countryNames.of(b)||b,'ar'));
 type Screen='register'|'login';
-export default function AccountPage({onBack,initialMode='login'}:{onBack:()=>void;initialMode?:Screen}){
+export default function AccountPage({onBack,onAuthenticated,initialMode='login'}:{onBack:()=>void;onAuthenticated:()=>void;initialMode?:Screen}){
  const [screen,setScreen]=React.useState<Screen>(initialMode);
  React.useEffect(()=>setScreen(initialMode),[initialMode]);
  const [country,setCountry]=React.useState<CountryCode>('SA');
@@ -20,6 +20,7 @@ export default function AccountPage({onBack,initialMode='login'}:{onBack:()=>voi
  const [password,setPassword]=React.useState('');
  const [confirm,setConfirm]=React.useState('');
  const [visible,setVisible]=React.useState(false);
+ const [acceptedTerms,setAcceptedTerms]=React.useState(false);
  const [busy,setBusy]=React.useState(false);
  const [error,setError]=React.useState('');
  const [success,setSuccess]=React.useState('');
@@ -30,6 +31,7 @@ export default function AccountPage({onBack,initialMode='login'}:{onBack:()=>voi
   if(!/^\S+@\S+\.\S+$/.test(cleanEmail)){setError('تأكد من صحة البريد الإلكتروني.');return;}
   let phone='';
   if(screen==='register'){
+   if(!acceptedTerms){setError('يرجى الموافقة على الشروط وسياسة الخصوصية قبل التسجيل.');return;}
    if(first.trim().length<2||last.trim().length<2){setError('اكتب اسمك الأول والأخير.');return;}
    const parsed=parsePhoneNumberFromString(mobile,country);
    if(!parsed?.isValid()||parsed.country!==country){setError('تأكد من صحة رقم الجوال ورمز الدولة.');return;}
@@ -45,8 +47,11 @@ export default function AccountPage({onBack,initialMode='login'}:{onBack:()=>voi
    });
    const data=await res.json().catch(()=>({}));
    if(!res.ok){throw Error(data?.message||'تعذر الاتصال بخدمة الحسابات. حاول لاحقًا.');}
-   if(screen==='register'){setSuccess('تم إنشاء حسابك. سجّل الدخول الآن.');setScreen('login');setPassword('');setConfirm('');}
-   else {setSuccess('حياك! تم تسجيل الدخول بنجاح.');sessionStorage.setItem('lamna-session',data.token);sessionStorage.setItem('lamna-account-name',data.firstName||'');setPassword('');}
+   if(!data?.token){throw Error('تعذر إنشاء جلسة آمنة للحساب. حاول تسجيل الدخول.');}
+   sessionStorage.setItem('lamna-session',data.token);
+   sessionStorage.setItem('lamna-account-name',data.firstName||first.trim());
+   setPassword('');setConfirm('');
+   onAuthenticated();
   }catch(e){setError(e instanceof Error?e.message:'تعذر إتمام العملية.');}
   finally{setBusy(false);}
  };
@@ -59,7 +64,7 @@ export default function AccountPage({onBack,initialMode='login'}:{onBack:()=>voi
    <div className="lm-account-intro">
     <span>حسابك في لمنا</span>
     <h1>{screen==='login'?'حياك من جديد!':'سجّل معنا'}</h1>
-    <p>{screen==='login'?'سجّل دخولك ببريدك وكلمة المرور.':'تسجيل واحد، وبعدها تدخل لحسابك متى ما بغيت.'}</p>
+    <p>{screen==='login'?'سجّل دخولك ببريدك وكلمة المرور.':'أنشئ حسابًا واحدًا لتحصل على مباراة مجانية محفوظة ورصيد ألعابك.'}</p>
    </div>
    <div className="lm-account-tabs" role="tablist" aria-label="التسجيل والدخول">
     <button type="button" className={screen==='login'?'selected':''} onClick={()=>switchTo('login')} role="tab" aria-selected={screen==='login'}><LogIn size={17}/> تسجيل الدخول</button>
@@ -85,6 +90,10 @@ export default function AccountPage({onBack,initialMode='login'}:{onBack:()=>voi
     </>}
     <label><span>كلمة المرور *</span><div className="lm-field-icon"><LockKeyhole size={18}/><input type={visible?'text':'password'} minLength={screen==='register'?8:1} required autoComplete={screen==='register'?'new-password':'current-password'} value={password} onChange={e=>setPassword(e.target.value)} placeholder="كلمة المرور"/><button type="button" aria-label={visible?'إخفاء':'إظهار'} className="lm-show-password" onClick={()=>setVisible(v=>!v)}>{visible?<EyeOff size={20}/>:<Eye size={20}/>}</button></div></label>
     {screen==='register'&&<label><span>تأكيد كلمة المرور *</span><input type={visible?'text':'password'} minLength={8} required autoComplete="new-password" value={confirm} onChange={e=>setConfirm(e.target.value)} placeholder="أعد كتابة كلمة المرور"/></label>}
+    {screen==='register'&&<label className="lm-account-consent">
+      <input type="checkbox" required checked={acceptedTerms} onChange={e=>setAcceptedTerms(e.target.checked)}/>
+      <span>أوافق على <a href="#terms">الشروط والأحكام</a> و<a href="#privacy">سياسة الخصوصية</a> الخاصة بلمنا.</span>
+    </label>}
     {error&&<p className="lm-account-error" role="alert">{error}</p>}
     {success&&<p className="lm-account-success" role="status"><CheckCircle2 size={18}/>{success}</p>}
     <button className="lm-account-submit" type="submit" disabled={busy}>{busy?'جارٍ التحقق…':screen==='login'?'تسجيل الدخول':'إنشاء الحساب'}</button>
