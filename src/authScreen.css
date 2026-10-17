@@ -1,0 +1,33 @@
+.lm-auth-view{background:#f4f7f7;min-height:80vh;padding:34px 18px 60px;display:grid;place-items:start center;color:#15374b}
+.lm-auth-card{width:min(100%,640px);background:#fff;border-radius:24px;border:1px solid #e2eeeb;box-shadow:0 11px 33px #143f5117;padding:25px clamp(14px,4vw,35px)}
+.lm-auth-head{text-align:center}
+.lm-auth-head .lamna-official-logo{margin:0 auto 8px;max-height:65px;width:165px}
+.lm-auth-head h1{font-size:clamp(27px,5vw,35px);margin:4px 0 9px;color:#183e52;font-weight:950}
+.lm-auth-head>p{font-size:15px;color:#67808b;line-height:1.6;margin:0 0 17px}
+.lm-auth-tabs{display:flex;gap:5px;background:#eff4f4;border-radius:14px;padding:5px}
+.lm-auth-tabs button{flex:1;border:0;border-radius:11px;background:transparent;color:#4e6976;padding:11px;font-size:16px;font-weight:850}
+.lm-auth-tabs button.active{background:#156b69;color:#fff}
+.lm-auth-preview-note{display:flex;align-items:flex-start;gap:8px;background:#fff8ea;border:1px solid #efd7a0;color:#705b2d;font-size:13px;line-height:1.6;border-radius:12px;padding:10px 12px;margin:17px 0}
+.lm-auth-preview-note svg{flex-shrink:0;margin-top:1px}
+.lm-auth-form{display:flex;flex-direction:column;gap:15px}
+.lm-auth-form label{font-size:14px;font-weight:850;display:flex;flex-direction:column;gap:7px;color:#243e50}
+.lm-auth-field-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.lm-auth-form input:not([type=checkbox]),.lm-auth-form select{width:100%;max-width:100%;min-width:0;box-sizing:border-box;border:1px solid #cadae0;border-radius:11px;padding:12px 13px;color:#1f4252;background:#fff;font:inherit;min-height:46px}
+.lm-auth-form input:disabled{background:#f7f9f8;color:#89979e;opacity:1}
+.lm-auth-form select:focus-visible{outline:2px solid #6cdcc7}
+.lm-auth-input-icon{position:relative;display:flex;align-items:center}
+.lm-auth-input-icon>svg{position:absolute;right:12px;color:#7196a1}
+.lm-auth-input-icon>input{padding-right:41px!important}
+.lm-auth-input-icon>button{position:absolute;left:8px;background:transparent;border:0;color:#557484}
+.lm-auth-phone{display:flex;border:1px solid #cadae0;border-radius:11px;overflow:hidden;align-items:center}
+.lm-auth-phone>span{flex:none;padding:11px 9px;background:#eaf6f3;color:#23595e;font-weight:850;direction:ltr}
+.lm-auth-phone>input{border:0!important;border-radius:0!important}
+.lm-auth-form .lm-auth-agree{flex-direction:row;align-items:center;font-weight:500;font-size:13px;line-height:1.5}
+.lm-auth-agree input{accent-color:#119e90;width:17px;height:17px}
+.lm-auth-submit{border:0;border-radius:13px;background:#57cbb7;color:#153745;font-size:17px;font-weight:950;padding:13px}
+.lm-auth-submit:disabled{opacity:.58;cursor:not-allowed}
+.lm-auth-switch,.lm-auth-forgot{text-align:center;font-size:13px;color:#6a7f8b;margin:0}
+.lm-auth-switch button{border:0;background:transparent;color:#007f77;font-weight:900;font-size:14px;text-decoration:underline}
+.lm-auth-forgot span{display:block}
+.lm-auth-home{display:block;margin:13px auto 0;background:transparent;border:0;color:#567586;text-decoration:underline;font-weight:700}
+@media(max-width:450px){.lm-auth-view{padding:14px 11px 40px}.lm-auth-card{border-radius:17px;padding:18px 14px}.lm-auth-field-row{gap:8px}.lm-auth-form label{font-size:13px}.lm-auth-form input:not([type=checkbox]),.lm-auth-form select{padding:10px 9px;font-size:13px}.lm-auth-preview-note{font-size:12px}}
