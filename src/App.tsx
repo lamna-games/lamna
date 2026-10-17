@@ -5,6 +5,7 @@ import './boardLayout.css';
 import CartoonCover from './CartoonCover';
 import { getQuestion, wordlessModeCount } from './quizData';
 import { WordlessTV } from './Wordless';
+import WinnerScreen from './WinnerScreen';
 const categories = [
   'معلومات عامة',
   'ولا كلمة',
@@ -441,7 +442,16 @@ function App() {
               </div>
             </div>
           </div>
-          {showResult && active===null && <div className="modal-back"><div className="question-modal result-modal"><span className="kicker">نهاية المباراة</span><h2>{scores[0]===scores[1]?'تعادل الفريقين!':'الفائز: '+teams[scores[0]>scores[1]?0:1]+' 🏆'}</h2><p>{teams[0]}: {scores[0]} نقطة — {teams[1]}: {scores[1]} نقطة</p><p>أُنجزت {used.length} من 36 سؤالًا</p><div className="modal-actions"><button className="primary" onClick={()=>{setShowResult(false);go('setup')}}>مباراة جديدة</button><button className="outline" onClick={()=>{setShowResult(false);go('home')}}>الرئيسية</button></div></div></div>}
+          {showResult && active===null && <WinnerScreen teams={teams} scores={scores} answered={used.length} total={36}
+             onReplay={()=>{
+               setScores([0,0]);setUsed([]);setHistory([]);setUsedAids([[],[]]);setTurn(0);setActive(null);
+               setReveal(false);setPickWinner(false);setPhase('question');setSeconds(60);setPaused(false);
+               setShowHelp(false);setShowHint(false);setAidEffect(null);setAidOwner(null);
+               setVarUsed([false,false]);setShowResult(false);
+             }}
+             onExit={()=>{setShowResult(false);go('home');}}
+             onSetup={()=>{setShowResult(false);go('setup');}}
+           />}
           {active !== null && (
             <div className="play-screen" dir="rtl" role="dialog" aria-modal="true" aria-label="شاشة لعب السؤال">
               <div className="play-header">
