@@ -223,3 +223,80 @@ html,body,#root,.site,.site.has-landing{background:var(--lm-brand-paper)!importa
 .lamna-finale-replay{background:var(--lm-brand-teal)!important;color:#fff!important}
 .lamna-finale-exit{background:var(--lm-brand-coral)!important;color:#fff!important}
 .lamna-finale-change,.lamna-finale-cheer{background:#fff!important;color:var(--lm-brand-ink)!important;border-color:var(--lm-brand-line)!important}
+
+/* Header refinement: centered official logo, separated account actions.
+   Layout only — never redraw or alter the official logo asset. */
+.site .header,
+.site.has-landing .lm-header{
+ display:grid!important;
+ grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)!important;
+ grid-template-rows:auto auto;
+ align-items:center!important;
+ justify-items:stretch;
+ column-gap:20px!important;
+ row-gap:7px!important;
+ padding-top:14px!important;
+ padding-bottom:14px!important;
+}
+.site .header .brand-link,
+.site.has-landing .lm-header .brand-link{
+ grid-column:2!important;grid-row:1!important;
+ display:flex!important;justify-content:center!important;align-items:center!important;
+ justify-self:center!important;min-width:0!important;margin:0!important;
+}
+.site .header .brand,
+.site.has-landing .lm-header .brand{
+ width:155px!important;min-height:55px!important;justify-content:center!important;
+}
+.site .header .brand .lamna-official-logo,
+.site.has-landing .lm-header .brand .lamna-official-logo{
+ display:block!important;width:155px!important;height:auto!important;max-height:62px!important;
+ object-fit:contain!important;object-position:center!important;
+}
+.site .header .lm-header-accounts{
+ grid-column:3!important;grid-row:1!important;
+ justify-self:end!important;display:flex!important;align-items:center!important;
+ flex-wrap:nowrap!important;gap:14px!important;direction:rtl;
+ margin:0!important;min-width:0;
+}
+.site .header .lm-header-accounts button{
+ flex:none;min-height:42px;padding:9px 14px!important;
+ border:1px solid #d7e9eb!important;background:#fff!important;
+ border-radius:12px!important;font:inherit;font-size:14px!important;font-weight:850!important;
+ white-space:nowrap!important;
+}
+.site .header .lm-header-accounts button:first-child{
+ background:#fff2eb!important;border-color:#f8c2b2!important;color:#a94531!important;
+}
+.site .header nav{grid-column:1/-1!important;grid-row:2!important;justify-self:center!important;justify-content:center!important}
+@media(max-width:700px){
+ .site .header,
+ .site.has-landing .lm-header{
+  grid-template-columns:minmax(0,1fr)!important;
+  grid-template-rows:auto auto auto;
+  row-gap:12px!important;min-height:0!important;
+  padding:12px 14px 15px!important;
+ }
+ .site .header .brand-link,
+ .site.has-landing .lm-header .brand-link{
+  grid-column:1!important;grid-row:1!important;
+  justify-self:center!important;margin:0 auto!important;
+ }
+ .site .header .brand,
+ .site.has-landing .lm-header .brand{width:140px!important;min-height:51px!important;}
+ .site .header .brand .lamna-official-logo,
+ .site.has-landing .lm-header .brand .lamna-official-logo{
+  width:140px!important;max-height:56px!important;
+ }
+ .site .header .lm-header-accounts{
+  grid-column:1!important;grid-row:2!important;justify-self:center!important;
+  justify-content:center!important;gap:clamp(10px,4vw,22px)!important;width:100%!important;
+ }
+ .site .header .lm-header-accounts button{
+  min-width:min(39vw,147px)!important;max-width:160px!important;
+  text-align:center!important;padding:11px 12px!important;
+  font-size:13px!important;
+ }
+ .site .header nav{grid-column:1!important;grid-row:3!important;max-width:100%!important;gap:5px!important;}
+ .site .header nav button{padding:8px!important;font-size:12px!important}
+}
