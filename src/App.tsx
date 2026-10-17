@@ -174,11 +174,16 @@ function App() {
     return()=>{alive=false};
   },[accountsEnabled,page]);
   const applyMatch=(match:ServerMatch)=>{
+    const p=match.progress;
     setActiveSession(match);setSelected(match.selected);setMatchName(match.match_name);
-    setScores([0,0]);setShowResult(match.status==='completed');setHistory([]);setShowHint(false);
-    setUsed([]);setTurn(0);setHelp([2,2]);setVarUsed([false,false]);
-    setActive(null);setPhase('question');setSeconds(60);setPaused(false);
-    setUsedAids([[],[]]);setAidEffect(null);setAidOwner(null);setShowHelp(false);
+    setTeams(Array.isArray(p?.teams)&&p.teams.length===2?p.teams:teams);
+    if(p?.chosenAids?.length===2)setChosenAids(p.chosenAids as AidId[][]);
+    setScores(p?.scores?.length===2?p.scores:[0,0]);
+    setShowResult(match.status==='completed');setHistory(p?.history||[]);setShowHint(false);
+    setUsed(p?.used||[]);setTurn(p?.turn===1?1:0);setHelp([2,2]);setVarUsed([false,false]);
+    setActive(p?.active??null);setPhase('question');setSeconds(60);setPaused(true);
+    setUsedAids(p?.usedAids?.length===2?p.usedAids as AidId[][]:[[],[]]);
+    setAidEffect(null);setAidOwner(null);setShowHelp(false);setReveal(false);setPickWinner(false);
     localStorage.setItem('lamna-current-match-id',match.id);
     go('game');
   };
@@ -198,11 +203,19 @@ function App() {
     if(!token()){setAuthMode('register');go('account');return;}
     try{
       setStarting(true);
-      const data=await storeRequest<{match:ServerMatch;credits:number;freeRemaining:boolean}>('matches','POST',{selected,matchName});
+      const data=await storeRequest<{match:ServerMatch;credits:number;freeRemaining:boolean}>('matches','POST',{selected,matchName,teams,chosenAids});
       applyMatch(data.match);
     }catch(error){setMatchError(error instanceof Error?error.message:'تعذر بدء المباراة.');}
     finally{setStarting(false);}
   };
+  React.useEffect(()=>{
+    if(!accountsEnabled||!activeSession||activeSession.status!=='active'||!token()||showResult)return;
+    const progress={teams,chosenAids,scores,used,turn,usedAids,history,active};
+    const t=window.setTimeout(()=>{
+      storeRequest('progress','POST',{matchId:activeSession.id,progress}).catch(()=>{});
+    },800);
+    return()=>window.clearTimeout(t);
+  },[accountsEnabled,activeSession?.id,activeSession?.status,teams,chosenAids,scores,used,turn,usedAids,history,active,showResult]);
   React.useEffect(()=>{
     if(!accountsEnabled||!activeSession||activeSession.status!=='active'||!showResult||active!==null)return;
     let alive=true;
