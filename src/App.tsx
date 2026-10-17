@@ -8,6 +8,7 @@ import { WordlessTV } from './Wordless';
 import WinnerScreen from './WinnerScreen';
 import OfficialLogo from './OfficialLogo';
 import SocialLinks from './SocialLinks';
+import AuthScreen from './AuthScreen';
 import { Plus, ArrowLeft, Sparkles, UsersRound, Grid2X2, Trophy, ChevronLeft, Check, Play } from 'lucide-react';
 import './landing.css';
 const categories = [
@@ -73,6 +74,7 @@ function AidGlyph({ id, size=26 }: { id:AidId; size?:number }) {
 }
 function App() {
   const [page, setPage] = useState<Page>('home');
+  const [authMode,setAuthMode] = useState<'register'|'login'>('register');
   const [selected, setSelected] = useState<number[]>([]);
   const [teams, setTeams] = useState(['الفريق الأول', 'الفريق الثاني']);
   const [matchName,setMatchName] = useState('');
@@ -215,6 +217,10 @@ function App() {
       {page!=="game" && <header className={"header"+(page==="home"?" lm-header":"")}>
         <div onClick={() => go('home')} className="brand-link">
           {brand}
+        </div>
+        <div className="lm-header-accounts">
+          <button type="button" onClick={()=>{setAuthMode('register');go('account');}}>سجّل معنا</button>
+          <button type="button" onClick={()=>{setAuthMode('login');go('account');}}>تسجيل الدخول</button>
         </div>
         {page!=='home'&&<nav>
           <button onClick={() => go('home')}>الرئيسية</button>
@@ -581,24 +587,7 @@ function App() {
           </div>
         </section>
       )}
-      {page === 'account' && (
-        <section className="section narrow">
-          <span className="kicker">حساب لمنا</span>
-          <h1>حياك في لمنا</h1>
-          <div className="setup-card">
-            <p>
-              تسجيل الدخول برقم الجوال أو البريد الإلكتروني سيكون متاحًا بعد ربط
-              النظام الآمن.
-            </p>
-            <p className="muted">
-              ما راح نطلب منك بيانات شخصية في هذه المعاينة.
-            </p>
-            <button className="primary" onClick={() => go('categories')}>
-              جرّب اختيار الفئات ←
-            </button>
-          </div>
-        </section>
-      )}
+      {page === 'account' && <AuthScreen initialMode={authMode} onReturn={()=>go('home')}/>}
       {page!=='game' && <footer className="lamna-site-footer">
         <div>{brand}</div>
         <p>ألعاب تجمعنا</p>
