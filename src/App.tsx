@@ -75,7 +75,20 @@ function AidGlyph({ id, size=26 }: { id:AidId; size?:number }) {
   return <Bomb size={size}/>;
 }
 function App() {
-  const [page, setPage] = useState<Page>('home');
+  const getInitialPage=():Page=>{
+    const fromHash=window.location.hash.replace(/^#\/?/,'');
+    return (['privacy','terms','faq','contact'] as string[]).includes(fromHash)?fromHash as Page:'home';
+  };
+  const [page, setPage] = useState<Page>(getInitialPage);
+  React.useEffect(()=>{
+    const handleHash=()=>{
+      const hash=window.location.hash.replace(/^#\/?/,'');
+      if((['privacy','terms','faq','contact'] as string[]).includes(hash)){setPage(hash as Page);}
+      else if(page!=='game')setPage('home');
+    };
+    window.addEventListener('hashchange',handleHash);
+    return()=>window.removeEventListener('hashchange',handleHash);
+  },[page]);
   const [authMode,setAuthMode] = useState<'register'|'login'>('register');
   const [accountsEnabled,setAccountsEnabled] = useState(false);
   React.useEffect(()=>{
@@ -148,6 +161,9 @@ function App() {
   };
   const go = (p: Page) => {
     setPage(p);
+    const infoPages=['privacy','terms','faq','contact'] as const;
+    if(infoPages.some(item=>item===p)){window.history.pushState(null,'','#'+p);}
+    else if(window.location.hash){window.history.pushState(null,'',window.location.pathname+window.location.search);}
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
   const choose = (i: number) => {
