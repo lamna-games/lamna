@@ -107,3 +107,175 @@
  .board-points button,.board-column .board-points button{font-size:15px!important;}
  .board-cover .lamna-cover-label strong{font-size:9px!important;}
 }
+
+/* Lamna reference-inspired full-screen question / answer / winner flow.
+   The three stages preserve a single stable header, frame, and team scoreboard. */
+.play-screen,
+.play-screen *{box-sizing:border-box}
+.play-screen{
+ position:fixed;inset:0;z-index:9999;isolation:isolate;
+ display:flex;flex-direction:column;
+ width:100%;height:100vh;height:100dvh;
+ min-width:0;min-height:0;overflow-x:hidden;overflow-y:auto;
+ color:#fff;background:#303030;
+ font-family:inherit;text-align:center;direction:rtl;
+}
+.play-screen button{cursor:pointer;font-family:inherit}
+.play-screen button:disabled{opacity:.35;cursor:not-allowed}
+.play-header{
+ flex:0 0 auto;
+ padding:12px 12px 10px;
+ background:linear-gradient(105deg,#292929 0%,#3c3c3c 65%,#525252 100%);
+}
+.play-nav{
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+ gap:3px;align-items:center;
+}
+.play-nav button{
+ color:#fff;background:transparent;border:0;
+ min-width:0;min-height:29px;padding:4px 2px;
+ font-weight:500;font-size:clamp(11px,3vw,17px);
+ white-space:nowrap;text-align:center;
+}
+.play-nav button:hover{color:#ff8659}
+.play-brandrow{
+ position:relative;display:flex;align-items:center;justify-content:center;
+ margin:4px 0 0;min-height:36px;
+}
+.play-turn{
+ border-radius:100px;background:#f78154;color:#fff;
+ padding:5px 14px;max-width:72%;
+ font-size:clamp(13px,3.6vw,20px);
+ white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.play-brand{
+ position:absolute;right:7px;top:50%;transform:translateY(-50%);
+ color:#ff7a42;font-size:clamp(16px,4.3vw,25px);font-weight:900;
+}
+.play-category{font-size:clamp(16px,4.2vw,25px);font-weight:500;margin:6px 0 0;line-height:1.2;color:#f6f6f6}
+.play-content{
+ display:flex;flex:1 1 auto;min-height:0;
+ flex-direction:column;padding:26px 13px 19px;
+ width:100%;
+}
+.play-stage{
+ position:relative;display:flex;flex-direction:column;flex:1 1 auto;min-height:250px;
+ background:#303030;border:4px solid #f78154;border-radius:25px;
+ padding:42px 15px 24px;
+ width:100%;
+}
+.play-timer{
+ position:absolute;top:-20px;left:50%;transform:translateX(-50%);
+ background:#262232;border-radius:50px;min-width:138px;min-height:39px;
+ display:flex;justify-content:space-around;align-items:center;gap:10px;
+ padding:3px 11px;font-size:clamp(15px,4vw,23px);
+ line-height:1;direction:ltr;z-index:2;white-space:nowrap;
+}
+.play-timer button{background:transparent;color:white;border:0;padding:0;font-size:25px;line-height:1;min-width:25px;}
+.play-point-tag{
+ position:absolute;right:13px;top:-20px;
+ padding:8px 9px;background:#030303;color:white;
+ border-radius:17px;font-size:clamp(13px,3.7vw,20px);font-weight:800;z-index:2;
+ white-space:nowrap;
+}
+.play-stage-inner{
+ width:100%;max-width:100%;flex:1 1 auto;min-height:0;
+ display:flex;flex-direction:column;align-items:center;
+ gap:12px;overflow-y:auto;overscroll-behavior:contain;
+}
+.play-stage-inner h2{color:white!important;text-align:center;max-width:100%;margin:0;overflow-wrap:break-word;}
+.play-question-view h2{font-size:clamp(21px,5.1vw,38px);font-weight:850;line-height:1.5;padding:0 3px;}
+.play-answer-view h2{font-size:clamp(27px,6vw,46px);font-weight:500;line-height:1.6;}
+.play-pick-view h2{font-size:clamp(23px,5.4vw,37px);font-weight:900;line-height:1.4;}
+.play-status{color:#fff0d1;font-size:clamp(13px,3.5vw,18px);}
+.play-context{color:#fed8c2;font-size:14px;margin:0;}
+.play-instructions{color:#e8e8e8;font-size:14px;line-height:1.45;margin:0;}
+.play-hint{color:#13293f;background:#e9eff4;border-radius:12px;padding:9px;font-size:14px;margin:0;}
+.play-choose-teams{
+ width:min(100%,430px);display:flex;flex-direction:column;align-items:center;
+ gap:19px;margin:auto 0;max-width:100%;padding:15px 5px;
+}
+.play-choose-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;gap:18px;}
+.play-choose-teams button{
+ border:0;border-radius:38px;background:#aa2419;color:#fff;
+ padding:12px 7px;min-height:49px;font-size:clamp(18px,4.4vw,26px);font-weight:500;
+ white-space:normal;overflow-wrap:anywhere;line-height:1.3;
+}
+.play-choose-teams .play-choose-none{width:100%;max-width:280px;background:#8e8e8e;}
+.play-stage-actions{
+ position:absolute;bottom:-13px;left:-4px;right:-4px;
+ display:flex;direction:ltr;justify-content:space-between;align-items:center;
+ z-index:2;pointer-events:none;gap:10px;
+}
+.play-action{
+ pointer-events:auto;direction:rtl;display:inline-grid;place-items:center;
+ min-height:37px;max-width:52%;border:0;border-radius:26px;
+ color:#fff;padding:5px 15px;
+ font-size:clamp(13px,3.65vw,21px);line-height:1.25;
+ font-weight:500;overflow-wrap:anywhere;text-align:center;
+}
+.play-action-green{background:#4d872e;color:#fff}
+.play-action-blue{background:#28699f;color:#fff}
+.play-action-red{background:#bc2a21;color:#fff}
+.play-action-category{background:#f78154;color:#fff;min-width:72px;pointer-events:none}
+.play-score-footer{
+ flex:0 0 auto;position:relative;min-width:0;
+ background:#303030;color:#fff;
+ padding:5px 15px max(12px,env(safe-area-inset-bottom));
+}
+.play-teams{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+.play-team{min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px}
+.play-team-name{
+ background:#f78154;color:white;border-radius:40px;
+ padding:6px 7px;width:100%;min-width:0;
+ font-weight:700;font-size:clamp(14px,4vw,23px);
+ overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.play-team-score{font-size:clamp(17px,4.1vw,23px);font-weight:900;line-height:1.15}
+.play-team-help-label{font-weight:800;font-size:clamp(12px,3.25vw,19px)}
+.play-team-controls{display:flex;justify-content:center;gap:8px;margin-top:5px;}
+.play-team-controls button{
+ border:3px solid #898989;border-radius:50%;background:transparent;color:#ff8a54;
+ font-weight:900;font-size:clamp(10px,2.8vw,15px);
+ width:39px;height:39px;display:grid;place-items:center;
+ position:relative;padding:0;
+}
+.play-team-controls button small{
+ font-size:9px;position:absolute;right:-2px;top:-6px;color:#fff;
+ background:#e57e53;border-radius:9px;padding:1px 3px;
+}
+.play-var-return{color:#fff;background:#bb2b21;border:0;border-radius:30px;padding:7px 13px;margin:8px auto 0;font-size:14px;}
+.play-help-popup{
+ position:absolute;bottom:100%;left:12px;right:12px;
+ border:1px solid #f78154;border-radius:13px;background:#202020;
+ padding:12px 10px;display:flex;align-items:center;justify-content:center;
+ flex-wrap:wrap;gap:9px;font-size:13px;z-index:20;
+}
+.play-help-popup button{background:#f78154;color:white;padding:6px 10px;border-radius:12px;border:0;font-size:13px;}
+@media(min-width:700px){
+ .play-screen{max-width:960px;left:50%;right:auto;transform:translateX(-50%);box-shadow:0 0 80px #0009;}
+ .play-header{padding:13px 25px 14px;}
+ .play-content{padding:28px 30px 22px;}
+ .play-stage{padding:55px 40px 25px;}
+ .play-score-footer{padding:8px 30px 18px;}
+}
+@media(max-width:360px){
+ .play-header{padding:9px 7px 7px;}
+ .play-content{padding:23px 7px 18px;}
+ .play-stage{padding:36px 7px 22px;border-width:3px;}
+ .play-stage-actions{bottom:-10px;}
+ .play-action{padding:5px 9px;font-size:12px;}
+ .play-point-tag{right:5px;font-size:12px;padding:9px 5px;}
+ .play-timer{min-width:121px;gap:4px;padding:4px;}
+ .play-team-controls button{width:33px;height:33px;font-size:10px;}
+}
+@media(max-height:710px){
+ .play-header{padding-top:6px;padding-bottom:5px;}
+ .play-brandrow{min-height:30px;margin-top:0;}
+ .play-category{margin-top:2px;}
+ .play-content{padding-top:24px;padding-bottom:17px;}
+ .play-stage{padding-top:37px;padding-bottom:18px;min-height:210px;}
+ .play-score-footer{padding-top:3px;}
+ .play-team{gap:2px;}
+ .play-team-controls{margin-top:2px;}
+}
