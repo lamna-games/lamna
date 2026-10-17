@@ -82,6 +82,7 @@ function App() {
   const [usedAids,setUsedAids] = useState<AidId[][]>([[],[]]);
   const [aidEffect,setAidEffect] = useState<AidId|null>(null);
   const [aidOwner,setAidOwner] = useState<number|null>(null);
+  const [twoAttemptsLeft,setTwoAttemptsLeft] = useState(2);
   const [turn, setTurn] = useState(0);
   const [scores, setScores] = useState([0, 0]);
   const [used, setUsed] = useState<number[]>([]);
@@ -127,6 +128,7 @@ function App() {
     if(active===null||reveal||pickWinner||phase==='var'||usedAids[team]?.includes(aid)||!chosenAids[team]?.includes(aid)||team!==(phase==='steal'?1-stealFrom:turn)||aidEffect!==null)return;
     setUsedAids(prev=>prev.map((list,i)=>i===team?[...list,aid]:list));
     setAidEffect(aid);setAidOwner(team);setShowHelp(false);
+    if(aid==='two')setTwoAttemptsLeft(2);
     if(aid==='phone'){setSeconds(v=>v+30);setPaused(false);}
     if(aid==='trap'){setStealFrom(team);setPhase('steal');setSeconds(10);setPaused(false);}
   };
@@ -151,7 +153,7 @@ function App() {
     if(active===null)return;
     const pts=[200,400,600][Math.floor((active%6)/2)];
     const change=[0,0];
-    if(team!==null)change[team]+=pts;
+    if(team!==null && !(aidEffect==='rest' && aidOwner!==null && team!==aidOwner))change[team]+=pts;
     if(aidEffect==='pit'&&aidOwner!==null&&team===aidOwner)change[1-team]-=pts;
     if(aidEffect==='trap'&&aidOwner!==null&&team===null)change[1-aidOwner]-=pts;
     const updatedScores=scores.map((score,i)=>Math.max(0,score+change[i]));
@@ -161,7 +163,7 @@ function App() {
     setUsed(v=>[...v,active]);setActive(null);
     setReveal(false);setPickWinner(false);setTurn(v=>1-v);
     setShowHelp(false);setShowHint(false);setPhase('question');setSeconds(60);setPaused(false);
-    setAidEffect(null);setAidOwner(null);
+    setAidEffect(null);setAidOwner(null);setTwoAttemptsLeft(2);
     if(used.length===35)setShowResult(true);
   };
   const brand = <div className="brand"><OfficialLogo/></div>;
@@ -479,8 +481,8 @@ function App() {
                       <h2>أي فريق جاوب صح؟</h2>
                       <div className="play-choose-teams">
                         <div className="play-choose-pair">
-                          <button type="button" onClick={()=>award(0)}>{teams[0]||'الفريق الأول'}</button>
-                          <button type="button" onClick={()=>award(1)}>{teams[1]||'الفريق الثاني'}</button>
+                          <button type="button" disabled={aidEffect==='rest'&&aidOwner===1} onClick={()=>award(0)}>{teams[0]||'الفريق الأول'}</button>
+                          <button type="button" disabled={aidEffect==='rest'&&aidOwner===0} onClick={()=>award(1)}>{teams[1]||'الفريق الثاني'}</button>
                         </div>
                         <button type="button" className="play-choose-none" onClick={()=>award(null)}>ولا أحد</button>
                       </div>
@@ -502,7 +504,8 @@ function App() {
                       ) : <h2>{currentQuestion?.prompt}</h2>}
                       {aidEffect!==null&&<div className="play-aid-activated">
                         <strong>{aidCatalog.find(x=>x.id===aidEffect)?.name}</strong>
-                        <span>{aidEffect==='phone'?'زاد وقت السؤال 30 ثانية للتشاور مع صديق':aidEffect==='two'?'يُسمح بمحاولتين للإجابة بدل محاولة واحدة':aidEffect==='rest'?'حدّد لاعبًا من الخصم يستريح عن المشاركة في هذا السؤال':aidEffect==='pit'?'إذا أجاب فريقك صح تخصم نقاط السؤال أيضًا من الخصم':'السؤال الآن عند الخصم: إذا لم يجب تُخصم منه نقاط السؤال'}</span>
+                        <span>{aidEffect==='phone'?'زاد وقت السؤال 30 ثانية للتشاور مع صديق':aidEffect==='two'?'لديكم '+twoAttemptsLeft+' '+(twoAttemptsLeft===2?'محاولتان':'محاولة')+' للإجابة في هذا السؤال':aidEffect==='rest'?'فريق الخصم لا يمكنه أخذ نقاط هذا السؤال':aidEffect==='pit'?'إذا أجاب فريقك صح تخصم نقاط السؤال أيضًا من الخصم':'السؤال الآن عند الخصم: إذا لم يجب تُخصم منه نقاط السؤال'}</span>
+                        {aidEffect==='two'&&twoAttemptsLeft===2&&<button className="lamna-second-guess" type="button" onClick={()=>setTwoAttemptsLeft(1)}>التخمين الأول خطأ — ابدأ المحاولة الثانية</button>}
                       </div>}
                       {!isWordlessQuestion&&currentQuestion?.mode && <p className="play-context">{currentQuestion.mode}</p>}
                       {!isWordlessQuestion&&currentQuestion?.instructions && <p className="play-instructions">{currentQuestion.instructions}</p>}
