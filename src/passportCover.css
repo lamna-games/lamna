@@ -1,0 +1,36 @@
+/* Tall, readable passport covers embedded within the active question card. */
+.lm-passport-card{
+ flex:1 1 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;
+ width:100%;max-width:100%;min-height:0;min-width:0;
+ padding:0;margin:1px auto 4px;
+ gap:5px;
+}
+.lm-passport-frame{
+ position:relative;display:block;aspect-ratio:320/440;
+ width:auto;height:clamp(165px,36vh,360px);max-width:min(90%,300px);
+ flex:none;overflow:hidden;background:#113d3b;
+ border-radius:13px;box-shadow:0 12px 27px rgba(8,27,41,.22);
+ border:1px solid rgba(249,218,157,.45);
+}
+.lm-passport-design,.lm-passport-photograph{
+ width:100%;height:100%;object-fit:contain;display:block;
+}
+.lm-passport-name-mask{
+ position:absolute;z-index:2;top:37%;left:14%;width:72%;height:19%;
+ background:rgba(71,66,62,.02);
+ backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px);
+ border-radius:13px;pointer-events:none;
+}
+.lm-passport-caption{font-size:11px;color:#66899a;text-align:center;font-weight:700;}
+@media(max-width:440px){
+ .lm-passport-frame{height:clamp(144px,34dvh,280px);border-radius:10px}
+ .lm-passport-caption{font-size:10px}
+}
+@media (orientation:landscape) and (max-height:640px){
+ .lm-passport-frame{height:min(45dvh,202px);width:auto;border-radius:8px}
+ .lm-passport-card{gap:1px}
+ .lm-passport-caption{font-size:9px}
+}
+@media(max-height:600px) and (orientation:portrait){
+ .lm-passport-frame{height:25dvh}
+}
