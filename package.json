@@ -5,10 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/validateCatalog.mjs && vite build",
+    "build": "npm run qa && vite build",
     "preview": "vite preview",
     "start": "node server.mjs",
-    "qa": "node scripts/validateCatalog.mjs"
+    "qa": "node scripts/validateCatalog.mjs && node scripts/testMatchProgress.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.469.0",
