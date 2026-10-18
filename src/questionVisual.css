@@ -37,3 +37,7 @@
 @media(max-height:600px) and (orientation:portrait){
  .lm-question-visual{max-height:20dvh}
 }
+
+/* Approved original photographic images share the same question frame. */
+.lm-question-visual--photo{background:#f7f8f6}
+.lm-question-visual--photo>img{display:block;width:100%;height:100%;object-fit:contain;object-position:center}
