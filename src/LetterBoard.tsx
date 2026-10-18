@@ -7,7 +7,7 @@ import './LetterBoard.css';
  * Normalizes Arabic alef and ha spelling variants for reliable matching. */
 const normalizeLetter=(ch:string)=>{
  if(/[إأآٱا]/.test(ch))return 'أ';
- if(/[هة]/.test(ch))return 'هـ';
+ if(/[هة]/.test(ch))return 'ه';
  if(ch==='ى')return 'ي';
  return ch;
 };
@@ -16,7 +16,7 @@ const letterNames:Record<string,string>={
  'الدال':'د','الذال':'ذ','الراء':'ر','الزاي':'ز','السين':'س','الشين':'ش',
  'الصاد':'ص','الضاد':'ض','الطاء':'ط','الظاء':'ظ','العين':'ع','الغين':'غ',
  'الفاء':'ف','القاف':'ق','الكاف':'ك','اللام':'ل','الميم':'م','النون':'ن',
- 'الهاء':'هـ','الواو':'و','الياء':'ي'
+ 'الهاء':'ه','الواو':'و','الياء':'ي'
 };
 export function initialOfAnswer(answer:string,english=false):string{
  const clean=answer.trim().replace(/^[\\s\\u064B-\\u065F\\u0670\\u0640"«»'()]+/g,'');
