@@ -15,4 +15,12 @@ const bad=[
 ];
 for(const mutation of bad) assert.equal(validateMatchProgress({...valid,...mutation}),false,JSON.stringify(mutation));
 assert.equal(validateMatchProgress({...valid,used:[0,3],history:[valid.history[0],{team:1,points:400,question:3}]}),true,'Two completed answers');
+const usedAll=Array.from({length:36},(_,i)=>i);
+const complete={...valid,revision:250,active:null,used:usedAll,scores:[4200,3800],
+ history:usedAll.map(i=>({team:i%2,points:[200,400,600][Math.floor((i%6)/2)],question:i})),
+ paused:true,phase:'question',varUsed:[true,true],varTeam:1,phaseBeforeVar:'steal'};
+assert.equal(validateMatchProgress(complete),true,'Final 36-question scoreboard should be persistable');
+assert.equal(validateMatchProgress({...complete,history:complete.history.slice(1)}),false,'Missing final answer must be rejected');
+assert.equal(validateMatchProgress({...valid,varTeam:3}),false,'Invalid VAR owner must be rejected');
+assert.equal(validateMatchProgress({...valid,phaseBeforeVar:'var'}),false,'Invalid VAR resume phase must be rejected');
 console.log('LAMNA progress QA OK: valid saves and '+bad.length+' malformed/overlap cases.');
