@@ -23,6 +23,8 @@ export function validateMatchProgress(p) {
  if(![0,1].includes(p.turn)||!['question','steal','var'].includes(p.phase))return false;
  if(!validNumber(p.seconds,180)||typeof p.paused!=='boolean')return false;
  if(p.varUsed!==undefined&&(!Array.isArray(p.varUsed)||p.varUsed.length!==2||p.varUsed.some(x=>typeof x!=='boolean')))return false;
+ if(p.varTeam!==undefined&&![0,1].includes(p.varTeam))return false;
+ if(p.phaseBeforeVar!==undefined&&!['question','steal'].includes(p.phaseBeforeVar))return false;
  if(p.help!==undefined&&(!Array.isArray(p.help)||p.help.length!==2||p.help.some(x=>!validNumber(x,3))))return false;
  for(const key of ['reveal','pickWinner','showHint'])if(p[key]!==undefined&&typeof p[key]!=='boolean')return false;
  if(p.stealFrom!==undefined&&![0,1].includes(p.stealFrom))return false;
