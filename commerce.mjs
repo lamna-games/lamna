@@ -362,9 +362,16 @@ export async function handleStore(req,res,url,pool,ensureAccounts){
   if(!user.is_admin){send(req,res,403,{message:'هذه العملية للإدارة فقط.'});return true;}
   const id=String(data.reportId||'');
   if(!/^[a-f0-9-]{36}$/i.test(id)){send(req,res,400,{message:'معرف البلاغ غير صحيح.'});return true;}
-  const r=await pool.query('UPDATE lamna_question_reports SET resolved_at=COALESCE(resolved_at,now()) WHERE id=$1 RETURNING id',[id]);
-  if(!r.rowCount){send(req,res,404,{message:'البلاغ غير موجود.'});return true;}
-  send(req,res,200,{ok:true});return true;
+  const client=await pool.connect();
+  try{
+   await client.query('BEGIN');
+   const r=await client.query('UPDATE lamna_question_reports SET resolved_at=COALESCE(resolved_at,now()) WHERE id=$1 RETURNING id',[id]);
+   if(!r.rowCount){await client.query('ROLLBACK');send(req,res,404,{message:'البلاغ غير موجود.'});return true;}
+   await client.query('INSERT INTO lamna_admin_audit(actor_id,action,entity,details) VALUES($1,$2,$3,$4::jsonb)',[
+    user.id,'resolve_report',id,JSON.stringify({reportId:id})]);
+   await client.query('COMMIT');
+   send(req,res,200,{ok:true});return true;
+  }catch(e){await client.query('ROLLBACK').catch(()=>{});throw e;}finally{client.release();}
  }
  if(route==='/api/store/report'){
   const id=String(data.matchId||'');
