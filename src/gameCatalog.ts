@@ -1,6 +1,6 @@
 /** 80 original Lamna games in eleven independent, single-page sections.
  * Existing IDs 0–49 remain stable: never reassign them (saved paid matches rely on IDs).
- * IDs 39,40 and 50–57 are dedicated Arabic letter-board games.
+ * IDs 36,39 and 50–57 are dedicated Arabic letter-board games.
  */
 export const categories = [
   "معلومات عامة",
@@ -172,7 +172,6 @@ export const categorySections = [
       6,
       15,
       17,
-      36,
       37,
       68,
       69
@@ -184,6 +183,7 @@ export const categorySections = [
     "ids": [
       16,
       38,
+      40,
       41,
       20
     ],
@@ -218,8 +218,8 @@ export const categorySections = [
   {
     "name": "الحروف",
     "ids": [
+      36,
       39,
-      40,
       50,
       51,
       52,
@@ -232,6 +232,6 @@ export const categorySections = [
     "description": "اختر حرفًا من الألف إلى الياء"
   }
 ] as const;
-export const letterGameIds = [39,40,50,51,52,53,54,55,56,57] as const;
+export const letterGameIds = [36,39,50,51,52,53,54,55,56,57] as const;
 export const isLetterGame = (id:number):boolean => (letterGameIds as readonly number[]).includes(id);
 export const arabicAlphabet = ['أ','ب','ت','ث','ج','ح','خ','د','ذ','ر','ز','س','ش','ص','ض','ط','ظ','ع','غ','ف','ق','ك','ل','م','ن','هـ','و','ي'] as const;
