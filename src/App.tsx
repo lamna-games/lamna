@@ -8,6 +8,7 @@ import LetterBoard from './LetterBoard';
 import { getQuestion, wordlessModeCount } from './quizData';
 import { WordlessTV } from './Wordless';
 import QuestionVisual from './QuestionVisual';
+import PassportCover from './PassportCover';
 import WinnerScreen from './WinnerScreen';
 import OfficialLogo from './OfficialLogo';
 import SocialLinks from './SocialLinks';
@@ -645,7 +646,9 @@ function App() {
                           points={[200,400,600][Math.floor((active%6)/2)]}
                           onStart={(n)=>{setSeconds(n);setPaused(true);}}
                           onTick={(n)=>{setSeconds(n);}}/>
-                      ) : <><h2>{currentQuestion?.prompt}</h2>{!isLetterQuestion&&currentQuestion&&<QuestionVisual category={selected[Math.floor(active/6)]} prompt={currentQuestion.prompt} imageUrl={currentQuestion.imageUrl}/>} {isLetterQuestion&&<LetterBoard answer={currentQuestion?.answer||''} category={selected[Math.floor(active/6)]}/>}</>}
+                      ) : <><h2>{currentQuestion?.prompt}</h2>{!isLetterQuestion&&currentQuestion&&(selected[Math.floor(active/6)]===74&&currentQuestion.passportCode
+   ? <PassportCover passportCode={currentQuestion.passportCode} imageUrl={currentQuestion.imageUrl}/>
+   : <QuestionVisual category={selected[Math.floor(active/6)]} prompt={currentQuestion.prompt} imageUrl={currentQuestion.imageUrl}/>)} {isLetterQuestion&&<LetterBoard answer={currentQuestion?.answer||''} category={selected[Math.floor(active/6)]}/>}</>}
                       {aidEffect!==null&&<div className="play-aid-activated">
                         <strong>{aidCatalog.find(x=>x.id===aidEffect)?.name}</strong>
                         <span>{aidEffect==='phone'?'زاد وقت السؤال 30 ثانية للتشاور مع صديق':aidEffect==='two'?'لديكم '+twoAttemptsLeft+' '+(twoAttemptsLeft===2?'محاولتان':'محاولة')+' للإجابة في هذا السؤال':aidEffect==='rest'?'سمِّ لاعبًا واحدًا من الفريق الخصم ليتوقف عن المشاركة في هذا السؤال':aidEffect==='pit'?'إذا أجاب فريقك صح تخصم نقاط السؤال أيضًا من الخصم':'السؤال الآن عند الخصم: إذا لم يجب تُخصم منه نقاط السؤال'}</span>
