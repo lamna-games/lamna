@@ -8,11 +8,11 @@
 export const flagRounds={
  free:[
   {code:'SA',answer:'السعودية',hint:'دولة عربية في شبه الجزيرة العربية'},
-  {code:'JP',answer:'اليابان',hint:'دولة آسيوية'},
   {code:'AE',answer:'الإمارات',hint:'دولة خليجية'},
+  {code:'JP',answer:'اليابان',hint:'دولة آسيوية'},
   {code:'CA',answer:'كندا',hint:'دولة في أمريكا الشمالية'},
-  {code:'AR',answer:'الأرجنتين',hint:'دولة من أمريكا الجنوبية'},
-  {code:'CH',answer:'سويسرا',hint:'دولة أوروبية غير ساحلية'}
+  {code:'PT',answer:'البرتغال',hint:'دولة أوروبية تطل على المحيط الأطلسي'},
+  {code:'UY',answer:'أوروغواي',hint:'دولة من أمريكا الجنوبية'}
  ],
  paid:[
   {code:'TR',answer:'تركيا',hint:'دولة تمتد في آسيا وأوروبا'},
