@@ -1,6 +1,7 @@
 import crypto from 'node:crypto';
 import {catalogByCategory} from './serverQuestionBank.mjs';
 import {validateMatchProgress} from './matchProgress.mjs';
+import {validQuestionImageUrl} from './questionImagePolicy.mjs';
 
 /* All entitlements and usage are server-authoritative, never localStorage.
    No successful payment, credit grant or account can be simulated client-side. */
@@ -70,6 +71,7 @@ async function setup(pool){
   question_id TEXT PRIMARY KEY,prompt TEXT NOT NULL,answer TEXT NOT NULL,hint TEXT NOT NULL,
   updated_by BIGINT NOT NULL REFERENCES lamna_accounts(id),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now())`);
+ await pool.query("ALTER TABLE lamna_question_edits ADD COLUMN IF NOT EXISTS image_url TEXT NOT NULL DEFAULT ''");
  await pool.query(`CREATE TABLE IF NOT EXISTS lamna_game_controls(
   game_id INTEGER PRIMARY KEY CHECK(game_id BETWEEN 0 AND 79),
   disabled BOOLEAN NOT NULL DEFAULT FALSE,
@@ -101,7 +103,7 @@ async function readMe(pool,id){
 
 async function questionPool(client,category,kind){
  const original=catalogByCategory(category,kind);
- const overrides=await client.query('SELECT question_id,prompt,answer,hint FROM lamna_question_edits WHERE question_id=ANY($1::text[])',[original.map(x=>x.id)]);
+ const overrides=await client.query('SELECT question_id,prompt,answer,hint,image_url AS "imageUrl" FROM lamna_question_edits WHERE question_id=ANY($1::text[])',[original.map(x=>x.id)]);
  const edited=new Map(overrides.rows.map(x=>[x.question_id,x]));
  return original.map(q=>({...q,...(edited.get(q.id)||{})}));
 }
@@ -193,14 +195,18 @@ export async function handleStore(req,res,url,pool,ensureAccounts){
   const prompt=restore?original.prompt:String(data.prompt||'').trim();
   const answer=restore?original.answer:String(data.answer||'').trim();
   const hint=restore?original.hint:String(data.hint||'').trim();
+  const imageUrl=restore?'':String(data.imageUrl||'').trim();
   if(!validQuestionText(prompt,9,400)||!validQuestionText(answer,1,180)||!validQuestionText(hint,1,180)){
    send(req,res,400,{message:'تحقق من طول السؤال والإجابة والتلميح وتجنب فواصل الأسطر.'});return true;
+  }
+  if(!validQuestionImageUrl(imageUrl)){
+   send(req,res,400,{message:'رابط الصورة غير معتمد؛ استخدم رابط صورة من مكتبة لمنا على Cloudinary.'});return true;
   }
   const normalize=t=>String(t).normalize('NFKC').replace(/[\u064b-\u065f\u0670\u0640\s؟?،,.!«»"'()]/g,'').toLowerCase();
   const client=await pool.connect();
   try{
    await client.query('BEGIN');
-   const before=await client.query('SELECT prompt,answer,hint FROM lamna_question_edits WHERE question_id=$1 FOR UPDATE',[questionId]);
+   const before=await client.query('SELECT prompt,answer,hint,image_url FROM lamna_question_edits WHERE question_id=$1 FOR UPDATE',[questionId]);
    // Prevent introducing copies across any of the 1,440 original questions
    // or their existing editorial overrides.
    const currentEdits=await client.query('SELECT question_id,prompt FROM lamna_question_edits');
@@ -218,13 +224,13 @@ export async function handleStore(req,res,url,pool,ensureAccounts){
    if(restore){
     await client.query('DELETE FROM lamna_question_edits WHERE question_id=$1',[questionId]);
    }else{
-    await client.query(`INSERT INTO lamna_question_edits(question_id,prompt,answer,hint,updated_by) VALUES($1,$2,$3,$4,$5)
-     ON CONFLICT(question_id) DO UPDATE SET prompt=EXCLUDED.prompt,answer=EXCLUDED.answer,hint=EXCLUDED.hint,updated_by=EXCLUDED.updated_by,updated_at=now()`,[questionId,prompt,answer,hint,user.id]);
+    await client.query(`INSERT INTO lamna_question_edits(question_id,prompt,answer,hint,image_url,updated_by) VALUES($1,$2,$3,$4,$5,$6)
+     ON CONFLICT(question_id) DO UPDATE SET prompt=EXCLUDED.prompt,answer=EXCLUDED.answer,hint=EXCLUDED.hint,image_url=EXCLUDED.image_url,updated_by=EXCLUDED.updated_by,updated_at=now()`,[questionId,prompt,answer,hint,imageUrl,user.id]);
    }
    await client.query('INSERT INTO lamna_admin_audit(actor_id,action,entity,details) VALUES($1,$2,$3,$4::jsonb)',[
-    user.id,restore?'restore_question':'edit_question',questionId,JSON.stringify({before:before.rows[0]||original,after:{prompt,answer,hint}})]);
+    user.id,restore?'restore_question':'edit_question',questionId,JSON.stringify({before:before.rows[0]||original,after:{prompt,answer,hint,imageUrl}})]);
    await client.query('COMMIT');
-   send(req,res,200,{ok:true,questionId,question:{...original,prompt,answer,hint}});return true;
+   send(req,res,200,{ok:true,questionId,question:{...original,prompt,answer,hint,imageUrl}});return true;
   }catch(e){await client.query('ROLLBACK').catch(()=>{});throw e;}finally{client.release();}
  }
  if(route==='/api/store/admin/game'){
