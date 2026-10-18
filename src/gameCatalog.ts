@@ -1,4 +1,7 @@
-/** Lamna original one-page catalogue. Keep existing IDs 0-19 stable for saved matches. */
+/** 80 original Lamna games in eleven independent, single-page sections.
+ * Existing IDs 0–49 remain stable: never reassign them (saved paid matches rely on IDs).
+ * IDs 39,40 and 50–57 are dedicated Arabic letter-board games.
+ */
 export const categories = [
   "معلومات عامة",
   "ولا كلمة",
@@ -49,7 +52,37 @@ export const categories = [
   "أحاديث",
   "آلات موسيقية",
   "عالم الطيران",
-  "عالم التطبيقات"
+  "عالم التطبيقات",
+  "حروف إسلامية",
+  "حروف كروية",
+  "حروف سعودية",
+  "حروف جغرافية",
+  "حروف علوم",
+  "حروف أفلام",
+  "حروف حيوانات",
+  "حروف أكلات",
+  "معالم العالم",
+  "أندية عالمية",
+  "نجوم كرة القدم",
+  "كأس آسيا",
+  "حضارات قديمة",
+  "اختراعات غيرت العالم",
+  "جسم الإنسان",
+  "عالم الفضاء",
+  "أعماق البحار",
+  "مدن عربية",
+  "مطابخ العالم",
+  "أمثال خليجية",
+  "من القائل؟",
+  "معاني الكلمات",
+  "تاريخ الإسلام",
+  "معلومات عن القرآن",
+  "مغامرات السفر",
+  "خمن البلد من معلم",
+  "سينما عربية",
+  "أغاني خليجية",
+  "مسرحيات خليجية",
+  "ألعاب الفيديو"
 ] as const;
 export const categorySections = [
   {
@@ -59,9 +92,11 @@ export const categorySections = [
       2,
       8,
       19,
-      20
+      62,
+      70,
+      71
     ],
-    "description": "ألغاز وتركيز وسرعة بديهة"
+    "description": "ألغاز وقرارات وسرعة بديهة"
   },
   {
     "name": "معرفة واكتشاف",
@@ -70,9 +105,13 @@ export const categorySections = [
       7,
       14,
       21,
-      22
+      22,
+      63,
+      64,
+      65,
+      66
     ],
-    "description": "معلومات من كل مكان"
+    "description": "معلومات وعلوم واكتشافات"
   },
   {
     "name": "أفلام وشاشات",
@@ -81,9 +120,11 @@ export const categorySections = [
       13,
       12,
       23,
-      24
+      24,
+      76,
+      78
     ],
-    "description": "فن ومشاهد وذكريات"
+    "description": "المسلسلات والسينما والمسرح"
   },
   {
     "name": "كرة ورياضة",
@@ -92,9 +133,12 @@ export const categorySections = [
       18,
       25,
       26,
-      27
+      27,
+      59,
+      60,
+      61
     ],
-    "description": "تحديات كروية ومنافسات"
+    "description": "الأندية والبطولات والنجوم"
   },
   {
     "name": "دول ورحلات",
@@ -103,9 +147,13 @@ export const categorySections = [
       28,
       29,
       30,
-      31
+      31,
+      58,
+      67,
+      74,
+      75
     ],
-    "description": "سافروا بالمعلومات"
+    "description": "السفر والمدن والعواصم والمعالم"
   },
   {
     "name": "من ديرتنا",
@@ -116,7 +164,7 @@ export const categorySections = [
       34,
       35
     ],
-    "description": "المملكة ولهجاتها"
+    "description": "السعودية وتاريخها ومدنها"
   },
   {
     "name": "سوالف اللمّة",
@@ -125,20 +173,21 @@ export const categorySections = [
       15,
       17,
       36,
-      37
+      37,
+      68,
+      69
     ],
-    "description": "أمثال ولهجة ومواقف"
+    "description": "أمثال ومطابخ وسوالف"
   },
   {
-    "name": "حروف وحيل",
+    "name": "ألغاز الصور والكلمات",
     "ids": [
       16,
       38,
-      39,
-      40,
-      41
+      41,
+      20
     ],
-    "description": "اكتشفوا كلمات وأسرارها"
+    "description": "ملاحظة وتركيز وكلمات"
   },
   {
     "name": "إسلاميات",
@@ -147,9 +196,11 @@ export const categorySections = [
       43,
       44,
       45,
-      46
+      46,
+      72,
+      73
     ],
-    "description": "قصص ومعرفة موثوقة"
+    "description": "قصص ومعرفة وتاريخ"
   },
   {
     "name": "لعب وفنون",
@@ -158,8 +209,29 @@ export const categorySections = [
       1,
       47,
       48,
-      49
+      49,
+      77,
+      79
     ],
-    "description": "موسيقى وتمثيل وتطبيقات"
+    "description": "فن وألعاب وتطبيقات"
+  },
+  {
+    "name": "الحروف",
+    "ids": [
+      39,
+      40,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57
+    ],
+    "description": "اختر حرفًا من الألف إلى الياء"
   }
 ] as const;
+export const letterGameIds = [39,40,50,51,52,53,54,55,56,57] as const;
+export const isLetterGame = (id:number):boolean => (letterGameIds as readonly number[]).includes(id);
+export const arabicAlphabet = ['أ','ب','ت','ث','ج','ح','خ','د','ذ','ر','ز','س','ش','ص','ض','ط','ظ','ع','غ','ف','ق','ك','ل','م','ن','هـ','و','ي'] as const;
