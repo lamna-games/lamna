@@ -138,13 +138,12 @@ const specificScenes=new Set<VisualTheme>([
  'oldtown','oasis','mountains','caravan','roses','coast','pearldive'
 ]);
 
-export default function QuestionVisual({category,prompt,imageUrl}:{category:number;prompt:string;imageUrl?:string}){
+export default function QuestionVisual({category,prompt,imageUrl,flagCode}:{category:number;prompt:string;imageUrl?:string;flagCode?:string}){
  const [photoFailed,setPhotoFailed]=React.useState(false);
  React.useEffect(()=>setPhotoFailed(false),[imageUrl]);
- // Card number uniquely maps to the genuine national flag; never show country names.
- const flagCard=category===11?Number(/بطاقة\s+(\d+)/.exec(prompt)?.[1]||0):0;
- const flagCodes='SA,AE,JP,CA,PT,UY,TR,FR,DE,EG,BR,LB,SE,KR,NP,MX,ZA,NZ'.split(',');
- if(flagCard>=1&&flagCard<=flagCodes.length)return <FlagQuestion flagCode={flagCodes[flagCard-1]}/>;
+ // The code is supplied by the server's saved question, not parsed from
+ // editable prompt text. Rewording a question cannot change its country.
+ if(category===11&&flagCode)return <FlagQuestion flagCode={flagCode}/>;
  const theme=getQuestionVisualTheme(category,prompt);
  // A real photo only appears when an administrator has attached a vetted
  // image from the owner's media library. Otherwise use original illustration.
