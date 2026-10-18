@@ -15,6 +15,12 @@ export async function storeRequest<T>(path:string,method:'GET'|'POST'='GET',payl
   sessionStorage.removeItem('lamna-account-name');
   localStorage.removeItem('lamna-current-match-id');
  }
- if(!response.ok)throw Error(data.message||'تعذر الاتصال بخدمة لمنا.');
+ if(!response.ok){
+  const error=new Error(data.message||'تعذر الاتصال بخدمة لمنا.') as Error & {code?:string;match?:ServerMatch;status?:number};
+  error.code=typeof data.code==='string'?data.code:undefined;
+  error.match=data.match;
+  error.status=response.status;
+  throw error;
+ }
  return data as T;
 }
