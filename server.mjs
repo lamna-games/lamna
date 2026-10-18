@@ -27,6 +27,11 @@ async function ensureAccounts() {
      token_hash TEXT PRIMARY KEY, account_id BIGINT NOT NULL REFERENCES lamna_accounts(id) ON DELETE CASCADE,
      created_at TIMESTAMPTZ DEFAULT NOW(), expires_at TIMESTAMPTZ NOT NULL
    )`);
+   await accountsPool.query(`CREATE TABLE IF NOT EXISTS lamna_password_resets(
+      token_hash TEXT PRIMARY KEY,account_id BIGINT NOT NULL REFERENCES lamna_accounts(id) ON DELETE CASCADE,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),expires_at TIMESTAMPTZ NOT NULL,
+      consumed_at TIMESTAMPTZ)`);
+   await accountsPool.query('CREATE INDEX IF NOT EXISTS lamna_reset_account_idx ON lamna_password_resets(account_id,created_at DESC)');
   })().catch(e=>{tablesReady=null;throw e;});
  }
  await tablesReady;return true;
@@ -119,7 +124,7 @@ const server = http.createServer(async(req,res)=>{
    res.setHeader('Cache-Control','no-store');
    if(u.pathname==='/api/accounts/status'&&req.method==='GET'){
     if(!accountsPool){respond(res,200,{enabled:false});return;}
-    try{await ensureAccounts();respond(res,200,{enabled:true});}
+    try{await ensureAccounts();respond(res,200,{enabled:true,passwordResetAvailable:Boolean(process.env.RESEND_API_KEY&&process.env.LAMNA_MAIL_FROM)});}
     catch{respond(res,200,{enabled:false});}
     return;
    }
@@ -136,6 +141,58 @@ const server = http.createServer(async(req,res)=>{
       await accountsPool.query('DELETE FROM lamna_sessions WHERE token_hash=$1',[hashed]);
      }
      respond(res,200,{ok:true});return;
+    }
+    if(u.pathname==='/api/accounts/reset/request'){
+     // Never reveal whether an email is registered. Requires a verified sender domain.
+     if(!process.env.RESEND_API_KEY||!process.env.LAMNA_MAIL_FROM){
+      respond(res,503,{message:'استعادة كلمة المرور قيد التجهيز حتى تفعيل البريد الإلكتروني الآمن.'});return;
+     }
+     const email=String(data.email||'').trim().toLowerCase();
+     if(!/^\\S+@\\S+\\.\\S+$/.test(email)||email.length>254){
+      respond(res,400,{message:'تأكد من صحة البريد الإلكتروني.'});return;
+     }
+     const neutral={ok:true,message:'إذا كان البريد مسجّلًا، ستصلك رسالة تحتوي على رابط صالح لمدة 30 دقيقة.'};
+     const found=await accountsPool.query('SELECT id,first_name FROM lamna_accounts WHERE email=$1 LIMIT 1',[email]);
+     if(!found.rowCount){respond(res,200,neutral);return;}
+     const account=found.rows[0];
+     const recent=await accountsPool.query("SELECT 1 FROM lamna_password_resets WHERE account_id=$1 AND created_at>NOW()-INTERVAL '2 minutes' LIMIT 1",[account.id]);
+     if(recent.rowCount){respond(res,200,neutral);return;}
+     const raw=crypto.randomBytes(32).toString('hex');
+     const hashed=crypto.createHash('sha256').update(raw).digest('hex');
+     await accountsPool.query("INSERT INTO lamna_password_resets(token_hash,account_id,expires_at) VALUES($1,$2,NOW()+INTERVAL '30 minutes')",[hashed,account.id]);
+     const publicUrl=(process.env.LAMNA_PUBLIC_URL||allowedAuthOrigin).replace(/\\/$/,'');
+     const resetLink=publicUrl+'/#reset-password?token='+raw;
+     const mail=await fetch('https://api.resend.com/emails',{
+      method:'POST',headers:{Authorization:'Bearer '+process.env.RESEND_API_KEY,'Content-Type':'application/json'},
+      body:JSON.stringify({from:process.env.LAMNA_MAIL_FROM,to:[email],subject:'استعادة كلمة مرور لمنا',text:'وصلنا طلب استعادة كلمة المرور. استخدم الرابط التالي خلال 30 دقيقة:\\n'+resetLink+'\\nإذا لم تطلب ذلك فتجاهل الرسالة.'}),
+      signal:AbortSignal.timeout(10000)
+     }).catch(()=>null);
+     if(!mail?.ok){
+      await accountsPool.query('DELETE FROM lamna_password_resets WHERE token_hash=$1',[hashed]).catch(()=>{});
+      respond(res,503,{message:'تعذر إرسال رسالة الاستعادة حاليًا. حاول لاحقًا.'});return;
+     }
+     respond(res,200,neutral);return;
+    }
+    if(u.pathname==='/api/accounts/reset/confirm'){
+     const raw=String(data.token||'');
+     if(!/^[a-f0-9]{64}$/.test(raw)||!validAuthPassword(data.password)){
+      respond(res,400,{message:'الرابط غير صالح أو كلمة المرور غير مناسبة.'});return;
+     }
+     const hashed=crypto.createHash('sha256').update(raw).digest('hex');
+     const client=await accountsPool.connect();
+     try{
+      await client.query('BEGIN');
+      const token=await client.query("SELECT account_id FROM lamna_password_resets WHERE token_hash=$1 AND consumed_at IS NULL AND expires_at>now() FOR UPDATE",[hashed]);
+      if(!token.rowCount){await client.query('ROLLBACK');respond(res,400,{message:'انتهت صلاحية الرابط أو استُخدم بالفعل. اطلب رابطًا جديدًا.'});return;}
+      const accountId=token.rows[0].account_id;
+      const salt=crypto.randomBytes(24).toString('hex');
+      const hash=passwordHash(data.password,salt);
+      await client.query('UPDATE lamna_accounts SET password_salt=$1,password_hash=$2 WHERE id=$3',[salt,hash,accountId]);
+      await client.query('DELETE FROM lamna_sessions WHERE account_id=$1',[accountId]);
+      await client.query('UPDATE lamna_password_resets SET consumed_at=now() WHERE account_id=$1 AND consumed_at IS NULL',[accountId]);
+      await client.query('COMMIT');
+      respond(res,200,{ok:true,message:'تم تحديث كلمة المرور. سجّل دخولك بكلمتك الجديدة.'});return;
+     }catch(err){await client.query('ROLLBACK').catch(()=>{});throw err;}finally{client.release();}
     }
     if(u.pathname==='/api/accounts/register'){
      const firstName=String(data.firstName||'').trim().slice(0,60);
