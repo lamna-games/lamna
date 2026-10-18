@@ -65,6 +65,19 @@ async function setup(pool){
   resolved_at TIMESTAMPTZ,
   UNIQUE(account_id,match_id,question_number,reason))`);
  await pool.query('ALTER TABLE lamna_question_reports ADD COLUMN IF NOT EXISTS resolved_at TIMESTAMPTZ');
+ await pool.query(`CREATE TABLE IF NOT EXISTS lamna_question_edits(
+  question_id TEXT PRIMARY KEY,prompt TEXT NOT NULL,answer TEXT NOT NULL,hint TEXT NOT NULL,
+  updated_by BIGINT NOT NULL REFERENCES lamna_accounts(id),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now())`);
+ await pool.query(`CREATE TABLE IF NOT EXISTS lamna_game_controls(
+  game_id INTEGER PRIMARY KEY CHECK(game_id BETWEEN 0 AND 79),
+  disabled BOOLEAN NOT NULL DEFAULT FALSE,
+  reason TEXT NOT NULL DEFAULT '',updated_by BIGINT NOT NULL REFERENCES lamna_accounts(id),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now())`);
+ await pool.query(`CREATE TABLE IF NOT EXISTS lamna_admin_audit(
+  id BIGSERIAL PRIMARY KEY,actor_id BIGINT NOT NULL REFERENCES lamna_accounts(id),
+  action TEXT NOT NULL,entity TEXT NOT NULL,details JSONB NOT NULL DEFAULT '{}'::jsonb,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now())`);
  })().catch(e=>{schema=null;throw e;});
  }
  await schema;
@@ -84,6 +97,15 @@ async function readMe(pool,id){
  const m=await pool.query('SELECT id,kind,selected,match_name,status,created_at FROM lamna_matches WHERE account_id=$1 ORDER BY created_at DESC LIMIT 12',[id]);
  return {freeRemaining:!balance.rows[0].free_used,credits:balance.rows[0].credits,matches:m.rows};
 }
+
+async function questionPool(client,category,kind){
+ const original=catalogByCategory(category,kind);
+ const overrides=await client.query('SELECT question_id,prompt,answer,hint FROM lamna_question_edits WHERE question_id=ANY($1::text[])',[original.map(x=>x.id)]);
+ const edited=new Map(overrides.rows.map(x=>[x.question_id,x]));
+ return original.map(q=>({...q,...(edited.get(q.id)||{})}));
+}
+const isValidGame=id=>Number.isInteger(id)&&id>=0&&id<80;
+const validQuestionText=(s,min,max)=>typeof s==='string'&&s.trim().length>=min&&s.trim().length<=max&&!/[|\\r\\n]/.test(s);
 
 export async function handleStore(req,res,url,pool,ensureAccounts){
  if(!url.pathname.startsWith('/api/store/'))return false;
@@ -151,6 +173,8 @@ export async function handleStore(req,res,url,pool,ensureAccounts){
    const row=(await client.query('SELECT free_used,credits FROM lamna_entitlements WHERE account_id=$1 FOR UPDATE',[user.id])).rows[0];
    const active=await client.query("SELECT id,kind,selected,questions,match_name,status,progress FROM lamna_matches WHERE account_id=$1 AND status='active' ORDER BY created_at DESC LIMIT 1",[user.id]);
    if(active.rowCount){await client.query('ROLLBACK');send(req,res,409,{code:'active_match',message:'عندك مباراة قائمة. كمّلها أولًا قبل بدء مباراة جديدة.',match:active.rows[0]});return true;}
+   const disabled=await client.query('SELECT game_id FROM lamna_game_controls WHERE disabled=TRUE AND game_id=ANY($1::integer[])',[selected]);
+   if(disabled.rowCount){await client.query('ROLLBACK');send(req,res,409,{code:'game_unavailable',message:'إحدى الألعاب المختارة متوقفة للمراجعة. اختر لعبة أخرى ولن يُخصم أي رصيد.'});return true;}
    const kind=row.free_used?'paid':'free';
    if(kind==='paid' && row.credits===0){await client.query('ROLLBACK');send(req,res,402,{code:'no_credit',message:'انتهت المباراة المجانية. اختر باقة لإضافة رصيد.'});return true;}
    if(kind==='paid'&&selected.includes(1)){
@@ -174,7 +198,7 @@ export async function handleStore(req,res,url,pool,ensureAccounts){
    }
    let questions=[];
    for(const c of selected){
-    const poolItems=catalogByCategory(c,kind);
+    const poolItems=await questionPool(client,c,kind);
     if(kind==='free'){questions.push(poolItems.slice(0,6));continue;}
     const seen=await client.query('SELECT question_id FROM lamna_seen_questions WHERE account_id=$1 AND question_id LIKE $2',[user.id,'paid-'+c+'-%']);
     const blocked=new Set(seen.rows.map(v=>v.question_id));
