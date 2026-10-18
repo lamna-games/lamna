@@ -153,7 +153,14 @@ function App() {
       setStarting(true);
       const data=await storeRequest<{match:ServerMatch;credits:number;freeRemaining:boolean}>('matches','POST',{selected,matchName,teams,chosenAids});
       applyMatch(data.match);
-    }catch(error){setMatchError(error instanceof Error?error.message:'تعذر بدء المباراة.');}
+    }catch(error){
+      const serverError=error as Error & {code?:string;match?:ServerMatch};
+      if(serverError?.code==='active_match'&&serverError.match){
+        applyMatch(serverError.match);
+      }else{
+        setMatchError(error instanceof Error?error.message:'تعذر بدء المباراة.');
+      }
+    }
     finally{setStarting(false);}
   };
   // Persist the COMPLETE active match to Postgres; local browser state never grants credits.
