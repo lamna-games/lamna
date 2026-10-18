@@ -287,4 +287,15 @@ const server = http.createServer(async(req,res)=>{
   }
   respond(res,404,{error:'not_found'});
 });
-server.listen(Number(process.env.PORT)||10000,'0.0.0.0',()=>console.log('Lamna wordless sync listening'));
+server.listen(Number(process.env.PORT)||10000,'0.0.0.0',async()=>{
+ console.log('Lamna wordless sync listening');
+ if(!accountsPool){console.warn('LAMNA DB readiness: missing DATABASE_URL');return;}
+ try{
+  await ensureAccounts();
+  await accountsPool.query('SELECT 1');
+  console.log('LAMNA DB readiness: connected, account tables ready');
+ }catch(error){
+  // Do not log connection strings, credentials or customer information.
+  console.error('LAMNA DB readiness: failed, code='+String(error?.code||'unknown'));
+ }
+});
