@@ -11,6 +11,7 @@ import WinnerScreen from './WinnerScreen';
 import OfficialLogo from './OfficialLogo';
 import SocialLinks from './SocialLinks';
 import AuthScreen from './AuthScreen';
+import PasswordRecovery from './PasswordRecovery';
 import StoreInformation from './StoreInformation';
 import StoreCommerce from './StoreCommerce';
 import QuestionReport from './QuestionReport';
@@ -19,7 +20,7 @@ import { Plus, ArrowLeft, Sparkles, UsersRound, Grid2X2, Trophy, ChevronLeft, Ch
 import './landing.css';
 import './gameSections.css';
 import './brandTheme.css';
-type Page = 'home' | 'categories' | 'setup' | 'game' | 'pricing' | 'account' | 'privacy' | 'terms' | 'faq' | 'contact';
+type Page = 'home' | 'categories' | 'setup' | 'game' | 'pricing' | 'account' | 'reset-password' | 'privacy' | 'terms' | 'faq' | 'contact';
 function Cover({i,title}:{i:number,title:string}) { return <CartoonCover i={i} title={title}/>; }
 type AidId = 'phone' | 'two' | 'rest' | 'pit' | 'trap';
 const aidCatalog: { id: AidId; name: string; info: string }[] = [
@@ -38,14 +39,14 @@ function AidGlyph({ id, size=26 }: { id:AidId; size?:number }) {
 }
 function App() {
   const getInitialPage=():Page=>{
-    const fromHash=window.location.hash.replace(/^#\/?/,'');
-    return (['privacy','terms','faq','contact','pricing','account'] as string[]).includes(fromHash)?fromHash as Page:'home';
+    const fromHash=window.location.hash.replace(/^#\/?/,'').split('?')[0];
+    return (['privacy','terms','faq','contact','pricing','account','reset-password'] as string[]).includes(fromHash)?fromHash as Page:'home';
   };
   const [page, setPage] = useState<Page>(getInitialPage);
   React.useEffect(()=>{
     const handleHash=()=>{
-      const hash=window.location.hash.replace(/^#\/?/,'');
-      if((['privacy','terms','faq','contact','pricing','account'] as string[]).includes(hash)){setPage(hash as Page);}
+      const hash=window.location.hash.replace(/^#\/?/,'').split('?')[0];
+      if((['privacy','terms','faq','contact','pricing','account','reset-password'] as string[]).includes(hash)){setPage(hash as Page);}
       else if(page!=='game')setPage('home');
     };
     window.addEventListener('hashchange',handleHash);
@@ -168,7 +169,7 @@ function App() {
   },[accountsEnabled,activeSession?.id,activeSession?.status,showResult,active]);
   const go = (p: Page) => {
     setPage(p);
-    const infoPages=['privacy','terms','faq','contact','pricing','account'] as const;
+    const infoPages=['privacy','terms','faq','contact','pricing','account','reset-password'] as const;
     if(infoPages.some(item=>item===p)){window.history.pushState(null,'','#'+p);}
     else if(window.location.hash){window.history.pushState(null,'',window.location.pathname+window.location.search);}
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -632,6 +633,7 @@ function App() {
           )}
         </section>
       )}
+      {page === 'reset-password'&&<PasswordRecovery onBack={()=>{setAuthMode('login');go('account')}}/>}
       {page === 'pricing' && <StoreCommerce mode="plans" accountsEnabled={accountsEnabled} onBack={()=>go('home')} onLogin={()=>{setAuthMode('login');go('account')}}/>}
       {(page==='privacy'||page==='terms'||page==='faq'||page==='contact')&&
         <StoreInformation page={page} onBack={()=>go('home')}/>}
