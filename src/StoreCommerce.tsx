@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowRight, Ticket, ShieldCheck, UserRound, LogOut, LockKeyhole } from 'lucide-react';
 import { storeRequest, token, type Wallet, type ServerMatch } from './storeApi';
-import AdminReports from './AdminReports';
+import AdminWorkbench from './AdminWorkbench';
 import './storeCommerce.css';
 type Props={mode:'plans'|'wallet';accountsEnabled:boolean;onBack:()=>void;onLogin:()=>void;onSignedOut?:()=>void;onResume?:(match:ServerMatch)=>void};
 const offers=[{games:1,price:'9.99',name:'لعبة واحدة'},{games:3,price:'19.99',name:'3 ألعاب'},{games:5,price:'29.99',name:'5 ألعاب'}];
@@ -43,7 +43,7 @@ export default function StoreCommerce({mode,accountsEnabled,onBack,onLogin,onSig
        <div className="lm-commerce-stats"><div><small>المجانية</small><strong>{wallet.freeRemaining?'متاحة':'استُخدمت'}</strong></div><div><small>رصيد المباريات</small><strong>{wallet.credits}</strong></div></div>
        <h2>مبارياتك</h2>
        {wallet.matches.length===0?<p>ما عندك مباريات سابقة بعد.</p>:wallet.matches.map(m=><div className="lm-commerce-match" key={m.id}><div><strong>{m.match_name||'مباراة لمنا'}</strong><small>{m.kind==='free'?'مجانية':'مدفوعة'} — {m.status==='active'?'لم تنتهِ':'مكتملة'}</small></div>{m.status==='active'&&<button type="button" disabled={loading} onClick={()=>resume(m.id)}>متابعة</button>}</div>)}
-       {wallet.user?.isAdmin&&<AdminReports/>}
+       {wallet.user?.isAdmin&&<AdminWorkbench/>}
        <button className="lm-commerce-signout" onClick={async()=>{
         try{
          const sessionToken=token();
