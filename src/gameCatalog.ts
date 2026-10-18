@@ -234,4 +234,4 @@ export const categorySections = [
 ] as const;
 export const letterGameIds = [36,39,50,51,52,53,54,55,56,57] as const;
 export const isLetterGame = (id:number):boolean => (letterGameIds as readonly number[]).includes(id);
-export const arabicAlphabet = ['أ','ب','ت','ث','ج','ح','خ','د','ذ','ر','ز','س','ش','ص','ض','ط','ظ','ع','غ','ف','ق','ك','ل','م','ن','هـ','و','ي'] as const;
+export const arabicAlphabet = ['أ','ب','ت','ث','ج','ح','خ','د','ذ','ر','ز','س','ش','ص','ض','ط','ظ','ع','غ','ف','ق','ك','ل','م','ن','ه','و','ي'] as const;
