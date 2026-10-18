@@ -3,7 +3,8 @@ import { Phone, Hand, Repeat2, Bomb, MessageSquareText, LogOut, LayoutGrid, Flag
 import './site.css';
 import './boardLayout.css';
 import CartoonCover from './CartoonCover';
-import {categories,categorySections} from './gameCatalog';
+import {categories,categorySections,isLetterGame} from './gameCatalog';
+import LetterBoard from './LetterBoard';
 import { getQuestion, wordlessModeCount } from './quizData';
 import { WordlessTV } from './Wordless';
 import WinnerScreen from './WinnerScreen';
@@ -67,6 +68,7 @@ function App() {
   const [matchError,setMatchError]=useState('');
   const [starting,setStarting]=useState(false);
   const [selected, setSelected] = useState<number[]>([]);
+  const [gameSearch,setGameSearch]=useState('');
   const [openSections,setOpenSections]=useState<number[]>(()=>categorySections.map((_,index)=>index));
   const [teams, setTeams] = useState(['الفريق الأول', 'الفريق الثاني']);
   const [matchName,setMatchName] = useState('');
@@ -85,36 +87,16 @@ function App() {
   const [logoOk, setLogoOk] = useState(true);
   const [help, setHelp] = useState([2, 2]);
   const [showHelp, setShowHelp] = useState(false); const [showHint,setShowHint]=useState(false); const [hydrated,setHydrated]=useState(false); const [showResult,setShowResult]=useState(false); const [history,setHistory]=useState<{team:number|null;points:number;question:number;changes?:number[]}[]>([]); const [phase,setPhase]=useState<'question'|'steal'|'var'>('question'); const [seconds,setSeconds]=useState(60); const [paused,setPaused]=useState(false); const [varUsed,setVarUsed]=useState([false,false]); const [varTeam,setVarTeam]=useState(0); const [phaseBeforeVar,setPhaseBeforeVar]=useState<'question'|'steal'>('question'); const [stealFrom,setStealFrom]=useState(0); React.useEffect(()=>{if(active===null||paused||phase==='var')return;const id=window.setInterval(()=>setSeconds(s=>Math.max(0,s-1)),1000);return()=>window.clearInterval(id)},[active,paused,phase]); React.useEffect(()=>{if(active===null||seconds!==0||selected[Math.floor(active/6)]===1)return;if(phase==='question'){setStealFrom(turn);setPhase('steal');setSeconds(10)}else if(phase==='steal'){award(null)}},[seconds,active,phase]); const startSteal=()=>{setStealFrom(turn);setPhase('steal');setSeconds(10);setPaused(false)}; const openVar=(i:number)=>{if(varUsed[i])return;setVarTeam(i);setVarUsed(v=>v.map((x,j)=>j===i?true:x));setPhaseBeforeVar(phase==='steal'?'steal':'question');setPhase('var');setPaused(true)};
-  React.useEffect(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem('lamna-demo-match-v2') || 'null');
-      if (saved && Array.isArray(saved.selected) && saved.selected.length === 6) {
-        setSelected(saved.selected); setTeams(saved.teams); setTurn(saved.turn);
-        setScores(saved.scores); setUsed(saved.used); setHistory(saved.history || []);
-        setHelp(saved.help || [2, 2]); setVarUsed(saved.varUsed || [false, false]);
-        if(typeof saved.matchName==='string')setMatchName(saved.matchName);
-        if(Array.isArray(saved.chosenAids)&&saved.chosenAids.length===2)setChosenAids(saved.chosenAids);
-        if(Array.isArray(saved.usedAids)&&saved.usedAids.length===2)setUsedAids(saved.usedAids);
-        setAidEffect(saved.aidEffect||null);setAidOwner(saved.aidOwner??null);
-        setActive(saved.active ?? null); setPhase(saved.phase || 'question');
-        setSeconds(saved.seconds ?? 60); setStealFrom(saved.stealFrom ?? 0);
-        setShowResult(!!saved.showResult); setPaused(true);
-      }
-    } catch { /* Invalid old browser data is ignored. */ }
+  // Account-bound match progress belongs in the database, not in a shared browser draft.
+  // Remove old cross-account demo state so a different user's scores cannot bleed into this session.
+  React.useEffect(()=>{
+    localStorage.removeItem('lamna-demo-match-v2');
     setHydrated(true);
-  }, []);
-  React.useEffect(() => {
-    if (!hydrated) return;
-    try {
-      localStorage.setItem('lamna-demo-match-v2', JSON.stringify({
-        selected, teams, turn, scores, used, history, help, varUsed,
-        active, phase, seconds, stealFrom, showResult, matchName, chosenAids, usedAids, aidEffect, aidOwner
-      }));
-    } catch { /* Private mode may block storage. */ }
-  }, [hydrated, selected, teams, turn, scores, used, history, help, varUsed, active, phase, seconds, stealFrom, showResult, matchName, chosenAids, usedAids, aidEffect, aidOwner]);
+  },[]);
   const currentQuestion = active === null ? null
    : (activeSession?.questions[Math.floor(active/6)]?.[active%6] ?? getQuestion(selected[Math.floor(active / 6)], active % 6));
   const isWordlessQuestion = active!==null && selected[Math.floor(active/6)]===1;
+  const isLetterQuestion = active!==null && isLetterGame(selected[Math.floor(active/6)]);
   const toggleAid = (team:number,aid:AidId) => {
     setChosenAids(prev=>prev.map((list,i)=>i!==team?list:list.includes(aid)?list.filter(x=>x!==aid):list.length<3?[...list,aid]:list));
   };
@@ -153,7 +135,7 @@ function App() {
     if(!id)return;
     let alive=true;
     storeRequest<{match:ServerMatch}>('matches/'+id)
-      .then(data=>{if(alive&&data.match.status==='active')setActiveSession(data.match)})
+      .then(data=>{if(alive&&data.match.status==='active')applyMatch(data.match)})
       .catch(()=>{if(alive)localStorage.removeItem('lamna-current-match-id')});
     return()=>{alive=false};
   },[accountsEnabled,hydrated]);
@@ -338,6 +320,7 @@ function App() {
             <div className="lm-library-progress" role="progressbar" aria-label="الفئات المختارة" aria-valuemin={0} aria-valuemax={6} aria-valuenow={selected.length}>
               <span style={{ width: (selected.length / 6) * 100 + '%' }}/>
             </div>
+            <div className="lm-game-search"><label htmlFor="lm-find-game">ابحث عن لعبة من ألعاب لمنا الـ80</label><input id="lm-find-game" type="search" dir="rtl" autoComplete="off" placeholder="اكتب اسم اللعبة، مثل الحروف أو الطيران…" value={gameSearch} onChange={e=>setGameSearch(e.target.value)} aria-label="البحث عن الألعاب"/>{gameSearch&&<button type="button" onClick={()=>setGameSearch('')} aria-label="امسح البحث">مسح</button>}</div>
             <nav className="lm-section-shortcuts" aria-label="انتقل إلى قسم الألعاب">
               {categorySections.map((section,index)=>(
                 <button type="button" key={section.name} className={openSections.includes(index)?'is-current':''}
@@ -349,6 +332,8 @@ function App() {
             </nav>
             <div className="lm-category-groups">
               {categorySections.map((section,index)=>{
+                const visibleIds=gameSearch.trim()?section.ids.filter(i=>categories[i].includes(gameSearch.trim())):section.ids;
+                if(visibleIds.length===0)return null;
                 const isOpen=openSections.includes(index);
                 return <section className={'lm-category-group'+(isOpen?' is-open':'')} key={section.name}
                     id={'lm-section-'+index} aria-label={section.name}>
@@ -365,7 +350,7 @@ function App() {
                   </button>
                   {isOpen&&<div className="lm-category-content" id={'lm-section-games-'+index}>
                     <div className="lm-library-grid">
-                      {section.ids.map(i=>(
+                      {visibleIds.map(i=>(
                         <button type="button" className={'lm-library-card'+(selected.includes(i)?' lm-is-selected':'')}
                          key={i} onClick={()=>choose(i)}
                          aria-label={(selected.includes(i)?'إلغاء اختيار ':'اختيار ')+categories[i]}
@@ -588,7 +573,7 @@ function App() {
                           points={[200,400,600][Math.floor((active%6)/2)]}
                           onStart={(n)=>{setSeconds(n);setPaused(true);}}
                           onTick={(n)=>{setSeconds(n);}}/>
-                      ) : <h2>{currentQuestion?.prompt}</h2>}
+                      ) : <><h2>{currentQuestion?.prompt}</h2>{isLetterQuestion&&<LetterBoard answer={currentQuestion?.answer||''}/>}</>}
                       {aidEffect!==null&&<div className="play-aid-activated">
                         <strong>{aidCatalog.find(x=>x.id===aidEffect)?.name}</strong>
                         <span>{aidEffect==='phone'?'زاد وقت السؤال 30 ثانية للتشاور مع صديق':aidEffect==='two'?'لديكم '+twoAttemptsLeft+' '+(twoAttemptsLeft===2?'محاولتان':'محاولة')+' للإجابة في هذا السؤال':aidEffect==='rest'?'سمِّ لاعبًا واحدًا من الفريق الخصم ليتوقف عن المشاركة في هذا السؤال':aidEffect==='pit'?'إذا أجاب فريقك صح تخصم نقاط السؤال أيضًا من الخصم':'السؤال الآن عند الخصم: إذا لم يجب تُخصم منه نقاط السؤال'}</span>
