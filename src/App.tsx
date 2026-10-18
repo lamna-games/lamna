@@ -199,6 +199,27 @@ function App() {
     else if(window.location.hash){window.history.pushState(null,'',window.location.pathname+window.location.search);}
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+  // A completed match cannot be replayed against its old question snapshot.
+  // Finish it on the server first, then request a NEW match through beginMatch.
+  // The next match consumes the next entitlement only after allocation succeeds.
+  const prepareAnotherMatch = async () => {
+    if(!activeSession)return;
+    if(starting)return;
+    setStarting(true);
+    try {
+      await storeRequest('finish','POST',{matchId:activeSession.id});
+      localStorage.removeItem('lamna-current-match-id');
+      setActiveSession(null);
+      setScores([0,0]);setUsed([]);setHistory([]);setUsedAids([[],[]]);
+      setTurn(0);setActive(null);setReveal(false);setPickWinner(false);
+      setPhase('question');setSeconds(60);setPaused(true);
+      setShowHelp(false);setShowHint(false);setAidEffect(null);setAidOwner(null);
+      setVarUsed([false,false]);setShowResult(false);setMatchError('');
+      go('setup');
+    } catch {
+      window.alert('تعذر تأكيد نهاية المباراة على الخادم. لن نعيد استخدامها؛ حاول مرة أخرى بعد التأكد من الاتصال.');
+    } finally { setStarting(false); }
+  };
   const choose = (i: number) => {
     const completesLineup = page==='home' && selected.length===5 && !selected.includes(i);
     setSelected(v => v.includes(i) ? v.filter(x => x !== i) : v.length < 6 ? [...v, i] : v);
@@ -535,14 +556,9 @@ function App() {
             </div>
           </div>
           {showResult && active===null && <WinnerScreen teams={teams} scores={scores} answered={used.length} total={36}
-             onReplay={()=>{
-               setScores([0,0]);setUsed([]);setHistory([]);setUsedAids([[],[]]);setTurn(0);setActive(null);
-               setReveal(false);setPickWinner(false);setPhase('question');setSeconds(60);setPaused(false);
-               setShowHelp(false);setShowHint(false);setAidEffect(null);setAidOwner(null);
-               setVarUsed([false,false]);setShowResult(false);
-             }}
+             onReplay={prepareAnotherMatch}
              onExit={()=>{setShowResult(false);go('home');}}
-             onSetup={()=>{setShowResult(false);go('setup');}}
+             onSetup={prepareAnotherMatch}
            />}
           {active !== null && (
             <div className="play-screen" dir="rtl" role="dialog" aria-modal="true" aria-label="شاشة لعب السؤال">
