@@ -116,8 +116,10 @@ function App() {
     storeRequest<Wallet>('me').then(data=>{if(alive)setWallet(data)}).catch(()=>{});
     return()=>{alive=false};
   },[accountsEnabled,page]);
+  const saveRevisionRef=React.useRef<{id:string;revision:number}>({id:'',revision:0});
   const applyMatch=(match:ServerMatch)=>{
     const p=match.progress;
+    saveRevisionRef.current={id:match.id,revision:typeof p?.revision==='number'&&p.revision>=0?p.revision:0};
     setActiveSession(match);setSelected(match.selected);setMatchName(match.match_name);
     setTeams(Array.isArray(p?.teams)&&p.teams.length===2?p.teams:teams);
     if(p?.chosenAids?.length===2)setChosenAids(p.chosenAids as AidId[][]);
@@ -159,11 +161,17 @@ function App() {
     reveal,pickWinner,showHint,stealFrom,varUsed,help,aidEffect,aidOwner,twoAttemptsLeft,restingPlayer};
   const progressRef=React.useRef(progressSnapshot);
   progressRef.current=progressSnapshot;
+  const versionedProgress=(matchId:string,pausing=false)=>{
+    if(saveRevisionRef.current.id!==matchId)return null;
+    const revision=++saveRevisionRef.current.revision;
+    return {...progressRef.current,paused:pausing?true:progressRef.current.paused,revision};
+  };
   React.useEffect(()=>{
     if(!accountsEnabled||!activeSession||activeSession.status!=='active'||!token()||showResult)return;
     const matchId=activeSession.id;
     const t=window.setTimeout(()=>{
-      storeRequest('progress','POST',{matchId,progress:progressRef.current}).catch(()=>{});
+      const progress=versionedProgress(matchId);
+      if(progress)storeRequest('progress','POST',{matchId,progress}).catch(()=>{});
     },450);
     return()=>window.clearTimeout(t);
   },[accountsEnabled,activeSession?.id,activeSession?.status,teams,chosenAids,scores,used,turn,usedAids,history,active,phase,seconds,paused,reveal,pickWinner,showHint,stealFrom,varUsed,help,aidEffect,aidOwner,twoAttemptsLeft,restingPlayer,showResult]);
@@ -173,7 +181,9 @@ function App() {
     const flush=()=>{
       if(document.visibilityState==='visible')return;
       const authToken=token();if(!authToken)return;
-      const body=JSON.stringify({matchId,progress:progressRef.current});
+      const progress=versionedProgress(matchId,true);
+      if(!progress)return;
+      const body=JSON.stringify({matchId,progress});
       if(body.length>6400)return;
       fetch('https://lamna-wordless-sync.onrender.com/api/store/progress',{
         method:'POST',keepalive:true,headers:{Authorization:'Bearer '+authToken,'Content-Type':'application/json'},
