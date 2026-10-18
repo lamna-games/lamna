@@ -204,7 +204,7 @@ function App() {
   React.useEffect(()=>{
     if(!accountsEnabled||!activeSession||activeSession.status!=='active'||!showResult||active!==null)return;
     let alive=true;
-    storeRequest<{ok:boolean;credits:number;freeRemaining:boolean}>('finish','POST',{matchId:activeSession.id})
+    storeRequest<{ok:boolean;credits:number;freeRemaining:boolean}>('finish','POST',{matchId:activeSession.id,progress:versionedProgress(activeSession.id,true)})
      .then(()=>{if(alive){setActiveSession(v=>v?{...v,status:'completed'}:v);localStorage.removeItem('lamna-current-match-id')}})
      .catch(()=>{});
     return()=>{alive=false};
@@ -224,7 +224,7 @@ function App() {
     if(starting)return;
     setStarting(true);
     try {
-      await storeRequest('finish','POST',{matchId:activeSession.id});
+      await storeRequest('finish','POST',{matchId:activeSession.id,progress:versionedProgress(activeSession.id,true)});
       localStorage.removeItem('lamna-current-match-id');
       setActiveSession(null);
       setScores([0,0]);setUsed([]);setHistory([]);setUsedAids([[],[]]);
