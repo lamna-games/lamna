@@ -911,3 +911,12 @@
  .play-team-controls .play-aid-button{width:24px!important;height:24px!important}
  .play-team-controls .play-aid-button svg{width:15px!important;height:15px!important}
 }
+
+/* Lamna VAR review controls: compact on TV and mobile */
+.play-var-toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:9px;margin:12px auto;max-width:680px;text-align:center;direction:rtl}
+.play-var-toolbar p{flex-basis:100%;font-size:14px;line-height:1.6;color:#31526a;margin:4px 0}
+.play-var-toolbar .play-status{flex-basis:100%;margin-bottom:3px}
+.play-var-toolbar button{font:800 14px Tajawal,Arial,sans-serif;min-height:42px;padding:10px 15px;border-radius:13px;border:1px solid #a2d8db;background:#f0faf9;color:#0d5867;cursor:pointer}
+.play-var-toolbar button:disabled{opacity:.48;cursor:not-allowed;background:#f6f8f9}
+.play-var-toolbar .play-action{width:auto;min-width:130px}
+@media(max-width:520px){.play-var-toolbar{gap:6px}.play-var-toolbar button{font-size:12px;min-height:39px;padding:7px 10px}}
