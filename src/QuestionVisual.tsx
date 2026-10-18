@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import type {LucideIcon} from 'lucide-react';
 import {getQuestionVisualTheme} from './questionVisualTheme.mjs';
+import QuestionSpecificScene, {type SpecificScene} from './QuestionSpecificScene';
 import './questionVisual.css';
 
 /**
@@ -21,7 +22,7 @@ import './questionVisual.css';
 export type VisualTheme =
  'globe'|'landmark'|'city'|'travel'|'money'|'football'|'sport'|'film'|
  'music'|'food'|'faith'|'history'|'science'|'space'|'health'|'sea'|
- 'technology'|'gaming'|'language'|'nature'|'math'|'ideas'|'drama'|'camera';
+ 'technology'|'gaming'|'language'|'nature'|'math'|'ideas'|'drama'|'camera'|SpecificScene;
 
 export const visualThemes:Record<VisualTheme,{label:string;icon:LucideIcon;colors:[string,string,string]}>={
  globe:{label:'العالم والجغرافيا',icon:Globe2,colors:['#caeef0','#83cad6','#1a8199']},
@@ -47,7 +48,20 @@ export const visualThemes:Record<VisualTheme,{label:string;icon:LucideIcon;color
  math:{label:'الأرقام والرياضيات',icon:Calculator,colors:['#eef0ff','#b9c4ee','#7c8ec2']},
  ideas:{label:'المعرفة والتفكير',icon:Lightbulb,colors:['#fff1d7','#ffda99','#bf924b']},
  drama:{label:'المسرح والدراما',icon:Drama,colors:['#fff0e5','#efbbaf','#c57b75']},
- camera:{label:'التصوير والصور',icon:Camera,colors:['#e3f0f7','#bbd5e5','#5d92af']}
+ camera:{label:'التصوير والصور',icon:Camera,colors:['#e3f0f7','#bbd5e5','#5d92af']},
+ penaltyarea:{label:'منطقة الحارس في الملعب',icon:Goal,colors:['#dbf4e9','#9ad1ae','#328e68']},
+ midline:{label:'منتصف ملعب كرة القدم',icon:Goal,colors:['#dbf4e9','#9ad1ae','#328e68']},
+ corner:{label:'زاوية ملعب كرة القدم',icon:Goal,colors:['#dbf4e9','#9ad1ae','#328e68']},
+ handball:{label:'تلامس الكرة مع اليد',icon:Goal,colors:['#dbf4e9','#9ad1ae','#328e68']},
+ fountain:{label:'نافورة مائية',icon:Waves,colors:['#ddf2f8','#98d2e6','#368fa8']},
+ carvedrocks:{label:'آثار منحوتة في الصخر',icon:Landmark,colors:['#f6e9d7','#dfb88e','#9e7457']},
+ oldtown:{label:'حي تراثي قديم',icon:Building2,colors:['#f2e7d7','#e1c7a5','#94765d']},
+ oasis:{label:'واحة نخيل',icon:TreePalm,colors:['#e6f3d9','#b7d6a0','#5e936d']},
+ mountains:{label:'جبال ومرتفعات',icon:Mountain,colors:['#e6f4ea','#b2d6bd','#588b78']},
+ caravan:{label:'قافلة تاريخية',icon:Compass,colors:['#f8ecd9','#e6c59d','#a6815b']},
+ roses:{label:'زهور الورد',icon:Sparkles,colors:['#fde7ef','#eec0d0','#b77e9b']},
+ coast:{label:'ساحل وميناء',icon:Plane,colors:['#e2f2f7','#b3d9e8','#5c9aad']},
+ pearldive:{label:'الغوص واللؤلؤ',icon:Fish,colors:['#d9f3f7','#9dd9e3','#508ba0']}
 };
 
 function GlobeScene(){
@@ -118,6 +132,11 @@ function TravelScene(){
  </g>;
 }
 
+const specificScenes=new Set<VisualTheme>([
+ 'penaltyarea','midline','handball','corner','fountain','carvedrocks',
+ 'oldtown','oasis','mountains','caravan','roses','coast','pearldive'
+]);
+
 export default function QuestionVisual({category,prompt,imageUrl}:{category:number;prompt:string;imageUrl?:string}){
  const [photoFailed,setPhotoFailed]=React.useState(false);
  React.useEffect(()=>setPhotoFailed(false),[imageUrl]);
@@ -134,7 +153,8 @@ export default function QuestionVisual({category,prompt,imageUrl}:{category:numb
  if(!theme)return null;
  const selected=visualThemes[theme];
  const Icon=selected.icon;
- const detailed=theme==='globe'||theme==='faith'||theme==='city'||theme==='football'||theme==='sea'||theme==='film'||theme==='music'||theme==='travel';
+ const customScene=specificScenes.has(theme);
+ const detailed=customScene||theme==='globe'||theme==='faith'||theme==='city'||theme==='football'||theme==='sea'||theme==='film'||theme==='music'||theme==='travel';
  return <figure className={'lm-question-visual lm-question-visual--'+theme}
    role="img" aria-label={'صورة توضيحية مرتبطة بموضوع السؤال: '+selected.label}>
   <svg className="lm-question-visual-scene" viewBox="0 0 440 280" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
@@ -142,7 +162,8 @@ export default function QuestionVisual({category,prompt,imageUrl}:{category:numb
    <circle cx="383" cy="40" r="82" fill={selected.colors[1]} opacity=".4"/>
    <circle cx="43" cy="254" r="125" fill={selected.colors[1]} opacity=".45"/>
    <path d="M0 237q84-50 167-15 87 35 169-6 48-24 104 10v54H0Z" fill={selected.colors[1]} opacity=".46"/>
-   {theme==='globe'?<GlobeScene/>:
+   {customScene?<QuestionSpecificScene variant={theme as SpecificScene}/>:
+    theme==='globe'?<GlobeScene/>:
     theme==='faith'?<FaithScene/>:
     theme==='city'?<CityScene/>:
     theme==='football'?<FootballScene/>:
@@ -152,6 +173,6 @@ export default function QuestionVisual({category,prompt,imageUrl}:{category:numb
     <g strokeLinecap="round"><circle cx="220" cy="137" r="94" fill="#fff" opacity=".6" stroke={selected.colors[2]} strokeWidth="5"/><circle cx="220" cy="137" r="70" fill="#fff" opacity=".45"/><path d="M60 211h76M305 211h79M64 82h45M333 75h51" stroke={selected.colors[2]} strokeWidth="9" opacity=".45"/></g>}
   </svg>
   {!detailed&&<span className="lm-question-visual-icon" aria-hidden="true"><Icon size={100} strokeWidth={1.5}/></span>}
-  <figcaption className="lm-question-visual-caption">صورة توضيحية</figcaption>
+  <figcaption className="lm-question-visual-caption">{customScene?'رسم مرتبط بالسؤال':'صورة توضيحية'}</figcaption>
  </figure>;
 }
