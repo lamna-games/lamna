@@ -158,7 +158,7 @@ export async function handleStore(req,res,url,pool,ensureAccounts){
    }
    // Paid content must not repeat across games, even when two categories share
    // the same question text. Inspect historical match snapshots, not just IDs.
-   const normalizeQuestion=(prompt)=>String(prompt||'').normalize('NFKC').replace(/[\\u064B-\\u065F\\u0670\\u0640\\s؟?،,.!«»"']/g,'').toLowerCase();
+   const normalizeQuestion=(prompt)=>String(prompt||'').normalize('NFKC').replace(/[\u064B-\u065F\u0670\u0640\s؟?،,.!«»"']/g,'').toLowerCase();
    const blockedPrompts=new Set();
    if(kind==='paid'){
     const history=await client.query("SELECT questions FROM lamna_matches WHERE account_id=$1 AND kind='paid'",[user.id]);
