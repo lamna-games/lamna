@@ -105,7 +105,7 @@ async function questionPool(client,category,kind){
  return original.map(q=>({...q,...(edited.get(q.id)||{})}));
 }
 const isValidGame=id=>Number.isInteger(id)&&id>=0&&id<80;
-const validQuestionText=(s,min,max)=>typeof s==='string'&&s.trim().length>=min&&s.trim().length<=max&&!/[|\\r\\n]/.test(s);
+const validQuestionText=(s,min,max)=>typeof s==='string'&&s.trim().length>=min&&s.trim().length<=max&&!/[|\r\n]/.test(s);
 
 export async function handleStore(req,res,url,pool,ensureAccounts){
  if(!url.pathname.startsWith('/api/store/'))return false;
