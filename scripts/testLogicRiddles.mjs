@@ -8,7 +8,8 @@ assert.equal(new Set(all.map(row=>row[0].normalize('NFKC').replace(/[\s؟?،,.!�
 assert.equal(4*9-7,29);
 assert.equal((7+4)*10+(7-4),74);
 assert.equal(23+24+25,72);
-assert.equal((6+3)*10+(6-3),93);
+assert.equal(6+3,9);
+assert.equal((6*10+3)-(3*10+6),27);
 assert.equal(2*(11+6),34);
 assert.equal(11*6,66);
 assert.equal(4*6+12,2*(6+12));
