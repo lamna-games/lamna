@@ -125,7 +125,7 @@ function App() {
     if(p?.chosenAids?.length===2)setChosenAids(p.chosenAids as AidId[][]);
     setScores(p?.scores?.length===2?p.scores:[0,0]);
     setShowResult(match.status==='completed');setHistory(p?.history||[]);setShowHint(false);
-    setUsed(p?.used||[]);setTurn(p?.turn===1?1:0);setHelp(p?.help?.length===2?p.help:[2,2]);setVarUsed(p?.varUsed?.length===2?p.varUsed:[false,false]);
+    setUsed(p?.used||[]);setTurn(p?.turn===1?1:0);setHelp(p?.help?.length===2?p.help:[2,2]);setVarUsed(p?.varUsed?.length===2?p.varUsed:[false,false]);setVarTeam(p?.varTeam===1?1:0);setPhaseBeforeVar(p?.phaseBeforeVar==='steal'?'steal':'question');
     setActive(p?.active??null);setPhase(p?.phase==='steal'?'steal':p?.phase==='var'?'var':'question');
     setSeconds(typeof p?.seconds==='number'&&p.seconds>=0&&p.seconds<=180?p.seconds:60);setPaused(true);
     setUsedAids(p?.usedAids?.length===2?p.usedAids as AidId[][]:[[],[]]);
@@ -158,7 +158,7 @@ function App() {
   };
   // Persist the COMPLETE active match to Postgres; local browser state never grants credits.
   const progressSnapshot={teams,chosenAids,scores,used,turn,usedAids,history,active,phase,seconds,paused,
-    reveal,pickWinner,showHint,stealFrom,varUsed,help,aidEffect,aidOwner,twoAttemptsLeft,restingPlayer};
+    reveal,pickWinner,showHint,stealFrom,varUsed,varTeam,phaseBeforeVar,help,aidEffect,aidOwner,twoAttemptsLeft,restingPlayer};
   const progressRef=React.useRef(progressSnapshot);
   progressRef.current=progressSnapshot;
   const versionedProgress=(matchId:string,pausing=false)=>{
@@ -174,7 +174,7 @@ function App() {
       if(progress)storeRequest('progress','POST',{matchId,progress}).catch(()=>{});
     },450);
     return()=>window.clearTimeout(t);
-  },[accountsEnabled,activeSession?.id,activeSession?.status,teams,chosenAids,scores,used,turn,usedAids,history,active,phase,seconds,paused,reveal,pickWinner,showHint,stealFrom,varUsed,help,aidEffect,aidOwner,twoAttemptsLeft,restingPlayer,showResult]);
+  },[accountsEnabled,activeSession?.id,activeSession?.status,teams,chosenAids,scores,used,turn,usedAids,history,active,phase,seconds,paused,reveal,pickWinner,showHint,stealFrom,varUsed,varTeam,phaseBeforeVar,help,aidEffect,aidOwner,twoAttemptsLeft,restingPlayer,showResult]);
   React.useEffect(()=>{
     if(!accountsEnabled||!activeSession||activeSession.status!=='active'||!token())return;
     const matchId=activeSession.id;
@@ -619,7 +619,19 @@ function App() {
                   ) : (
                     <div className="play-stage-inner play-question-view">
                       {phase==='steal'&&<div className="play-status">فرصة السرقة للفريق: {teams[1-stealFrom]} — 10 ثوانٍ</div>}
-                      {phase==='var'&&<div className="play-status">مراجعة VAR للفريق: {teams[varTeam]}</div>}
+                      {phase==='var'&&<div className="play-var-toolbar" role="region" aria-label="مراجعة الفيديو">
+                        <div className="play-status">مراجعة VAR للفريق: {teams[varTeam]}</div>
+                        <p>أوقفنا المؤقت. راجعوا السؤال والإجابة ثم أكملوا؛ لا تُخصم نقاط عند طلب المراجعة.</p>
+                        <button type="button" className="play-action play-action-blue" onClick={()=>{setPhase(phaseBeforeVar);setPaused(true);}}>العودة للسؤال</button>
+                        <button type="button" className="play-action play-action-green" onClick={()=>{setPhase(phaseBeforeVar);setReveal(true);setPaused(true);}}>عرض الإجابة للمراجعة</button>
+                      </div>}
+                      {phase!=='var'&&!isWordlessQuestion&&<div className="play-var-toolbar" aria-label="وسيلة مراجعة VAR">
+                        {teams.map((name,index)=><button key={index} type="button"
+                          disabled={varUsed[index]} onClick={()=>openVar(index)}
+                          aria-label={'طلب مراجعة VAR للفريق '+name}>
+                          {varUsed[index]?'استُخدم VAR':'VAR — '+name}
+                        </button>)}
+                      </div>}
                       {isWordlessQuestion ? (
                         <WordlessTV index={active%6}
                           points={[200,400,600][Math.floor((active%6)/2)]}
