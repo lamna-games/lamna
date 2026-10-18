@@ -1,3 +1,6 @@
+import {letterExpansionBank} from './letterQuestions50to57.mjs';
+import {expansionBank58to68} from './extraQuestions58to68.mjs';
+import {expansionBank69to79} from './extraQuestions69to79.mjs';
 import {extra20to29} from './extraQuestions20to29.mjs';
 import {extra30to39} from './extraQuestions30to39.mjs';
 import {extra40to49} from './extraQuestions40to49.mjs';
@@ -446,7 +449,7 @@ export const paidRows = [
     "ما لون الموز الناضج عادة؟|أصفر|فاكهة"
   ]
 ];
-const expansionBank = {...extra20to29,...extra30to39,...extra40to49};
+const expansionBank = {...extra20to29,...extra30to39,...extra40to49,...letterExpansionBank,...expansionBank58to68,...expansionBank69to79};
 export const catalogByCategory = (category,kind='paid')=>{
  const lines=category<20 ? ((kind==='free'?freeRows:paidRows)[category]||[]) : (expansionBank[category]?.[kind==='free'?'free':'paid']||[]);
  return lines.map((line,index)=>{
