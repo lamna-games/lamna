@@ -8,7 +8,7 @@
     "build": "npm run qa && vite build",
     "preview": "vite preview",
     "start": "node server.mjs",
-    "qa": "node scripts/validateCatalog.mjs && node scripts/testMatchProgress.mjs"
+    "qa": "node scripts/validateCatalog.mjs && node scripts/testMatchProgress.mjs && node scripts/testHttpContracts.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.469.0",
