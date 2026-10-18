@@ -156,13 +156,27 @@ export async function handleStore(req,res,url,pool,ensureAccounts){
    if(kind==='paid'&&selected.includes(1)){
     await client.query('ROLLBACK');send(req,res,409,{code:'image_bank_pending',message:'فئة ولا كلمة المدفوعة تحتاج صورًا جديدة قبل استخدامها؛ اختر فئة أخرى حاليًا.'});return true;
    }
+   // Paid content must not repeat across games, even when two categories share
+   // the same question text. Inspect historical match snapshots, not just IDs.
+   const normalizeQuestion=(prompt)=>String(prompt||'').normalize('NFKC').replace(/[\\u064B-\\u065F\\u0670\\u0640\\s؟?،,.!«»"']/g,'').toLowerCase();
+   const blockedPrompts=new Set();
+   if(kind==='paid'){
+    const history=await client.query("SELECT questions FROM lamna_matches WHERE account_id=$1 AND kind='paid'",[user.id]);
+    for(const oldMatch of history.rows){
+     for(const column of (Array.isArray(oldMatch.questions)?oldMatch.questions:[])){
+      for(const q of (Array.isArray(column)?column:[])){
+       if(q?.prompt)blockedPrompts.add(normalizeQuestion(q.prompt));
+      }
+     }
+    }
+   }
    let questions=[];
    for(const c of selected){
     const poolItems=catalogByCategory(c,kind);
     if(kind==='free'){questions.push(poolItems.slice(0,6));continue;}
     const seen=await client.query('SELECT question_id FROM lamna_seen_questions WHERE account_id=$1 AND question_id LIKE $2',[user.id,'paid-'+c+'-%']);
     const blocked=new Set(seen.rows.map(v=>v.question_id));
-    const available=poolItems.filter(item=>!blocked.has(item.id));
+    const available=poolItems.filter(item=>!blocked.has(item.id)&&!blockedPrompts.has(normalizeQuestion(item.prompt)));
     if(available.length<6){
      await client.query('ROLLBACK');
      send(req,res,409,{code:'questions_exhausted',message:'لا توجد أسئلة جديدة كافية لإحدى الفئات المختارة. لن يُخصم من رصيدك شيء. اختر فئات أخرى أو انتظر إضافة الأسئلة.'});
@@ -171,6 +185,7 @@ export async function handleStore(req,res,url,pool,ensureAccounts){
     // Shuffle on the server; never reuse IDs already seen by this account.
     const shuffled=available.map(x=>({x,n:crypto.randomInt(0,0x7fffffff)})).sort((a,b)=>a.n-b.n).slice(0,6).map(y=>y.x);
     questions.push(shuffled);
+    shuffled.forEach(q=>blockedPrompts.add(normalizeQuestion(q.prompt)));
    }
    const id=crypto.randomUUID();
    await client.query('INSERT INTO lamna_matches(id,account_id,kind,selected,questions,match_name,progress) VALUES($1,$2,$3,$4,$5,$6,$7)',[id,user.id,kind,selected,JSON.stringify(questions),matchName,JSON.stringify(initialProgress)]);
