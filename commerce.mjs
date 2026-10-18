@@ -161,7 +161,9 @@ export async function handleStore(req,res,url,pool,ensureAccounts){
    const normalizeQuestion=(prompt)=>String(prompt||'').normalize('NFKC').replace(/[\u064B-\u065F\u0670\u0640\s؟?،,.!«»"']/g,'').toLowerCase();
    const blockedPrompts=new Set();
    if(kind==='paid'){
-    const history=await client.query("SELECT questions FROM lamna_matches WHERE account_id=$1 AND kind='paid'",[user.id]);
+    // Previously viewed FREE questions count as seen too: a paid match must
+    // not recycle anything revealed during the customer's single free match.
+    const history=await client.query("SELECT questions FROM lamna_matches WHERE account_id=$1",[user.id]);
     for(const oldMatch of history.rows){
      for(const column of (Array.isArray(oldMatch.questions)?oldMatch.questions:[])){
       for(const q of (Array.isArray(column)?column:[])){
