@@ -58,4 +58,4 @@ export default function NewCovers80({i}:{i:number}){
  default:return null;
  }
 }
-function TxtQuote(){return <g><Text x={50} y={55} size={64} fill="#e28d61}>”</Text><Text x={256} y={185} size={64} fill="#e28d61}>“</Text></g>}
+function TxtQuote(){return <g><Text x={50} y={55} size={64} fill="#e28d61">”</Text><Text x={256} y={185} size={64} fill="#e28d61">“</Text></g>}
