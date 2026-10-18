@@ -23,7 +23,7 @@ export function getQuestionVisualTheme(category,prompt){
  // For mixed/general knowledge, select by question wording when reliable.
  const mixed=[0,14,19].includes(category);
  if(mixed){
-  if(/صل[ااوة]|ركع|القرآن|المسجد|رمضان|الصيام|مسلم|النبي|دين/.test(q))return 'faith';
+  if(/صل[ااوة]|ركع|القرآن|المسجد|رمضان|الصيام|مسلم|النبي|الديانة|الإسلام/.test(q))return 'faith';
   if(/عاصمة|مدينة|دول|قارة|خليج|بحر|محيط|القارات|العالم|جزيرة|بلد/.test(q))return 'globe';
   if(/كوكب|شمس|قمر|نجوم|فضاء/.test(q))return 'space';
   if(/ساع|دقيق|زمن|عدد|حساب|رقم|كم يساوي/.test(q))return 'math';
