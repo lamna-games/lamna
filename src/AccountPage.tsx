@@ -90,6 +90,7 @@ export default function AccountPage({onBack,onAuthenticated,initialMode='login'}
     </>}
     <label><span>كلمة المرور *</span><div className="lm-field-icon"><LockKeyhole size={18}/><input type={visible?'text':'password'} minLength={screen==='register'?8:1} required autoComplete={screen==='register'?'new-password':'current-password'} value={password} onChange={e=>setPassword(e.target.value)} placeholder="كلمة المرور"/><button type="button" aria-label={visible?'إخفاء':'إظهار'} className="lm-show-password" onClick={()=>setVisible(v=>!v)}>{visible?<EyeOff size={20}/>:<Eye size={20}/>}</button></div></label>
     {screen==='register'&&<label><span>تأكيد كلمة المرور *</span><input type={visible?'text':'password'} minLength={8} required autoComplete="new-password" value={confirm} onChange={e=>setConfirm(e.target.value)} placeholder="أعد كتابة كلمة المرور"/></label>}
+    {screen==='login'&&<p className="lm-account-forgot"><button type="button" onClick={()=>{window.location.hash='reset-password'}}>نسيت كلمة المرور؟</button></p>}
     {screen==='register'&&<label className="lm-account-consent">
       <input type="checkbox" required checked={acceptedTerms} onChange={e=>setAcceptedTerms(e.target.checked)}/>
       <span>أوافق على <a href="#terms">الشروط والأحكام</a> و<a href="#privacy">سياسة الخصوصية</a> الخاصة بلمنا.</span>
