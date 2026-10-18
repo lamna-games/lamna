@@ -148,7 +148,7 @@ const server = http.createServer(async(req,res)=>{
       respond(res,503,{message:'استعادة كلمة المرور قيد التجهيز حتى تفعيل البريد الإلكتروني الآمن.'});return;
      }
      const email=String(data.email||'').trim().toLowerCase();
-     if(!/^\\S+@\\S+\\.\\S+$/.test(email)||email.length>254){
+     if(!/^[^ @]+@[^ @]+[.][^ @]+$/.test(email)||email.length>254){
       respond(res,400,{message:'تأكد من صحة البريد الإلكتروني.'});return;
      }
      const neutral={ok:true,message:'إذا كان البريد مسجّلًا، ستصلك رسالة تحتوي على رابط صالح لمدة 30 دقيقة.'};
