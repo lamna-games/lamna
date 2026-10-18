@@ -246,6 +246,9 @@ const server = http.createServer(async(req,res)=>{
   }
   if(req.method==='POST' && u.pathname==='/api/rooms') {
     try {
+      // Bound anonymous QR rooms so repeated requests cannot exhaust memory.
+      if(rooms.size>=600)clean();
+      if(rooms.size>=600){respond(res,503,{error:'rooms_busy'});return;}
       const payload=await body(req);
       const itemIndex=Number(payload.itemIndex), duration=Number(payload.duration);
       if(!Number.isInteger(itemIndex)||itemIndex<0||itemIndex>5||![90,60,40].includes(duration)) {
