@@ -354,7 +354,22 @@ export async function handleStore(req,res,url,pool,ensureAccounts){
  }
  if(route==='/api/store/finish'){
   const id=String(data.matchId||'');
-  const r=await pool.query("UPDATE lamna_matches SET status='completed',finished_at=COALESCE(finished_at,now()) WHERE id=$1 AND account_id=$2 RETURNING id",[id,user.id]);
+  if(!/^[a-f0-9-]{36}$/i.test(id)){
+   send(req,res,400,{message:'معرف المباراة غير صحيح.'});return true;
+  }
+  const finalProgress=data.progress;
+  if(finalProgress!==undefined&&!validateMatchProgress(finalProgress)){
+   send(req,res,400,{message:'بيانات نهاية المباراة غير صحيحة.'});return true;
+  }
+  // Commit the final score and completed state in ONE database update.
+  // An older in-flight autosave cannot overwrite a finished match.
+  const r=await pool.query(`UPDATE lamna_matches SET
+   progress=CASE WHEN $3::jsonb IS NOT NULL
+      AND COALESCE((progress->>'revision')::bigint,0) < COALESCE(($3::jsonb->>'revision')::bigint,0)
+     THEN $3::jsonb ELSE progress END,
+   status='completed',finished_at=COALESCE(finished_at,now())
+   WHERE id=$1 AND account_id=$2 RETURNING id`,
+   [id,user.id,finalProgress===undefined?null:JSON.stringify(finalProgress)]);
   if(!r.rowCount){send(req,res,404,{message:'المباراة غير موجودة'});return true;}
   send(req,res,200,{ok:true,...(await readMe(pool,user.id))});return true;
  }
