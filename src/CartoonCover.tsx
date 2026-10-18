@@ -5,6 +5,7 @@ import ExpansionCoverArt from './ExpansionCoverArt';
 import RealWorldCoverArt from './RealWorldCoverArt';
 import RealWorldCoverScenes from './RealWorldCoverScenes';
 import RealWorldCoverFinish from './RealWorldCoverFinish';
+import NewCovers80 from './NewCovers80';
 import {LAMNA_OFFICIAL_LOGO} from './brandLogo';
 
 type CoverProps = { i: number; title: string };
@@ -181,7 +182,7 @@ export default function CartoonCover({i,title}:CoverProps){
      <circle cx="47" cy="15" r="118" fill="#fff" opacity=".12"/>
      <path d="M-30 323Q85 272 160 310q112-71 265-13v80H-30Z" fill={i%3===0?"#9bdcc0":i%3===1?"#c5e8ce":"#c0e9ed"} opacity=".52"/>
      <path d="M-20 338q81-40 141-11 71-38 146-8 77-22 155-7v44H-20Z" fill="#79c2a8" opacity=".42"/>
-     {photorealSubjectCovers.has(i)?<RealWorldCoverArt i={i}/>:classicSubjectCovers.has(i)?<RealWorldCoverScenes i={i}/>:finishingSubjectCovers.has(i)?<RealWorldCoverFinish i={i}/>:i>=20?<ExpansionCoverArt i={i}/>:featured?<FeaturedArt i={i}/>:<LamnaCoverArt i={i}/>}
+     {i>=50?<NewCovers80 i={i}/>:photorealSubjectCovers.has(i)?<RealWorldCoverArt i={i}/>:classicSubjectCovers.has(i)?<RealWorldCoverScenes i={i}/>:finishingSubjectCovers.has(i)?<RealWorldCoverFinish i={i}/>:i>=20?<ExpansionCoverArt i={i}/>:featured?<FeaturedArt i={i}/>:<LamnaCoverArt i={i}/>}
     </svg>
     <span className="lamna-cover-info" aria-hidden="true">i</span>
     <span className="lamna-cover-symbol" aria-hidden="true">
