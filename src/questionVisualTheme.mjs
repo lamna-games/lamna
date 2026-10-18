@@ -16,10 +16,46 @@ const specificTheme={
  75:'travel',76:'film',77:'music',78:'drama',79:'gaming'
 };
 
+
+// Manual per-question editorial decisions for the first five reviewed games.
+// A null choice is deliberate: an irrelevant or answer-revealing picture
+// is worse than a legible text-only question. The sea scene is retained.
+export const reviewedVisualGames=[4,28,33,34,66];
+const selectedQuestionScenes={
+  4:[
+    [/المنطقة التي يُسمح فيها للحارس بمسك الكرة/, 'penaltyarea'],
+    [/الخط الذي يفصل نصفي الملعب/, 'midline'],
+    [/المخالفة عند لمس الكرة باليد عمدًا/, 'handball'],
+    [/الضربة التي تنفذ من زاوية الملعب/, 'corner']
+  ],
+  33:[
+    [/نافورة الملك فهد/, 'fountain'],
+    [/موقع التراث العالمي في العلا الذي يضم المقابر المنحوتة/, 'carvedrocks'],
+    [/الحي التاريخي المسجل في اليونسكو بمدينة جدة/, 'oldtown'],
+    [/الواحة السعودية المعروفة بوفرة النخيل/, 'oasis'],
+    [/القرية التراثية المشهورة في منطقة عسير/, 'mountains'],
+    [/الطريق القديم الذي يرتبط بالحج/, 'caravan']
+  ],
+  34:[
+    [/حي البلد التاريخي/, 'oldtown'],
+    [/نافورة الملك فهد/, 'fountain'],
+    [/تقع أبها/, 'mountains'],
+    [/مدينة الورد/, 'roses'],
+    [/مركز محافظة الأحساء/, 'oasis'],
+    [/مشهور[ة]? بمينائها في البحر الأحمر/, 'coast'],
+    [/الغوص واللؤلؤ/, 'pearldive']
+  ]
+};
+
 /** Select a picture about the QUESTION topic, not the correct ANSWER. */
 export function getQuestionVisualTheme(category,prompt){
  if(puzzles.has(category))return null;
  const q=String(prompt||'').normalize('NFKC');
+ if(category===66)return 'sea'; // Approved: retain the existing sea artwork.
+ if(category===28)return null; // All capital questions work better without spoilers.
+ if(Object.prototype.hasOwnProperty.call(selectedQuestionScenes,category)){
+  return selectedQuestionScenes[category].find(([pattern])=>pattern.test(q))?.[1]??null;
+ }
  // For mixed/general knowledge, select by question wording when reliable.
  const mixed=[0,14,19].includes(category);
  if(mixed){
