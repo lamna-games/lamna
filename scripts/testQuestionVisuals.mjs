@@ -39,7 +39,7 @@ assert(illustrated>total*.58,'Most eligible questions should have a relevant ill
 assert.equal(missing.length,0,'No topic pictures mapped for supported categories: '+missing);
 const app=fs.readFileSync(new URL('../src/App.tsx',import.meta.url),'utf8');
 const component=fs.readFileSync(new URL('../src/QuestionVisual.tsx',import.meta.url),'utf8');
-assert(app.includes('<QuestionVisual category={selected[Math.floor(active/6)]} prompt={currentQuestion.prompt} imageUrl={currentQuestion.imageUrl}/>'),'Question picture must show before revealing answer and accept approved user media');
+assert(app.includes('<QuestionVisual category={selected[Math.floor(active/6)]} prompt={currentQuestion.prompt} imageUrl={currentQuestion.imageUrl} flagCode={currentQuestion.flagCode}/>'),'Question picture must show before revealing answer and accept approved user media');
 assert(app.indexOf('<QuestionVisual')>app.indexOf(') : reveal ? ('),'Never add a picture to the answer screen');
 assert(!component.includes('currentQuestion?.answer'),'Question pictures must not embed the correct answer');
 assert(!component.includes('https://'),'Question art must not fetch unauthorized third-party photos');
