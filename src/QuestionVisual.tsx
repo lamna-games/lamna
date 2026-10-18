@@ -118,8 +118,19 @@ function TravelScene(){
  </g>;
 }
 
-export default function QuestionVisual({category,prompt}:{category:number;prompt:string}){
+export default function QuestionVisual({category,prompt,imageUrl}:{category:number;prompt:string;imageUrl?:string}){
+ const [photoFailed,setPhotoFailed]=React.useState(false);
+ React.useEffect(()=>setPhotoFailed(false),[imageUrl]);
  const theme=getQuestionVisualTheme(category,prompt);
+ // A real photo only appears when an administrator has attached a vetted
+ // image from the owner's media library. Otherwise use original illustration.
+ if(imageUrl&&!photoFailed){
+  return <figure className="lm-question-visual lm-question-visual--photo" role="img" aria-label="صورة أصلية مرتبطة بالسؤال">
+   <img src={imageUrl} alt="صورة مرتبطة بالسؤال" loading="eager" decoding="async" referrerPolicy="no-referrer"
+     onError={()=>setPhotoFailed(true)}/>
+   <figcaption className="lm-question-visual-caption">صورة السؤال</figcaption>
+  </figure>;
+ }
  if(!theme)return null;
  const selected=visualThemes[theme];
  const Icon=selected.icon;
