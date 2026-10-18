@@ -1,5 +1,6 @@
 import {letterExpansionBank} from './letterQuestions50to57.mjs';
 import {flagRoundRows,flagCodes} from './flagQuiz.mjs';
+import {reviewedTierRows} from './reviewedTierRows.mjs';
 import {passportCodes} from './passportQuiz.mjs';
 import {expansionBank58to68} from './extraQuestions58to68.mjs';
 import {expansionBank69to79} from './extraQuestions69to79.mjs';
@@ -433,7 +434,7 @@ export const paidRows = [
 ];
 const expansionBank = {...extra20to29,...extra30to39,...extra40to49,...letterExpansionBank,...expansionBank58to68,...expansionBank69to79};
 export const catalogByCategory = (category,kind='paid')=>{
- const lines=category<20 ? ((kind==='free'?freeRows:paidRows)[category]||[]) : (expansionBank[category]?.[kind==='free'?'free':'paid']||[]);
+ const lines=reviewedTierRows[category]?.[kind==='free'?'free':'paid'] || (category<20 ? ((kind==='free'?freeRows:paidRows)[category]||[]) : (expansionBank[category]?.[kind==='free'?'free':'paid']||[]));
  return lines.map((line,index)=>{
   const [prompt,answer,hint='']=line.split('|');
   return {id:kind+'-'+category+'-'+index,category,prompt,answer,hint,
