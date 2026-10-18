@@ -1,4 +1,5 @@
 import {letterExpansionBank} from './letterQuestions50to57.mjs';
+import {passportCodes} from './passportQuiz.mjs';
 import {expansionBank58to68} from './extraQuestions58to68.mjs';
 import {expansionBank69to79} from './extraQuestions69to79.mjs';
 import {extra20to29} from './extraQuestions20to29.mjs';
@@ -454,6 +455,7 @@ export const catalogByCategory = (category,kind='paid')=>{
  const lines=category<20 ? ((kind==='free'?freeRows:paidRows)[category]||[]) : (expansionBank[category]?.[kind==='free'?'free':'paid']||[]);
  return lines.map((line,index)=>{
   const [prompt,answer,hint='']=line.split('|');
-  return {id:kind+'-'+category+'-'+index,category,prompt,answer,hint};
+  return {id:kind+'-'+category+'-'+index,category,prompt,answer,hint,
+   ...(category===74?{passportCode:passportCodes[kind+'-'+index]}:{})};
  });
 };
