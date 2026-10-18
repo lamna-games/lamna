@@ -21,6 +21,7 @@ export default function AdminWorkbench(){
  const [prompt,setPrompt]=React.useState('');
  const [answer,setAnswer]=React.useState('');
  const [hint,setHint]=React.useState('');
+ const [imageUrl,setImageUrl]=React.useState('');
  const [reason,setReason]=React.useState('');
  const [working,setWorking]=React.useState(false);
  const [loading,setLoading]=React.useState(false);
@@ -60,15 +61,15 @@ export default function AdminWorkbench(){
   return()=>{alive=false};
  },[gameId,kind]);
  React.useEffect(()=>{
-  setPrompt(current?.prompt||'');setAnswer(current?.answer||'');setHint(current?.hint||'');
- },[current?.id,current?.prompt,current?.answer,current?.hint]);
+  setPrompt(current?.prompt||'');setAnswer(current?.answer||'');setHint(current?.hint||'');setImageUrl(current?.imageUrl||'');
+ },[current?.id,current?.prompt,current?.answer,current?.hint,current?.imageUrl]);
 
  const changeQuestion=async(restore=false)=>{
   if(!current||working)return;
   setWorking(true);setError('');setMessage('');
   try{
    await storeRequest('admin/question','POST',{
-    gameId,kind,index,restore,prompt:prompt.trim(),answer:answer.trim(),hint:hint.trim()
+    gameId,kind,index,restore,prompt:prompt.trim(),answer:answer.trim(),hint:hint.trim(),imageUrl:imageUrl.trim()
    });
    await Promise.all([refreshQuestions(),refreshMeta()]);
    setMessage(restore?'تمت استعادة السؤال الأصلي وتوثيق العملية.':'حُفظ تعديل السؤال وتوثّق في سجل الإدارة.');
@@ -125,6 +126,11 @@ export default function AdminWorkbench(){
     <label>نص السؤال<textarea rows={3} maxLength={400} value={prompt} onChange={e=>setPrompt(e.target.value)} /></label>
     <label>الإجابة الصحيحة<input maxLength={180} value={answer} onChange={e=>setAnswer(e.target.value)}/></label>
     <label>التلميح<input maxLength={180} value={hint} onChange={e=>setHint(e.target.value)}/></label>
+    <label>صورة حقيقية لهذا السؤال (اختياري)
+     <input type="url" dir="ltr" maxLength={450} value={imageUrl} onChange={e=>setImageUrl(e.target.value)}
+      placeholder="https://res.cloudinary.com/l1ixwj8b/image/upload/..." />
+    </label>
+    <p>أضف فقط صورة تملك حق استخدامها من مكتبة لمنا المعتمدة. تظهر مع السؤال قبل الإجابة، وإذا تركتها فارغة تُستخدم الصورة التوضيحية المناسبة تلقائيًا. لا يلزم QR.</p>
     <div className="lm-admin-actions">
      <button type="button" disabled={working||loading||!prompt.trim()||!answer.trim()||!hint.trim()} onClick={()=>changeQuestion(false)}>حفظ التعديل</button>
      <button type="button" disabled={working||loading||!current||!editedIds.includes(current.id)} onClick={()=>changeQuestion(true)}>استعادة الأصل</button>
