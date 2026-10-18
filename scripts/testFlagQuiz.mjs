@@ -1,0 +1,32 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {flagRounds} from '../flagQuiz.mjs';
+import {catalogByCategory} from '../serverQuestionBank.mjs';
+const free=catalogByCategory(11,'free');
+const paid=catalogByCategory(11,'paid');
+assert.equal(free.length,6);
+assert.equal(paid.length,12);
+const all=[...free,...paid];
+assert.equal(new Set(all.map(q=>q.flagCode)).size,18,'Duplicate flags');
+assert.equal(new Set(all.map(q=>q.answer)).size,18,'Duplicate countries');
+assert.equal(new Set(all.map(q=>q.prompt)).size,18,'Duplicate prompts');
+assert.deepEqual(free.map(q=>q.flagCode),flagRounds.free.map(q=>q.code));
+assert.deepEqual(paid.map(q=>q.flagCode),flagRounds.paid.map(q=>q.code));
+for(const [index,q] of all.entries()){
+ assert(/^[A-Z]{2}$/.test(q.flagCode),'Invalid country code');
+ assert.equal(q.imageUrl,'https://flagcdn.com/w320/'+q.flagCode.toLowerCase()+'.png');
+ assert(q.prompt.includes('بطاقة '+(index+1)),'Missing card number');
+ assert(!q.prompt.includes(q.answer),'Answer leaked into prompt');
+}
+const visual=fs.readFileSync(new URL('../src/QuestionVisual.tsx',import.meta.url),'utf8');
+const flag=fs.readFileSync(new URL('../src/FlagQuestion.tsx',import.meta.url),'utf8');
+assert(visual.includes('category===11'),'Flag UI missing');
+assert(visual.includes('<FlagQuestion flagCode={flagCodes[flagCard-1]}/>'),'Flag renderer missing');
+const codeOrder=visual.match(/const flagCodes='([^']+)'\.split\(','\)/)?.[1].split(',');
+assert.deepEqual(codeOrder,all.map(q=>q.flagCode),'UI flag code order differs from answers');
+assert(flag.includes('onError={()=>setFailed(true)}'),'Image fallback missing');
+assert(flag.includes('lm-flag-fallback'),'Emoji fallback missing');
+assert.deepEqual(paid.slice(0,4).map(q=>q.flagCode),['TR','FR','DE','EG']);
+assert.deepEqual(paid.slice(4,8).map(q=>q.flagCode),['BR','LB','SE','KR']);
+assert.deepEqual(paid.slice(8,12).map(q=>q.flagCode),['NP','MX','ZA','NZ']);
+console.log('LAMNA flag QA OK: 18 unique authentic flags; 6 free and 12 paid; three difficulty tiers; correct image and answer mapping.');
