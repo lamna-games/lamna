@@ -160,7 +160,7 @@ const server = http.createServer(async(req,res)=>{
      const raw=crypto.randomBytes(32).toString('hex');
      const hashed=crypto.createHash('sha256').update(raw).digest('hex');
      await accountsPool.query("INSERT INTO lamna_password_resets(token_hash,account_id,expires_at) VALUES($1,$2,NOW()+INTERVAL '30 minutes')",[hashed,account.id]);
-     const publicUrl=(process.env.LAMNA_PUBLIC_URL||allowedAuthOrigin).replace(/\\/$/,'');
+     const publicUrl=(process.env.LAMNA_PUBLIC_URL||allowedAuthOrigin).replace(/[/]$/,'');
      const resetLink=publicUrl+'/#reset-password?token='+raw;
      const mail=await fetch('https://api.resend.com/emails',{
       method:'POST',headers:{Authorization:'Bearer '+process.env.RESEND_API_KEY,'Content-Type':'application/json'},
