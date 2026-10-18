@@ -20,10 +20,11 @@ for(const [index,q] of all.entries()){
 }
 const visual=fs.readFileSync(new URL('../src/QuestionVisual.tsx',import.meta.url),'utf8');
 const flag=fs.readFileSync(new URL('../src/FlagQuestion.tsx',import.meta.url),'utf8');
-assert(visual.includes('category===11'),'Flag UI missing');
-assert(visual.includes('<FlagQuestion flagCode={flagCodes[flagCard-1]}/>'),'Flag renderer missing');
-const codeOrder=visual.match(/const flagCodes='([^']+)'\.split\(','\)/)?.[1].split(',');
-assert.deepEqual(codeOrder,all.map(q=>q.flagCode),'UI flag code order differs from answers');
+assert(visual.includes('category===11&&flagCode'),'Flag UI must use saved question metadata');
+assert(visual.includes('<FlagQuestion flagCode={flagCode}/>'),'Flag renderer must bind saved flag code');
+assert(!visual.includes('flagCard'),'Flag display must never depend on editable question wording');
+const app=fs.readFileSync(new URL('../src/App.tsx',import.meta.url),'utf8');
+assert(app.includes('flagCode={currentQuestion.flagCode}'),'Question flag ID must be passed unchanged from saved match');
 assert(flag.includes('onError={()=>setFailed(true)}'),'Image fallback missing');
 assert(flag.includes('lm-flag-fallback'),'Emoji fallback missing');
 assert.deepEqual(paid.slice(0,4).map(q=>q.flagCode),['TR','FR','DE','EG']);
