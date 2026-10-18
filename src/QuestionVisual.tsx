@@ -10,6 +10,7 @@ import {
 import type {LucideIcon} from 'lucide-react';
 import {getQuestionVisualTheme} from './questionVisualTheme.mjs';
 import QuestionSpecificScene, {type SpecificScene} from './QuestionSpecificScene';
+import FlagQuestion from './FlagQuestion';
 import './questionVisual.css';
 
 /**
@@ -140,6 +141,10 @@ const specificScenes=new Set<VisualTheme>([
 export default function QuestionVisual({category,prompt,imageUrl}:{category:number;prompt:string;imageUrl?:string}){
  const [photoFailed,setPhotoFailed]=React.useState(false);
  React.useEffect(()=>setPhotoFailed(false),[imageUrl]);
+ // Card number uniquely maps to the genuine national flag; never show country names.
+ const flagCard=category===11?Number(/بطاقة\s+(\d+)/.exec(prompt)?.[1]||0):0;
+ const flagCodes='SA,JP,AE,CA,AR,CH,TR,FR,DE,EG,BR,LB,SE,KR,NP,MX,ZA,NZ'.split(',');
+ if(flagCard>=1&&flagCard<=flagCodes.length)return <FlagQuestion flagCode={flagCodes[flagCard-1]}/>;
  const theme=getQuestionVisualTheme(category,prompt);
  // A real photo only appears when an administrator has attached a vetted
  // image from the owner's media library. Otherwise use original illustration.

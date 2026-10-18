@@ -438,6 +438,6 @@ export const catalogByCategory = (category,kind='paid')=>{
   const [prompt,answer,hint='']=line.split('|');
   return {id:kind+'-'+category+'-'+index,category,prompt,answer,hint,
    ...(category===74?{passportCode:passportCodes[kind+'-'+index]}:{}),
-   ...(category===11?{flagCode:flagCodes[kind+'-'+index]}:{})};
+   ...(category===11?{flagCode:flagCodes[kind+'-'+index],imageUrl:'https://flagcdn.com/w320/'+flagCodes[kind+'-'+index].toLowerCase()+'.png'}:{})};
  });
 };
