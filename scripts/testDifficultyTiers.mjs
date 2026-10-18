@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {catalogByCategory} from '../serverQuestionBank.mjs';
 import {reviewedTierRows} from '../reviewedTierRows.mjs';
 const tiers=[200,400,600];
-for(const category of [0,4]){
+for(const category of [0,4,8]){
  for(const kind of ['free','paid']){
   const questions=catalogByCategory(category,kind);
   const expected=reviewedTierRows[category][kind];
