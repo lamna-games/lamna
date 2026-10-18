@@ -127,6 +127,33 @@ export async function handleStore(req,res,url,pool,ensureAccounts){
  }
  const user=await account(pool,req).catch(()=>null);
  if(!user){send(req,res,401,{message:'سجّل دخولك لاستخدام المباريات.'});return true;}
+ if(route.startsWith('/api/store/admin/')&&!user.is_admin){
+  send(req,res,403,{message:'هذه الخدمة مخصصة لإدارة لمنا فقط.'});return true;
+ }
+ if(route==='/api/store/admin/overview'&&req.method==='GET'){
+  const metrics=await pool.query(`SELECT
+   (SELECT COUNT(*)::int FROM lamna_accounts) AS accounts,
+   (SELECT COUNT(*)::int FROM lamna_matches) AS matches,
+   (SELECT COUNT(*)::int FROM lamna_matches WHERE kind='paid') AS paid_matches,
+   (SELECT COUNT(*)::int FROM lamna_question_reports WHERE resolved_at IS NULL) AS open_reports,
+   (SELECT COALESCE(SUM(credits),0)::int FROM lamna_entitlements) AS remaining_credits`);
+  const actions=await pool.query(`SELECT id,actor_id,action,entity,details,created_at FROM lamna_admin_audit ORDER BY id DESC LIMIT 50`);
+  send(req,res,200,{metrics:metrics.rows[0],audit:actions.rows});return true;
+ }
+ if(route==='/api/store/admin/games'&&req.method==='GET'){
+  const r=await pool.query('SELECT game_id,disabled,reason,updated_at FROM lamna_game_controls ORDER BY game_id');
+  send(req,res,200,{games:r.rows});return true;
+ }
+ if(route==='/api/store/admin/questions'&&req.method==='GET'){
+  const gameId=Number(url.searchParams.get('gameId'));
+  const kind=url.searchParams.get('kind');
+  if(!isValidGame(gameId)||!['free','paid'].includes(kind)){
+   send(req,res,400,{message:'حدد اللعبة ونوع الأسئلة بشكل صحيح.'});return true;
+  }
+  const questions=await questionPool(pool,gameId,kind);
+  const edits=await pool.query('SELECT question_id FROM lamna_question_edits WHERE question_id=ANY($1::text[])',[questions.map(q=>q.id)]);
+  send(req,res,200,{questions,editedIds:edits.rows.map(x=>x.question_id)});return true;
+ }
  if(route==='/api/store/admin/reports'&&req.method==='GET'){
   if(!user.is_admin){send(req,res,403,{message:'هذه الصفحة مخصصة لإدارة لمنا.'});return true;}
   const r=await pool.query(`SELECT q.id,q.match_id,q.question_number,q.reason,q.comment,q.created_at,q.resolved_at,
@@ -153,6 +180,68 @@ export async function handleStore(req,res,url,pool,ensureAccounts){
  if(req.method!=='POST'){send(req,res,405,{message:'العملية غير مدعومة'});return true;}
  let data;
  try{data=await readJson(req);}catch{send(req,res,400,{message:'الطلب غير صحيح'});return true;}
+ if(route==='/api/store/admin/question'){
+  const gameId=Number(data.gameId),kind=String(data.kind||''),index=Number(data.index);
+  if(!isValidGame(gameId)||!['free','paid'].includes(kind)||!Number.isInteger(index)||index<0||index>=(kind==='free'?6:12)){
+   send(req,res,400,{message:'اختر سؤالًا موجودًا لتعديله.'});return true;
+  }
+  const questionId=kind+'-'+gameId+'-'+index;
+  const original=catalogByCategory(gameId,kind)[index];
+  if(!original){send(req,res,404,{message:'السؤال غير موجود.'});return true;}
+  const restore=data.restore===true;
+  const prompt=restore?original.prompt:String(data.prompt||'').trim();
+  const answer=restore?original.answer:String(data.answer||'').trim();
+  const hint=restore?original.hint:String(data.hint||'').trim();
+  if(!validQuestionText(prompt,9,400)||!validQuestionText(answer,1,180)||!validQuestionText(hint,1,180)){
+   send(req,res,400,{message:'تحقق من طول السؤال والإجابة والتلميح وتجنب فواصل الأسطر.'});return true;
+  }
+  const normalize=t=>String(t).normalize('NFKC').replace(/[\u064b-\u065f\u0670\u0640\s؟?،,.!«»"'()]/g,'').toLowerCase();
+  const client=await pool.connect();
+  try{
+   await client.query('BEGIN');
+   const before=await client.query('SELECT prompt,answer,hint FROM lamna_question_edits WHERE question_id=$1 FOR UPDATE',[questionId]);
+   // Prevent introducing copies across any of the 1,440 original questions
+   // or their existing editorial overrides.
+   const currentEdits=await client.query('SELECT question_id,prompt FROM lamna_question_edits');
+   const overrides=new Map(currentEdits.rows.map(x=>[x.question_id,x.prompt]));
+   if(!restore){
+    const canonical=normalize(prompt);let duplicate=false;
+    for(let gid=0;gid<80&&!duplicate;gid++)for(let k of ['free','paid']){
+     for(const q of catalogByCategory(gid,k)){
+      if(q.id!==questionId&&normalize(overrides.get(q.id)||q.prompt)===canonical){duplicate=true;break;}
+     }
+     if(duplicate)break;
+    }
+    if(duplicate){await client.query('ROLLBACK');send(req,res,409,{message:'يوجد سؤال بنفس النص في لعبة أخرى؛ غيّر الصياغة والمعلومة.'});return true;}
+   }
+   if(restore){
+    await client.query('DELETE FROM lamna_question_edits WHERE question_id=$1',[questionId]);
+   }else{
+    await client.query(`INSERT INTO lamna_question_edits(question_id,prompt,answer,hint,updated_by) VALUES($1,$2,$3,$4,$5)
+     ON CONFLICT(question_id) DO UPDATE SET prompt=EXCLUDED.prompt,answer=EXCLUDED.answer,hint=EXCLUDED.hint,updated_by=EXCLUDED.updated_by,updated_at=now()`,[questionId,prompt,answer,hint,user.id]);
+   }
+   await client.query('INSERT INTO lamna_admin_audit(actor_id,action,entity,details) VALUES($1,$2,$3,$4::jsonb)',[
+    user.id,restore?'restore_question':'edit_question',questionId,JSON.stringify({before:before.rows[0]||original,after:{prompt,answer,hint}})]);
+   await client.query('COMMIT');
+   send(req,res,200,{ok:true,questionId,question:{...original,prompt,answer,hint}});return true;
+  }catch(e){await client.query('ROLLBACK').catch(()=>{});throw e;}finally{client.release();}
+ }
+ if(route==='/api/store/admin/game'){
+  const gameId=Number(data.gameId),disabled=data.disabled,reason=String(data.reason||'').trim().slice(0,200);
+  if(!isValidGame(gameId)||typeof disabled!=='boolean'){
+   send(req,res,400,{message:'حدد اللعبة والحالة الجديدة.'});return true;
+  }
+  const client=await pool.connect();
+  try{
+   await client.query('BEGIN');
+   await client.query(`INSERT INTO lamna_game_controls(game_id,disabled,reason,updated_by) VALUES($1,$2,$3,$4)
+    ON CONFLICT(game_id) DO UPDATE SET disabled=EXCLUDED.disabled,reason=EXCLUDED.reason,updated_by=EXCLUDED.updated_by,updated_at=now()`,[gameId,disabled,reason,user.id]);
+   await client.query('INSERT INTO lamna_admin_audit(actor_id,action,entity,details) VALUES($1,$2,$3,$4::jsonb)',[
+    user.id,'set_game_status',String(gameId),JSON.stringify({disabled,reason})]);
+   await client.query('COMMIT');
+   send(req,res,200,{ok:true,gameId,disabled});return true;
+  }catch(e){await client.query('ROLLBACK').catch(()=>{});throw e;}finally{client.release();}
+ }
  if(route==='/api/store/matches'){
   const selected=data.selected;
   if(!Array.isArray(selected)||selected.length!==6||new Set(selected).size!==6||selected.some(x=>!Number.isInteger(x)||x<0||x>79)){
