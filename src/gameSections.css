@@ -1,4 +1,4 @@
-/* Lamna: ten original expandable sections in the SAME page, five games per section. */
+/* Lamna: eleven independently expandable sections on the same page; variable game counts. */
 .lm-section-shortcuts{display:flex;gap:9px;overflow-x:auto;scroll-snap-type:x proximity;margin:17px 0 22px;padding:5px 2px 12px;scrollbar-width:thin}
 .lm-section-shortcuts button{flex:0 0 auto;scroll-snap-align:start;border:1px solid #cfe9eb;color:#13485c;background:#fff;border-radius:30px;padding:11px 15px;font-size:14px;font-weight:900;min-height:41px;transition:border-color .15s,background .15s}
 .lm-section-shortcuts button.is-current{background:#e7f8f9;border-color:#27b4ba;color:#087b86}
