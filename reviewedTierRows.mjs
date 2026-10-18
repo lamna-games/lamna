@@ -1,3 +1,4 @@
+import {orderingRounds} from './orderingRounds.mjs';
 /**
  * Editorially reviewed difficulty ladders for the first two audited topics.
  * Free board: 2 x 200, 2 x 400, 2 x 600.
@@ -5,6 +6,7 @@
  * Existing saved match snapshots are never rewritten.
  */
 export const reviewedTierRows={
+ 8: orderingRounds,
  0:{
   free:[
    'ما أكبر دولة في شبه الجزيرة العربية من حيث المساحة؟|السعودية|تضم الرياض ومكة',
