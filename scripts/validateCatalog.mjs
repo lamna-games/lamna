@@ -11,7 +11,10 @@ function parseTsLiteral(name){
 }
 const names=parseTsLiteral('categories');
 const sections=parseTsLiteral('categorySections');
-const alphabet=parseTsLiteral('arabicAlphabet');
+// The alphabet is a TypeScript array of single-quoted letters, not a JSON array.
+const alphabetLiteral=source.match(/export const arabicAlphabet = \[([^\]]+)\] as const;/);
+assert(alphabetLiteral,'Arabic alphabet export missing');
+const alphabet=[...alphabetLiteral[1].matchAll(/'([^']+)'/g)].map(match=>match[1]);
 const expectedAlphabet=['أ','ب','ت','ث','ج','ح','خ','د','ذ','ر','ز','س','ش','ص','ض','ط','ظ','ع','غ','ف','ق','ك','ل','م','ن','ه','و','ي'];
 assert.deepEqual(alphabet,expectedAlphabet,'Arabic alphabet must contain all 28 distinct single-letter glyphs in order');
 assert(alphabet.every(letter=>Array.from(letter).length===1),'Every Arabic tile must contain exactly one letter');
