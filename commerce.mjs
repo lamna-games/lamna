@@ -176,16 +176,24 @@ export async function handleStore(req,res,url,pool,ensureAccounts){
     if(kind==='free'){questions.push(poolItems.slice(0,6));continue;}
     const seen=await client.query('SELECT question_id FROM lamna_seen_questions WHERE account_id=$1 AND question_id LIKE $2',[user.id,'paid-'+c+'-%']);
     const blocked=new Set(seen.rows.map(v=>v.question_id));
-    const available=poolItems.filter(item=>!blocked.has(item.id)&&!blockedPrompts.has(normalizeQuestion(item.prompt)));
-    if(available.length<6){
-     await client.query('ROLLBACK');
-     send(req,res,409,{code:'questions_exhausted',message:'لا توجد أسئلة جديدة كافية لإحدى الفئات المختارة. لن يُخصم من رصيدك شيء. اختر فئات أخرى أو انتظر إضافة الأسئلة.'});
-     return true;
+    // Each category has twelve paid questions: four candidates for each
+    // difficulty tier (200, 400, 600). The board has exactly two slots per
+    // tier. Never put a hard question in a 200-point slot by random shuffling.
+    const selection=[];
+    for(let tier=0;tier<3;tier++){
+     const candidates=poolItems.slice(tier*4,tier*4+4)
+       .filter(item=>!blocked.has(item.id)&&!blockedPrompts.has(normalizeQuestion(item.prompt)));
+     if(candidates.length<2){
+      await client.query('ROLLBACK');
+      send(req,res,409,{code:'questions_exhausted',message:'لا توجد أسئلة جديدة كافية في مستوى '+[200,400,600][tier]+' لإحدى الفئات. لن يُخصم من رصيدك شيء؛ اختر فئات أخرى.'});
+      return true;
+     }
+     const picked=candidates.map(x=>({x,n:crypto.randomInt(0,0x7fffffff)}))
+       .sort((a,b)=>a.n-b.n).slice(0,2).map(y=>y.x);
+     selection.push(...picked);
+     picked.forEach(q=>blockedPrompts.add(normalizeQuestion(q.prompt)));
     }
-    // Shuffle on the server; never reuse IDs already seen by this account.
-    const shuffled=available.map(x=>({x,n:crypto.randomInt(0,0x7fffffff)})).sort((a,b)=>a.n-b.n).slice(0,6).map(y=>y.x);
-    questions.push(shuffled);
-    shuffled.forEach(q=>blockedPrompts.add(normalizeQuestion(q.prompt)));
+    questions.push(selection);
    }
    const id=crypto.randomUUID();
    await client.query('INSERT INTO lamna_matches(id,account_id,kind,selected,questions,match_name,progress) VALUES($1,$2,$3,$4,$5,$6,$7)',[id,user.id,kind,selected,JSON.stringify(questions),matchName,JSON.stringify(initialProgress)]);
