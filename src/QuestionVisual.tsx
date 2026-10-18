@@ -143,7 +143,7 @@ export default function QuestionVisual({category,prompt,imageUrl}:{category:numb
  React.useEffect(()=>setPhotoFailed(false),[imageUrl]);
  // Card number uniquely maps to the genuine national flag; never show country names.
  const flagCard=category===11?Number(/بطاقة\s+(\d+)/.exec(prompt)?.[1]||0):0;
- const flagCodes='SA,JP,AE,CA,AR,CH,TR,FR,DE,EG,BR,LB,SE,KR,NP,MX,ZA,NZ'.split(',');
+ const flagCodes='SA,AE,JP,CA,PT,UY,TR,FR,DE,EG,BR,LB,SE,KR,NP,MX,ZA,NZ'.split(',');
  if(flagCard>=1&&flagCard<=flagCodes.length)return <FlagQuestion flagCode={flagCodes[flagCard-1]}/>;
  const theme=getQuestionVisualTheme(category,prompt);
  // A real photo only appears when an administrator has attached a vetted
