@@ -19,7 +19,7 @@ assert.equal(new Set(assigned).size,80,'Duplicate game section ID');
 assert.deepEqual([...assigned].sort((a,b)=>a-b),Array.from({length:80},(_,i)=>i),'Missing catalogue IDs');
 assert(sections.some(section=>section.name==='الحروف'&&section.ids.length>=8),'Dedicated alphabet section must exist');
 let total=0;let alerts=[];
-const localSpelling=/[�□]|\s{3,}|(\?|؟){3,}/g;
+const localSpelling=/[�□]|\s{3,}|(\?|؟){3,}/;
 for(let id=0;id<80;id++){
  for(const kind of ['free','paid']){
   const questions=catalogByCategory(id,kind);
