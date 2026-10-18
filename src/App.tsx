@@ -123,10 +123,13 @@ function App() {
     if(p?.chosenAids?.length===2)setChosenAids(p.chosenAids as AidId[][]);
     setScores(p?.scores?.length===2?p.scores:[0,0]);
     setShowResult(match.status==='completed');setHistory(p?.history||[]);setShowHint(false);
-    setUsed(p?.used||[]);setTurn(p?.turn===1?1:0);setHelp([2,2]);setVarUsed([false,false]);
-    setActive(p?.active??null);setPhase('question');setSeconds(60);setPaused(true);
+    setUsed(p?.used||[]);setTurn(p?.turn===1?1:0);setHelp(p?.help?.length===2?p.help:[2,2]);setVarUsed(p?.varUsed?.length===2?p.varUsed:[false,false]);
+    setActive(p?.active??null);setPhase(p?.phase==='steal'?'steal':p?.phase==='var'?'var':'question');
+    setSeconds(typeof p?.seconds==='number'&&p.seconds>=0&&p.seconds<=180?p.seconds:60);setPaused(true);
     setUsedAids(p?.usedAids?.length===2?p.usedAids as AidId[][]:[[],[]]);
-    setAidEffect(null);setAidOwner(null);setShowHelp(false);setReveal(false);setPickWinner(false);
+    setAidEffect(p?.aidEffect as AidId|null||null);setAidOwner(typeof p?.aidOwner==='number'?p.aidOwner:null);
+    setTwoAttemptsLeft(p?.twoAttemptsLeft===1?1:2);setRestingPlayer(p?.restingPlayer||'');setStealFrom(p?.stealFrom===1?1:0);
+    setShowHelp(false);setReveal(Boolean(p?.reveal));setPickWinner(Boolean(p?.pickWinner));setShowHint(Boolean(p?.showHint));
     localStorage.setItem('lamna-current-match-id',match.id);
     go('game');
   };
@@ -151,14 +154,36 @@ function App() {
     }catch(error){setMatchError(error instanceof Error?error.message:'تعذر بدء المباراة.');}
     finally{setStarting(false);}
   };
+  // Persist the COMPLETE active match to Postgres; local browser state never grants credits.
+  const progressSnapshot={teams,chosenAids,scores,used,turn,usedAids,history,active,phase,seconds,paused,
+    reveal,pickWinner,showHint,stealFrom,varUsed,help,aidEffect,aidOwner,twoAttemptsLeft,restingPlayer};
+  const progressRef=React.useRef(progressSnapshot);
+  progressRef.current=progressSnapshot;
   React.useEffect(()=>{
     if(!accountsEnabled||!activeSession||activeSession.status!=='active'||!token()||showResult)return;
-    const progress={teams,chosenAids,scores,used,turn,usedAids,history,active};
+    const matchId=activeSession.id;
     const t=window.setTimeout(()=>{
-      storeRequest('progress','POST',{matchId:activeSession.id,progress}).catch(()=>{});
-    },800);
+      storeRequest('progress','POST',{matchId,progress:progressRef.current}).catch(()=>{});
+    },450);
     return()=>window.clearTimeout(t);
-  },[accountsEnabled,activeSession?.id,activeSession?.status,teams,chosenAids,scores,used,turn,usedAids,history,active,showResult]);
+  },[accountsEnabled,activeSession?.id,activeSession?.status,teams,chosenAids,scores,used,turn,usedAids,history,active,phase,seconds,paused,reveal,pickWinner,showHint,stealFrom,varUsed,help,aidEffect,aidOwner,twoAttemptsLeft,restingPlayer,showResult]);
+  React.useEffect(()=>{
+    if(!accountsEnabled||!activeSession||activeSession.status!=='active'||!token())return;
+    const matchId=activeSession.id;
+    const flush=()=>{
+      if(document.visibilityState==='visible')return;
+      const authToken=token();if(!authToken)return;
+      const body=JSON.stringify({matchId,progress:progressRef.current});
+      if(body.length>6400)return;
+      fetch('https://lamna-wordless-sync.onrender.com/api/store/progress',{
+        method:'POST',keepalive:true,headers:{Authorization:'Bearer '+authToken,'Content-Type':'application/json'},
+        body,cache:'no-store'
+      }).catch(()=>{});
+      setPaused(true);
+    };
+    document.addEventListener('visibilitychange',flush);
+    return()=>document.removeEventListener('visibilitychange',flush);
+  },[accountsEnabled,activeSession?.id,activeSession?.status]);
   React.useEffect(()=>{
     if(!accountsEnabled||!activeSession||activeSession.status!=='active'||!showResult||active!==null)return;
     let alive=true;
