@@ -1,5 +1,6 @@
 import crypto from 'node:crypto';
 import {catalogByCategory} from './serverQuestionBank.mjs';
+import {validateMatchProgress} from './matchProgress.mjs';
 
 /* All entitlements and usage are server-authoritative, never localStorage.
    No successful payment, credit grant or account can be simulated client-side. */
@@ -333,17 +334,23 @@ export async function handleStore(req,res,url,pool,ensureAccounts){
  if(route==='/api/store/progress'){
   const id=String(data.matchId||'');
   const progress=data.progress;
-  if(!/^[a-f0-9-]{36}$/i.test(id)||!progress||typeof progress!=='object'||Array.isArray(progress)||
-    !Array.isArray(progress.scores)||progress.scores.length!==2||progress.scores.some(n=>!Number.isInteger(n)||n<0||n>999999)||
-    !Array.isArray(progress.used)||progress.used.length>36||progress.used.some(n=>!Number.isInteger(n)||n<0||n>35)||
-    !Array.isArray(progress.teams)||progress.teams.length!==2||progress.teams.some(t=>typeof t!=='string'||t.length>25)||
-    !Array.isArray(progress.chosenAids)||progress.chosenAids.length!==2||
-    JSON.stringify(progress).length>6500){
-    send(req,res,400,{message:'بيانات المباراة غير صحيحة'});return true;
+  if(!/^[a-f0-9-]{36}$/i.test(id)||!validateMatchProgress(progress)){
+   send(req,res,400,{message:'بيانات المباراة غير صحيحة'});return true;
   }
-  const r=await pool.query("UPDATE lamna_matches SET progress=$1::jsonb WHERE id=$2 AND account_id=$3 AND status='active' RETURNING id",[JSON.stringify(progress),id,user.id]);
-  if(!r.rowCount){send(req,res,404,{message:'المباراة غير متاحة'});return true;}
-  send(req,res,200,{ok:true});return true;
+  // Only newer checkpoints may replace a stored checkpoint: older requests
+  // can arrive late due to mobile connectivity or background/foreground events.
+  const r=await pool.query(`UPDATE lamna_matches SET progress=$1::jsonb
+   WHERE id=$2 AND account_id=$3 AND status='active'
+   AND COALESCE((progress->>'revision')::bigint,0)<$4 RETURNING id`,
+   [JSON.stringify(progress),id,user.id,progress.revision]);
+  if(!r.rowCount){
+   const existing=await pool.query("SELECT status FROM lamna_matches WHERE id=$1 AND account_id=$2",[id,user.id]);
+   if(existing.rowCount&&existing.rows[0].status==='active'){
+    send(req,res,409,{code:'stale_progress',message:'حُفظت نسخة أحدث من المباراة؛ افتح المباراة من حسابك لاستكمال آخر نسخة.'});return true;
+   }
+   send(req,res,404,{message:'المباراة غير متاحة'});return true;
+  }
+  send(req,res,200,{ok:true,revision:progress.revision});return true;
  }
  if(route==='/api/store/finish'){
   const id=String(data.matchId||'');
