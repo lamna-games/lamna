@@ -4,6 +4,7 @@ import {reviewedTierRows} from './reviewedTierRows.mjs';
 import {passportCodes} from './passportQuiz.mjs';
 import {carQuestionRows,carCards} from './carQuiz.mjs';
 import {carPhotoAssets} from './carPhotoAssets.mjs';
+import {instrumentPhotoAssets} from './instrumentPhotoAssets.mjs';
 import {expansionBank58to68} from './extraQuestions58to68.mjs';
 import {expansionBank69to79} from './extraQuestions69to79.mjs';
 import {extra20to29} from './extraQuestions20to29.mjs';
@@ -439,7 +440,9 @@ export const catalogByCategory = (category,kind='paid')=>{
  const lines=category===80 ? carQuestionRows[kind==='free'?'free':'paid'] : reviewedTierRows[category]?.[kind==='free'?'free':'paid'] || (category<20 ? ((kind==='free'?freeRows:paidRows)[category]||[]) : (expansionBank[category]?.[kind==='free'?'free':'paid']||[]));
  return lines.map((line,index)=>{
   const [prompt,answer,hint='']=line.split('|');
-  return {id:kind+'-'+category+'-'+index,category,prompt,answer,hint,
+  const piano=category===47&&kind==='free'&&index===1&&answer==='البيانو';
+  return {id:kind+'-'+category+'-'+index,category,prompt:piano?'من الصورة، ما اسم الآلة الموسيقية؟':prompt,answer,hint:piano?'تُعزف بالضغط على المفاتيح':hint,
+   ...(piano?instrumentPhotoAssets['free-1']:{}),
    ...(category===74?{passportCode:passportCodes[kind+'-'+index]}:{}),
    ...(category===11?{flagCode:flagCodes[kind+'-'+index],imageUrl:'https://flagcdn.com/w320/'+flagCodes[kind+'-'+index].toLowerCase()+'.png'}:{}),
    ...(category===80?{carPhotoKey:carCards[kind+'-'+index].photoKey,carView:carCards[kind+'-'+index].view,carTier:carCards[kind+'-'+index].tier,...(carPhotoAssets[kind+'-'+index]||{})}:{})};
