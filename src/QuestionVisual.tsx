@@ -147,8 +147,11 @@ export default function QuestionVisual({category,prompt,imageUrl,flagCode}:{cate
  const theme=getQuestionVisualTheme(category,prompt);
  // A real photo only appears when an administrator has attached a vetted
  // image from the owner's media library. Otherwise use original illustration.
- if(imageUrl&&!photoFailed){
-  return <figure className="lm-question-visual lm-question-visual--photo" role="img" aria-label="صورة أصلية مرتبطة بالسؤال">
+ if(imageUrl){
+  if(photoFailed)return <figure className="lm-question-visual lm-question-visual--photo-error" role="status" aria-live="polite">
+   <figcaption>تعذر تحميل صورة السؤال. لا يمكن تخمين الإجابة من رسم بديل.</figcaption>
+  </figure>;
+  return <figure className="lm-question-visual lm-question-visual--photo" role="img" aria-label="صورة مرفقة بالسؤال">
    <img src={imageUrl} alt="صورة مرتبطة بالسؤال" loading="eager" decoding="async" referrerPolicy="no-referrer"
      onError={()=>setPhotoFailed(true)}/>
    <figcaption className="lm-question-visual-caption">صورة السؤال</figcaption>
