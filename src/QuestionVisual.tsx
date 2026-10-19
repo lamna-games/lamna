@@ -138,7 +138,7 @@ const specificScenes=new Set<VisualTheme>([
  'oldtown','oasis','mountains','caravan','roses','coast','pearldive'
 ]);
 
-export default function QuestionVisual({category,prompt,imageUrl,flagCode}:{category:number;prompt:string;imageUrl?:string;flagCode?:string}){
+export default function QuestionVisual({category,prompt,imageUrl,flagCode,photoCredit,photoSource,photoLicense}:{category:number;prompt:string;imageUrl?:string;flagCode?:string;photoCredit?:string;photoSource?:string;photoLicense?:string}){
  const [photoFailed,setPhotoFailed]=React.useState(false);
  React.useEffect(()=>setPhotoFailed(false),[imageUrl]);
  // The code is supplied by the server's saved question, not parsed from
@@ -154,7 +154,7 @@ export default function QuestionVisual({category,prompt,imageUrl,flagCode}:{cate
   return <figure className="lm-question-visual lm-question-visual--photo" role="img" aria-label="صورة مرفقة بالسؤال">
    <img src={imageUrl} alt="صورة مرتبطة بالسؤال" loading="eager" decoding="async" referrerPolicy="no-referrer"
      onError={()=>setPhotoFailed(true)}/>
-   <figcaption className="lm-question-visual-caption">صورة السؤال</figcaption>
+   <figcaption className="lm-question-visual-caption">صورة السؤال{photoCredit&&photoSource&&photoLicense&&<span className="lm-question-photo-credit"> · تصوير: {photoCredit} · {photoLicense} · <a href={photoSource} target="_blank" rel="noopener noreferrer">المصدر</a></span>}</figcaption>
   </figure>;
  }
  if(category===80)return <figure className="lm-question-visual lm-question-visual--photo-error" role="status" aria-live="polite">
