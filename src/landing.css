@@ -123,3 +123,8 @@
 .lamna-site-footer .brand img{width:200px!important;max-width:100%!important;max-height:78px!important;object-fit:contain!important;object-position:center!important}
 .lamna-site-footer>p{color:#5d7582!important;font-size:16px}
 .lamna-site-footer>small{color:#80949c!important;font-size:12px}
+
+/* Newly added photo-first car game: visible but never sold before original images pass QA. */
+.lm-library-card:disabled{cursor:not-allowed;opacity:.76;filter:saturate(.85)}
+.lm-library-card:disabled:hover{transform:none;box-shadow:0 7px 18px #123a4f15}
+.lm-library-card:disabled .lm-library-selection-index{width:auto;min-width:60px;max-width:85px;padding:0 7px;font-size:11px;background:#fff6d8;color:#695023;white-space:nowrap}
