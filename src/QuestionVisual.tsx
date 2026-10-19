@@ -157,6 +157,9 @@ export default function QuestionVisual({category,prompt,imageUrl,flagCode}:{cate
    <figcaption className="lm-question-visual-caption">صورة السؤال</figcaption>
   </figure>;
  }
+ if(category===80)return <figure className="lm-question-visual lm-question-visual--photo-error" role="status" aria-live="polite">
+  <figcaption>صورة السيارة الحقيقية لم تُعتمد لهذا السؤال بعد. لا تُعرض رسومات أو صور سيارة مختلفة.</figcaption>
+ </figure>;
  if(!theme)return null;
  const selected=visualThemes[theme];
  const Icon=selected.icon;
