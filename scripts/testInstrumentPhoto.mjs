@@ -4,16 +4,28 @@ import {instrumentPhotoAssets} from '../instrumentPhotoAssets.mjs';
 
 const free=catalogByCategory(47,'free');
 const paid=catalogByCategory(47,'paid');
-const photo=instrumentPhotoAssets['free-1'];
+const pianoPhoto=instrumentPhotoAssets['free-1'];
+const violinPhoto=instrumentPhotoAssets['free-4'];
 assert.equal(free.length,6);
 assert.equal(paid.length,12);
-assert.equal(free[1].id,'free-47-1');
-assert.equal(free[1].answer,'البيانو');
-assert.equal(free[1].imageUrl,photo.imageUrl);
-assert.equal(free[1].photoSource,photo.photoSource);
-assert.equal(free[1].photoLicense,'CC0 1.0');
-assert.equal(free[1].photoCredit,'Raysonho');
-assert(!free[1].prompt.includes('البيانو'),'Do not reveal the instrument in the question');
-assert(!free[1].prompt.includes('سوداء وبيضاء'),'Do not answer via the text prompt');
-for(const row of [...free.slice(0,1),...free.slice(2),...paid])assert(!row.imageUrl,'Do not reuse piano image for other instruments');
-console.log('LAMNA instrument photo pilot OK: 1/18 verified piano photo, correct free question and rights.');
+for(const [index,answer,photo,credit] of [
+ [1,'البيانو',pianoPhoto,'Raysonho'],
+ [4,'الكمان',violinPhoto,'Just plain Bill']
+]){
+ const row=free[index];
+ assert.equal(row.id,'free-47-'+index);
+ assert.equal(row.answer,answer);
+ assert.equal(row.imageUrl,photo.imageUrl);
+ assert.equal(row.photoSource,photo.photoSource);
+ assert.equal(row.photoLicense,'CC0 1.0');
+ assert.equal(row.photoCredit,credit);
+ assert(row.imageUrl.startsWith('https://'),'Image must use HTTPS');
+ assert(row.photoSource.startsWith('https://commons.wikimedia.org/wiki/File:'),'Require verifiable original source');
+ assert(!row.prompt.includes(answer),'Do not reveal the instrument in the question');
+ assert(!row.prompt.includes('سوداء وبيضاء'),'Do not answer via the text prompt');
+}
+for(const row of [...free.filter((_,i)=>i!==1&&i!==4),...paid]){
+ assert(!row.imageUrl,'Do not reuse instrument photos for other cards');
+}
+assert.notEqual(free[1].imageUrl,free[4].imageUrl,'Each instrument must use its own image');
+console.log('LAMNA instrument photo pilot OK: 2/18 licensed real photos (piano, violin) with correct questions and rights.');
