@@ -1,4 +1,4 @@
-/** 80 original Lamna games in eleven independent, single-page sections.
+/** 81 original Lamna games in twelve independent, single-page sections.
  * Existing IDs 0–49 remain stable: never reassign them (saved paid matches rely on IDs).
  * IDs 36,39 and 50–57 are dedicated Arabic letter-board games.
  */
@@ -82,7 +82,8 @@ export const categories = [
   "سينما عربية",
   "أغاني خليجية",
   "مسرحيات خليجية",
-  "ألعاب الفيديو"
+  "ألعاب الفيديو",
+  "عالم السيارات"
 ] as const;
 export const categorySections = [
   {
@@ -214,6 +215,11 @@ export const categorySections = [
       79
     ],
     "description": "فن وألعاب وتطبيقات"
+  },
+  {
+    "name": "سيارات ومحركات",
+    "ids": [80],
+    "description": "تعرّف على السيارات من صورها الحقيقية"
   },
   {
     "name": "الحروف",
