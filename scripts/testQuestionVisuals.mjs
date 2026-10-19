@@ -5,7 +5,8 @@ import {getQuestionVisualTheme} from '../src/questionVisualTheme.mjs';
 import {validQuestionImageUrl} from '../questionImagePolicy.mjs';
 
 const themes=new Set(['penaltyarea','midline','handball','corner','fountain','carvedrocks','oldtown','oasis','mountains','caravan','roses','coast','pearldive','globe','landmark','city','travel','money','football','sport','film','music','food','faith','history','science','space','health','sea','technology','gaming','language','nature','math','ideas','drama','camera']);
-const ignored=new Set([1,2,7,9,12,13,16,38,39,40,41,50,51,52,53,54,55,56,57,74,80]);
+// Photo-first games must not accidentally fall back to answer-irrelevant cartoons.
+const ignored=new Set([1,2,5,7,9,12,13,16,38,39,40,41,47,48,49,50,51,52,53,54,55,56,57,74,80]);
 assert.equal(getQuestionVisualTheme(0,'كم عدد ركعات الصلاة المفروضة؟'),'faith','Prayer questions should show faith-related art');
 assert.equal(getQuestionVisualTheme(0,'ما المدينة الخليجية التي تضم مطارا دوليا؟'),'globe','Geography questions should show the globe');
 assert.equal(getQuestionVisualTheme(28,'ما عاصمة السعودية؟'),null,'Capital guessing should not show unrelated towers or a reused globe');
@@ -18,6 +19,10 @@ assert.equal(getQuestionVisualTheme(4,'ما اسم الخط الذي يفصل ن
 assert.equal(getQuestionVisualTheme(4,'ما اسم الضربة التي تنفذ من زاوية الملعب؟'),'corner');
 assert.equal(getQuestionVisualTheme(66,'ما الحيوان الذي يملك ثماني أذرع؟'),'sea','Keep the user-approved existing sea picture');
 assert.equal(getQuestionVisualTheme(79,'ما اسم هذه اللعبة؟'),'gaming');
+for(const category of [5,16,47,48,49]){
+ assert.equal(getQuestionVisualTheme(category,'ما اسم هذا الشيء من الصورة؟'),null,
+  'Photo-first game '+category+' may only show approved real media, never cartoons');
+}
 for(const id of ignored)assert.equal(getQuestionVisualTheme(id,'ما الإجابة الصحيحة؟'),null,'QR and answer-guessing categories must not show generic spoiler illustrations: '+id);
 let total=0,illustrated=0,missing=[],misclassified=[];
 const reviewedCounts=new Map([[4,0],[28,0],[33,0],[34,0],[66,0]]);
