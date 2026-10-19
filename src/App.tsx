@@ -468,12 +468,14 @@ function App() {
               <button
                 className={'category ' + (selected.includes(i) ? 'chosen' : '')}
                 key={c}
+                disabled={i===80}
+                aria-label={i===80?'عالم السيارات: الصور الحقيقية قيد الإعداد':c}
                 onClick={() => choose(i)}
               >
                 <Cover i={i} title={c}/>
                 <strong>{c}</strong>
                 <small>
-                  {selected.includes(i) ? '✓ تم الاختيار' : 'اضغط للاختيار'}
+                  {i===80?'قريبًا — الصور الحقيقية قيد الإعداد':selected.includes(i) ? '✓ تم الاختيار' : 'اضغط للاختيار'}
                 </small>
               </button>
             ))}
