@@ -1,4 +1,4 @@
-export type QuizItem = { prompt: string; answer: string; hint: string; mode?: string; instructions?: string };
+export type QuizItem = { prompt: string; answer: string; hint: string; mode?: string; instructions?: string; photoCredit?: string; photoSource?: string; photoLicense?: string };
 const rows: string[][] = [
   [
     'ما عاصمة المملكة العربية السعودية؟|الرياض|مدينة في وسط المملكة',
