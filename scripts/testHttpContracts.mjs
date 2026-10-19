@@ -32,6 +32,22 @@ try{
  assert.equal(packs.status,200);
  assert.equal(packs.data.checkoutAvailable,false);
  assert.deepEqual(packs.data.packages.map(x=>x.halalas),[999,1999,2999]);
+ const trial=await call('/api/store/demo?selected=0,4,11,47,48,49');
+ assert.equal(trial.status,200,'Guest demo should work without login or database');
+ assert.equal(trial.data.kind,'demo');
+ assert.deepEqual(trial.data.selected,[0,4,11,47,48,49]);
+ assert.equal(trial.data.saved,false);
+ assert.equal(trial.data.usesCredits,false);
+ assert.equal(trial.data.questions.length,6);
+ assert(trial.data.questions.every(rows=>rows.length===6),'Trial must have 36 free questions');
+ assert(trial.data.questions.every((rows,i)=>rows.every(q=>q.id.startsWith('free-'+trial.data.selected[i]+'-'))),'Never expose paid questions in anonymous trial');
+ const impossible=await call('/api/store/demo?selected=0,4,11,47,48,80');
+ assert.equal(impossible.status,400,'Unready car photos must not be playable as demo');
+ const malformed=await call('/api/store/demo?selected=0,4,11,47,48,48');
+ assert.equal(malformed.status,400,'Repeated trial categories must be rejected');
+ const missingDemo=await call('/api/store/demo');
+ assert.equal(missingDemo.status,400,'Trial must select six categories');
+
  const forbiddenCheckout=await call('/api/store/checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
  assert.notEqual(forbiddenCheckout.status,200,'No payments may be granted by test endpoint');
  const room=await call('/api/rooms',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({itemIndex:2,duration:60})});
