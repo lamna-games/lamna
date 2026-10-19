@@ -20,6 +20,6 @@ for(const group of groups){
 }
 assert(/i\s*>=\s*50\s*&&\s*i\s*<=\s*57/.test(newer)&&newer.includes('<Letters id={i}/>'),'Games 50–57 must draw their own letter board artwork');
 const cases=new Set([...newer.matchAll(/case\s+(\d+)\s*:/g)].map(m=>Number(m[1])));
-for(let id=58;id<80;id++)assert(cases.has(id),'Missing topical cover art for game '+id);
-console.log('LAMNA cover routing QA OK: illustrations are mapped for games 20–79; original logo overlay remains intact.');
+for(let id=58;id<81;id++)assert(cases.has(id),'Missing topical cover art for game '+id);
+console.log('LAMNA cover routing QA OK: illustrations are mapped for games 20–80; original logo overlay remains intact.');
 // This cannot assess subjective illustration quality or physical-device rendering.
