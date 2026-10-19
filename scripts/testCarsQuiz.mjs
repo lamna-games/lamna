@@ -60,4 +60,9 @@ assert(app.includes('<CarQuestion imageUrl={currentQuestion.imageUrl} view={curr
 const visual=src('src/CarQuestion.tsx');
 assert(visual.includes('!imageUrl||failed'),'Missing photos must never become fake images');
 assert(visual.includes('onError={()=>setFailed(true)}'),'Broken photo URL must be explicit');
+for(const asset of Object.values(carPhotoAssets)){
+ assert(visual.includes(asset.photoSource),'In-game photo source attribution missing: '+asset.photoSource);
+ assert(visual.includes("author:'"+asset.photoCredit+"'"),'In-game photographer attribution missing: '+asset.photoCredit);
+}
+
 console.log('LAMNA car-game QA OK: category 80 (game 81), dedicated section, 18 unique model/photo slots; all 200/400/600 tiers; player and credit safety; 6 real photos attached; 12 still PENDING.');
