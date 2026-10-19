@@ -1,6 +1,9 @@
 import React from 'react';
 import './carQuestion.css';
 const credits=[
+ {key:'car-02-toyota-land-cruiser-j300-gr-sport',author:'Firzafp',source:'https://commons.wikimedia.org/wiki/File:Toyota_Land_Cruiser_TNGA_-_GR_Sport_(J300)_(front)_in_Putri_Pinang_Masak_Park,_Jambi_City.jpg'},
+ {key:'car-04-kia-sportage-gt-line-rear',author:'Vauxford',source:'https://commons.wikimedia.org/wiki/File:2022_Kia_Sportage_GT-Line_ISG_HEV_Automatic_1.6_Rear.jpg'},
+ {key:'car-07-toyota-hilux-invincible-front',author:'Vauxford',source:'https://commons.wikimedia.org/wiki/File:2016_Toyota_HiLux_Invincible_D-4D_4WD_2.4_Front.jpg'},
  {key:'car-08-nissan-patrol-y62',author:'Coptic Light',source:'https://commons.wikimedia.org/wiki/File:Nissan_Patrol_Sixth_generation_Front.jpg'},
  {key:'car-09-ford-mustang-gt-2018',author:'Vauxford',source:'https://commons.wikimedia.org/wiki/File:2018_Ford_Mustang_GT_5.0_Front.jpg'},
  {key:'car-10-mercedes-g500-w463',author:'Ethan Llamas',source:'https://commons.wikimedia.org/wiki/File:Mercedes-Benz_W463_G500_V8_Arctic_White_front_left.jpg'}
