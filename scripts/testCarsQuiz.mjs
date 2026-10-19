@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {carRounds,carQuestionRows,carCards,carPhotoReady} from '../carQuiz.mjs';
+import {carPhotoAssets} from '../carPhotoAssets.mjs';
 import {catalogByCategory} from '../serverQuestionBank.mjs';
 
 const src=file=>fs.readFileSync(new URL('../'+file,import.meta.url),'utf8');
@@ -11,6 +12,7 @@ assert.match(catalog,/"ids": \[80\]/,'Car game must keep ID 80');
 assert.equal(carPhotoReady,false,'Do not unlock game without vetted real vehicle photos');
 
 const carIds=new Set(),photoKeys=new Set(),models=new Set();
+let verifiedPhotoCount=0;
 for(const [kind,count,perTier] of [['free',6,2],['paid',12,4]]){
  const rows=catalogByCategory(80,kind);
  assert.equal(rows.length,count,kind+' capacity');
@@ -24,7 +26,18 @@ for(const [kind,count,perTier] of [['free',6,2],['paid',12,4]]){
   assert.equal(row.carTier,[200,400,600][Math.floor(i/perTier)],'Incorrect 200/400/600 difficulty assignment');
   assert(!row.prompt.includes(draft.model),'Question leaked the car model');
   assert(row.prompt.includes('صورة'),'Photo required for this category');
-  assert(!row.imageUrl,'Unverified photographs must never be inserted as real photos');
+  const vetted=carPhotoAssets[kind+'-'+i];
+  if(vetted){
+   verifiedPhotoCount++;
+   assert.equal(row.imageUrl,vetted.imageUrl,'Photo must match vetted asset for this card');
+   assert.equal(row.photoCredit,vetted.photoCredit,'Photographer attribution missing');
+   assert.equal(row.photoSource,vetted.photoSource,'Source attribution missing');
+   assert.equal(row.photoLicense,'CC BY-SA 4.0','Unexpected or unverified photo license');
+   assert(row.imageUrl.startsWith('https://res.cloudinary.com/l1ixwj8b/image/upload/'),'Use approved Lamna media host');
+   assert(row.photoSource.startsWith('https://commons.wikimedia.org/wiki/File:'),'Missing original licensed source');
+  }else{
+   assert(!row.imageUrl,'Unverified photographs must never be inserted as real photos');
+  }
   assert(/^car-\d\d$/.test(row.carPhotoKey),'Unexpected photo identifier');
   assert.equal(row.carPhotoKey,carCards[kind+'-'+i].photoKey);
   assert(!carIds.has(row.id),'Duplicate question ID');carIds.add(row.id);
@@ -33,6 +46,7 @@ for(const [kind,count,perTier] of [['free',6,2],['paid',12,4]]){
  }
 }
 assert.equal(photoKeys.size,18);
+assert.equal(verifiedPhotoCount,3,'Only three verified attributed photos approved so far');
 assert.equal(models.size,18);
 const commerce=src('commerce.mjs');
 assert(commerce.includes('id<81'),'Admin must recognize game 81');
@@ -46,4 +60,4 @@ assert(app.includes('<CarQuestion imageUrl={currentQuestion.imageUrl} view={curr
 const visual=src('src/CarQuestion.tsx');
 assert(visual.includes('!imageUrl||failed'),'Missing photos must never become fake images');
 assert(visual.includes('onError={()=>setFailed(true)}'),'Broken photo URL must be explicit');
-console.log('LAMNA car-game QA OK: category 80 (game 81), dedicated section, 18 unique model/photo slots; all 200/400/600 tiers; player and credit safety; real photos PENDING.');
+console.log('LAMNA car-game QA OK: category 80 (game 81), dedicated section, 18 unique model/photo slots; all 200/400/600 tiers; player and credit safety; 3 real photos attached; 15 still PENDING.');
