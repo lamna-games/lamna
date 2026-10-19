@@ -9,6 +9,7 @@ import { getQuestion, wordlessModeCount } from './quizData';
 import { WordlessTV } from './Wordless';
 import QuestionVisual from './QuestionVisual';
 import PassportCover from './PassportCover';
+import CarQuestion from './CarQuestion';
 import WinnerScreen from './WinnerScreen';
 import OfficialLogo from './OfficialLogo';
 import SocialLinks from './SocialLinks';
@@ -240,6 +241,7 @@ function App() {
     } finally { setStarting(false); }
   };
   const choose = (i: number) => {
+    if(i===80)return; // Car-photo content is being licensed/validated. Prevent a broken game.
     const completesLineup = page==='home' && selected.length===5 && !selected.includes(i);
     setSelected(v => v.includes(i) ? v.filter(x => x !== i) : v.length < 6 ? [...v, i] : v);
     if(completesLineup) window.setTimeout(() => document.getElementById('lm-setup-teams')?.scrollIntoView({behavior:'smooth',block:'start'}), 280);
@@ -386,7 +388,7 @@ function App() {
             <div className="lm-library-progress" role="progressbar" aria-label="الفئات المختارة" aria-valuemin={0} aria-valuemax={6} aria-valuenow={selected.length}>
               <span style={{ width: (selected.length / 6) * 100 + '%' }}/>
             </div>
-            <div className="lm-game-search"><label htmlFor="lm-find-game">ابحث عن لعبة من ألعاب لمنا الـ80</label><input id="lm-find-game" type="search" dir="rtl" autoComplete="off" placeholder="اكتب اسم اللعبة، مثل الحروف أو الطيران…" value={gameSearch} onChange={e=>setGameSearch(e.target.value)} aria-label="البحث عن الألعاب"/>{gameSearch&&<button type="button" onClick={()=>setGameSearch('')} aria-label="امسح البحث">مسح</button>}</div>
+            <div className="lm-game-search"><label htmlFor="lm-find-game">ابحث عن لعبة من ألعاب لمنا الـ{categories.length}</label><input id="lm-find-game" type="search" dir="rtl" autoComplete="off" placeholder="اكتب اسم اللعبة، مثل الحروف أو الطيران…" value={gameSearch} onChange={e=>setGameSearch(e.target.value)} aria-label="البحث عن الألعاب"/>{gameSearch&&<button type="button" onClick={()=>setGameSearch('')} aria-label="امسح البحث">مسح</button>}</div>
             <nav className="lm-section-shortcuts" aria-label="انتقل إلى قسم الألعاب">
               {categorySections.map((section,index)=>(
                 <button type="button" key={section.name} className={openSections.includes(index)?'is-current':''}
@@ -417,12 +419,12 @@ function App() {
                   {isOpen&&<div className="lm-category-content" id={'lm-section-games-'+index}>
                     <div className="lm-library-grid">
                       {visibleIds.map(i=>(
-                        <button type="button" className={'lm-library-card'+(selected.includes(i)?' lm-is-selected':'')}
+                        <button type="button" disabled={i===80} className={'lm-library-card'+(selected.includes(i)?' lm-is-selected':'')}
                          key={i} onClick={()=>choose(i)}
-                         aria-label={(selected.includes(i)?'إلغاء اختيار ':'اختيار ')+categories[i]}
+                         aria-label={i===80?'عالم السيارات: بانتظار الصور الحقيقية':(selected.includes(i)?'إلغاء اختيار ':'اختيار ')+categories[i]}
                          aria-pressed={selected.includes(i)}>
                           <Cover i={i} title={categories[i]}/>
-                          <span className="lm-library-selection-index" aria-hidden="true">{selected.includes(i)?String(selected.indexOf(i)+1).padStart(2,'0'):'+'}</span>
+                          <span className="lm-library-selection-index" aria-hidden="true">{i===80?'قريبًا':selected.includes(i)?String(selected.indexOf(i)+1).padStart(2,'0'):'+'}</span>
                         </button>
                       ))}
                     </div>
@@ -648,7 +650,9 @@ function App() {
                           onTick={(n)=>{setSeconds(n);}}/>
                       ) : <><h2>{currentQuestion?.prompt}</h2>{!isLetterQuestion&&currentQuestion&&(selected[Math.floor(active/6)]===74&&currentQuestion.passportCode
    ? <PassportCover passportCode={currentQuestion.passportCode} imageUrl={currentQuestion.imageUrl}/>
-   : <QuestionVisual category={selected[Math.floor(active/6)]} prompt={currentQuestion.prompt} imageUrl={currentQuestion.imageUrl} flagCode={currentQuestion.flagCode}/>)} {isLetterQuestion&&<LetterBoard answer={currentQuestion?.answer||''} category={selected[Math.floor(active/6)]}/>}</>}
+   : selected[Math.floor(active/6)]===80
+     ? <CarQuestion imageUrl={currentQuestion.imageUrl} view={currentQuestion.carView}/>
+     : <QuestionVisual category={selected[Math.floor(active/6)]} prompt={currentQuestion.prompt} imageUrl={currentQuestion.imageUrl} flagCode={currentQuestion.flagCode}/>)} {isLetterQuestion&&<LetterBoard answer={currentQuestion?.answer||''} category={selected[Math.floor(active/6)]}/>}</>}
                       {aidEffect!==null&&<div className="play-aid-activated">
                         <strong>{aidCatalog.find(x=>x.id===aidEffect)?.name}</strong>
                         <span>{aidEffect==='phone'?'زاد وقت السؤال 30 ثانية للتشاور مع صديق':aidEffect==='two'?'لديكم '+twoAttemptsLeft+' '+(twoAttemptsLeft===2?'محاولتان':'محاولة')+' للإجابة في هذا السؤال':aidEffect==='rest'?'سمِّ لاعبًا واحدًا من الفريق الخصم ليتوقف عن المشاركة في هذا السؤال':aidEffect==='pit'?'إذا أجاب فريقك صح تخصم نقاط السؤال أيضًا من الخصم':'السؤال الآن عند الخصم: إذا لم يجب تُخصم منه نقاط السؤال'}</span>
