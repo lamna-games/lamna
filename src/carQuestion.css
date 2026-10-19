@@ -1,0 +1,8 @@
+.lm-car-photo{position:relative;flex:0 1 auto;display:flex;align-items:center;justify-content:center;width:min(100%,480px);height:min(34vh,255px);min-height:110px;margin:2px auto 6px;overflow:hidden;border-radius:18px;background:#eef3f5;border:2px solid rgba(255,255,255,.82);box-shadow:0 10px 26px rgba(0,20,42,.13)}
+.lm-car-photo>img{width:100%;height:100%;object-fit:contain;display:block}
+.lm-car-photo figcaption{position:absolute;right:8px;bottom:7px;padding:3px 10px;border-radius:30px;color:#224257;background:rgba(255,255,255,.92);font:700 11px Tajawal,Arial,sans-serif}
+.lm-car-photo--missing{flex-direction:column;gap:7px;border-style:dashed;box-shadow:none;background:#edf4f6}
+.lm-car-photo--missing figcaption{position:static;background:transparent;text-align:center;font-size:13px}
+.lm-car-photo-placeholder{font-size:clamp(39px,12vw,66px);line-height:1}
+@media(max-width:440px){.lm-car-photo{width:min(90%,335px);height:min(28dvh,230px);min-height:90px;border-radius:13px}}
+@media(orientation:landscape) and (max-height:640px){.lm-car-photo{height:27dvh;min-height:70px;max-width:295px}.lm-car-photo figcaption{font-size:9px}}
