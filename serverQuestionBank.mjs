@@ -3,6 +3,7 @@ import {flagRoundRows,flagCodes} from './flagQuiz.mjs';
 import {reviewedTierRows} from './reviewedTierRows.mjs';
 import {passportCodes} from './passportQuiz.mjs';
 import {carQuestionRows,carCards} from './carQuiz.mjs';
+import {carPhotoAssets} from './carPhotoAssets.mjs';
 import {expansionBank58to68} from './extraQuestions58to68.mjs';
 import {expansionBank69to79} from './extraQuestions69to79.mjs';
 import {extra20to29} from './extraQuestions20to29.mjs';
@@ -441,6 +442,6 @@ export const catalogByCategory = (category,kind='paid')=>{
   return {id:kind+'-'+category+'-'+index,category,prompt,answer,hint,
    ...(category===74?{passportCode:passportCodes[kind+'-'+index]}:{}),
    ...(category===11?{flagCode:flagCodes[kind+'-'+index],imageUrl:'https://flagcdn.com/w320/'+flagCodes[kind+'-'+index].toLowerCase()+'.png'}:{}),
-   ...(category===80?{carPhotoKey:carCards[kind+'-'+index].photoKey,carView:carCards[kind+'-'+index].view,carTier:carCards[kind+'-'+index].tier}:{})};
+   ...(category===80?{carPhotoKey:carCards[kind+'-'+index].photoKey,carView:carCards[kind+'-'+index].view,carTier:carCards[kind+'-'+index].tier,...(carPhotoAssets[kind+'-'+index]||{})}:{})};
  });
 };
