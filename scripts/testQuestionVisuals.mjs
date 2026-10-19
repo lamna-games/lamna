@@ -31,7 +31,7 @@ for(let category=0;category<81;category++){
  }
  if(!ignored.has(category)&&category!==28&&categoryShown===0)missing.push(category);
 }
-assert.equal(total,1440);
+assert.equal(total,1458);
 assert.deepEqual(Object.fromEntries(reviewedCounts),{4:4,28:0,33:6,34:7,66:18},
  'The first five reviewed games must have specific, deliberate per-question decisions');
 assert.equal(misclassified.length,0,'Question pictures have an unknown illustration theme: '+misclassified);
