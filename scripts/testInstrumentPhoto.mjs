@@ -4,11 +4,13 @@ import {instrumentPhotoAssets} from '../instrumentPhotoAssets.mjs';
 
 const free=catalogByCategory(47,'free');
 const paid=catalogByCategory(47,'paid');
+const oudPhoto=instrumentPhotoAssets['free-0'];
 const pianoPhoto=instrumentPhotoAssets['free-1'];
 const violinPhoto=instrumentPhotoAssets['free-4'];
 assert.equal(free.length,6);
 assert.equal(paid.length,12);
 for(const [index,answer,photo,credit] of [
+ [0,'العود',oudPhoto,'The Metropolitan Museum of Art'],
  [1,'البيانو',pianoPhoto,'Raysonho'],
  [4,'الكمان',violinPhoto,'Just plain Bill']
 ]){
@@ -24,8 +26,8 @@ for(const [index,answer,photo,credit] of [
  assert(!row.prompt.includes(answer),'Do not reveal the instrument in the question');
  assert(!row.prompt.includes('سوداء وبيضاء'),'Do not answer via the text prompt');
 }
-for(const row of [...free.filter((_,i)=>i!==1&&i!==4),...paid]){
+for(const row of [...free.filter((_,i)=>![0,1,4].includes(i)),...paid]){
  assert(!row.imageUrl,'Do not reuse instrument photos for other cards');
 }
-assert.notEqual(free[1].imageUrl,free[4].imageUrl,'Each instrument must use its own image');
-console.log('LAMNA instrument photo pilot OK: 2/18 licensed real photos (piano, violin) with correct questions and rights.');
+assert.equal(new Set([free[0].imageUrl,free[1].imageUrl,free[4].imageUrl]).size,3,'Each instrument must use its own image');
+console.log('LAMNA instrument photo pilot OK: 3/18 documented real photos (oud, piano, violin) with correct questions and rights.');

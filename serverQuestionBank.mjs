@@ -440,10 +440,11 @@ export const catalogByCategory = (category,kind='paid')=>{
  const lines=category===80 ? carQuestionRows[kind==='free'?'free':'paid'] : reviewedTierRows[category]?.[kind==='free'?'free':'paid'] || (category<20 ? ((kind==='free'?freeRows:paidRows)[category]||[]) : (expansionBank[category]?.[kind==='free'?'free':'paid']||[]));
  return lines.map((line,index)=>{
   const [prompt,answer,hint='']=line.split('|');
+  const oud=category===47&&kind==='free'&&index===0&&answer==='العود';
   const piano=category===47&&kind==='free'&&index===1&&answer==='البيانو';
   const violin=category===47&&kind==='free'&&index===4&&answer==='الكمان';
-  const instrumentPhoto=piano?instrumentPhotoAssets['free-1']:violin?instrumentPhotoAssets['free-4']:null;
-  return {id:kind+'-'+category+'-'+index,category,prompt:piano?'من الصورة، ما اسم الآلة الموسيقية؟':violin?'ما اسم الآلة الظاهرة في الصورة؟':prompt,answer,hint:piano?'تُعزف بالضغط على المفاتيح':violin?'تُعزف بقوس':hint,
+  const instrumentPhoto=oud?instrumentPhotoAssets['free-0']:piano?instrumentPhotoAssets['free-1']:violin?instrumentPhotoAssets['free-4']:null;
+  return {id:kind+'-'+category+'-'+index,category,prompt:oud?'أي آلة وترية عربية تظهر في الصورة؟':piano?'من الصورة، ما اسم الآلة الموسيقية؟':violin?'ما اسم الآلة الظاهرة في الصورة؟':prompt,answer,hint:oud?'تُعزف بريشة، ولها صندوق رنان كمثري':piano?'تُعزف بالضغط على المفاتيح':violin?'تُعزف بقوس':hint,
    ...(instrumentPhoto||{}),
    ...(category===74?{passportCode:passportCodes[kind+'-'+index]}:{}),
    ...(category===11?{flagCode:flagCodes[kind+'-'+index],imageUrl:'https://flagcdn.com/w320/'+flagCodes[kind+'-'+index].toLowerCase()+'.png'}:{}),
