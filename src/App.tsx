@@ -166,6 +166,39 @@ function App() {
     }
     finally{setStarting(false);}
   };
+  // Trial questions are the server's FREE bank only. This local session
+  // never creates a customer account, credits, or a persisted match.
+  const beginGuestTrial=async()=>{
+    if(starting)return;
+    setMatchError('');
+    if(selected.length!==6||new Set(selected).size!==6||selected.includes(80)){
+      setMatchError('اختر ست فئات متاحة لتجربة لمنا.');
+      return;
+    }
+    setStarting(true);
+    try{
+      const data=await storeRequest<{kind:'demo';selected:number[];questions:ServerMatch['questions']}>(
+        'demo?selected='+selected.join(',')
+      );
+      if(data.kind!=='demo'||data.questions.length!==6||data.questions.some(col=>col.length!==6)){
+        throw new Error('أسئلة وضع التجربة غير مكتملة.');
+      }
+      const title=matchName.trim()||'تجربة لمنا بدون تسجيل';
+      const previewAids=chosenAids.map(list=>list.length===3?list:['phone','two','rest'] as AidId[]);
+      setMatchName(title);
+      setChosenAids(previewAids);
+      setActiveSession({id:'lamna-local-trial',kind:'free',selected:[...selected],
+        questions:data.questions,match_name:title,status:'completed'});
+      setScores([0,0]);setUsed([]);setHistory([]);setUsedAids([[],[]]);
+      setTurn(0);setActive(null);setReveal(false);setPickWinner(false);
+      setPhase('question');setSeconds(60);setPaused(true);
+      setShowHelp(false);setShowHint(false);setAidEffect(null);setAidOwner(null);
+      setVarUsed([false,false]);setHelp([2,2]);setShowResult(false);
+      go('game');
+    }catch(error){
+      setMatchError(error instanceof Error?error.message:'تعذر بدء التجربة الآن.');
+    }finally{setStarting(false);}
+  };
   // Persist the COMPLETE active match to Postgres; local browser state never grants credits.
   const progressSnapshot={teams,chosenAids,scores,used,turn,usedAids,history,active,phase,seconds,paused,
     reveal,pickWinner,showHint,stealFrom,varUsed,varTeam,phaseBeforeVar,help,aidEffect,aidOwner,twoAttemptsLeft,restingPlayer};
@@ -225,6 +258,16 @@ function App() {
   const prepareAnotherMatch = async () => {
     if(!activeSession)return;
     if(starting)return;
+    if(activeSession.id==='lamna-local-trial'){
+      setActiveSession(null);
+      setScores([0,0]);setUsed([]);setHistory([]);setUsedAids([[],[]]);
+      setTurn(0);setActive(null);setReveal(false);setPickWinner(false);
+      setPhase('question');setSeconds(60);setPaused(true);
+      setShowHelp(false);setShowHint(false);setAidEffect(null);setAidOwner(null);
+      setVarUsed([false,false]);setShowResult(false);setMatchError('');
+      go('setup');
+      return;
+    }
     setStarting(true);
     try {
       await storeRequest('finish','POST',{matchId:activeSession.id,progress:versionedProgress(activeSession.id,true)});
@@ -311,6 +354,12 @@ function App() {
             <button className="primary aid-start-button"
               disabled={starting||!matchName.trim()||teams.some(t=>!t.trim())||chosenAids.some(list=>list.length!==3)}
               onClick={beginMatch}>{starting?'جارٍ تجهيز المباراة…':'ابدأ اللعب ←'}</button>
+            <button type="button" className="primary aid-start-button lm-guest-trial"
+              disabled={starting||selected.length!==6||selected.includes(80)}
+              onClick={beginGuestTrial}>
+              {starting?'جارٍ تحميل التجربة…':'جرّب الآن بدون تسجيل'}
+            </button>
+            <p className="muted aid-setup-note">تجربة مجانية للفحص، بدون حساب أو خصم رصيد. أسماء الفريقين ووسائل المساعدة تُجهّز تلقائيًا، ولا تُحفظ نتائج التجربة.</p>
             {matchError&&<p className="lm-new-game-note" role="alert">{matchError}</p>}
           </div>
   );
@@ -354,6 +403,7 @@ function App() {
                   <Play size={17} fill="currentColor"/> متابعة المباراة المحفوظة
                 </button>}
               <div className="lm-hero-meta"><span>ألعاب متنوعة</span><span>6 ألعاب تختارها</span><span>فريقان</span></div>
+              <p className="lm-trial-disclosure">تقدر تختار ست فئات وتلعب تجربة فورية بدون تسجيل أو دفع.</p>
               <button type="button" className="lm-hero-bundles" onClick={()=>go('pricing')}>شوف باقات لمنا وأسعارها</button>
             </div>
           </section>
@@ -520,7 +570,7 @@ function App() {
                 <span className="lamna-match-current">دور فريق: <strong>{teams[turn]||'الفريق '+(turn+1)}</strong></span>
                 <div className="lamna-match-logo"><OfficialLogo/></div>
               </div>
-              <div className="lamna-match-title">{matchName||'لوحة التحدّي'}</div>
+              <div className="lamna-match-title">{matchName||'لوحة التحدّي'}{activeSession?.id==='lamna-local-trial'&&' — وضع التجربة'}</div>
             </header>
             <div className="lamna-match-playfield">
           <div className="game-board">
