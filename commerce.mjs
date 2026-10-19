@@ -128,6 +128,23 @@ export async function handleStore(req,res,url,pool,ensureAccounts){
  if(route==='/api/store/packages' && req.method==='GET'){
   send(req,res,200,{packages,checkoutAvailable:false});return true;
  }
+ if(route==='/api/store/demo' && req.method==='GET'){
+  // Public trial content is FREE ONLY, is not a paid match, and does not
+  // access the database, user accounts, saved questions, or entitlements.
+  // Using an explicit selected list prevents exposing the paid question bank.
+  const parts=String(url.searchParams.get('selected')||'').split(',');
+  const selected=parts.map(x=>Number(x));
+  if(parts.length!==6||parts.some(x=>!/^(0|[1-9][0-9]?)$/.test(x))||
+    new Set(selected).size!==6||selected.some(x=>!Number.isInteger(x)||x<0||x>=80)){
+    send(req,res,400,{message:'اختر ست فئات مختلفة متاحة لتجربة لمنا دون حساب.'});return true;
+  }
+  const questions=selected.map(category=>catalogByCategory(category,'free').slice(0,6));
+  if(questions.some(set=>set.length!==6)){
+    send(req,res,503,{message:'بعض أسئلة التجربة غير مكتملة؛ اختر فئات أخرى.'});return true;
+  }
+  send(req,res,200,{kind:'demo',selected,questions,saved:false,usesCredits:false});return true;
+ }
+
  if(!pool){send(req,res,503,{message:'نظام الحسابات والاشتراكات غير متاح حتى يتم ربط قاعدة البيانات.'});return true;}
  try{await ensureAccounts();await setup(pool);}catch{
   send(req,res,503,{message:'تعذر الوصول إلى قاعدة البيانات.'});return true;
