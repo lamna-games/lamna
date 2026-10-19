@@ -73,10 +73,14 @@ async function setup(pool){
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now())`);
  await pool.query("ALTER TABLE lamna_question_edits ADD COLUMN IF NOT EXISTS image_url TEXT NOT NULL DEFAULT ''");
  await pool.query(`CREATE TABLE IF NOT EXISTS lamna_game_controls(
-  game_id INTEGER PRIMARY KEY CHECK(game_id BETWEEN 0 AND 79),
+  game_id INTEGER PRIMARY KEY CHECK(game_id BETWEEN 0 AND 80),
   disabled BOOLEAN NOT NULL DEFAULT FALSE,
   reason TEXT NOT NULL DEFAULT '',updated_by BIGINT NOT NULL REFERENCES lamna_accounts(id),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now())`);
+ // Old installations have an automatically named CHECK for IDs 0..79.
+ // Extend it in place without rewriting game IDs or stored matches.
+ await pool.query('ALTER TABLE lamna_game_controls DROP CONSTRAINT IF EXISTS lamna_game_controls_game_id_check');
+ await pool.query('ALTER TABLE lamna_game_controls ADD CONSTRAINT lamna_game_controls_game_id_check CHECK(game_id BETWEEN 0 AND 80)');
  await pool.query(`CREATE TABLE IF NOT EXISTS lamna_admin_audit(
   id BIGSERIAL PRIMARY KEY,actor_id BIGINT NOT NULL REFERENCES lamna_accounts(id),
   action TEXT NOT NULL,entity TEXT NOT NULL,details JSONB NOT NULL DEFAULT '{}'::jsonb,
@@ -107,7 +111,7 @@ async function questionPool(client,category,kind){
  const edited=new Map(overrides.rows.map(x=>[x.question_id,x]));
  return original.map(q=>({...q,...(edited.get(q.id)||{})}));
 }
-const isValidGame=id=>Number.isInteger(id)&&id>=0&&id<80;
+const isValidGame=id=>Number.isInteger(id)&&id>=0&&id<81;
 const validQuestionText=(s,min,max)=>typeof s==='string'&&s.trim().length>=min&&s.trim().length<=max&&!/[|\r\n]/.test(s);
 
 export async function handleStore(req,res,url,pool,ensureAccounts){
@@ -213,7 +217,7 @@ export async function handleStore(req,res,url,pool,ensureAccounts){
    const overrides=new Map(currentEdits.rows.map(x=>[x.question_id,x.prompt]));
    if(!restore){
     const canonical=normalize(prompt);let duplicate=false;
-    for(let gid=0;gid<80&&!duplicate;gid++)for(let k of ['free','paid']){
+    for(let gid=0;gid<81&&!duplicate;gid++)for(let k of ['free','paid']){
      for(const q of catalogByCategory(gid,k)){
       if(q.id!==questionId&&normalize(overrides.get(q.id)||q.prompt)===canonical){duplicate=true;break;}
      }
@@ -251,7 +255,7 @@ export async function handleStore(req,res,url,pool,ensureAccounts){
  }
  if(route==='/api/store/matches'){
   const selected=data.selected;
-  if(!Array.isArray(selected)||selected.length!==6||new Set(selected).size!==6||selected.some(x=>!Number.isInteger(x)||x<0||x>79)){
+  if(!Array.isArray(selected)||selected.length!==6||new Set(selected).size!==6||selected.some(x=>!Number.isInteger(x)||x<0||x>80)){
    send(req,res,400,{message:'اختر ست فئات مختلفة.'});return true;
   }
   const matchName=String(data.matchName||'').trim().slice(0,50);
@@ -273,6 +277,14 @@ export async function handleStore(req,res,url,pool,ensureAccounts){
    if(disabled.rowCount){await client.query('ROLLBACK');send(req,res,409,{code:'game_unavailable',message:'إحدى الألعاب المختارة متوقفة للمراجعة. اختر لعبة أخرى ولن يُخصم أي رصيد.'});return true;}
    const kind=row.free_used?'paid':'free';
    if(kind==='paid' && row.credits===0){await client.query('ROLLBACK');send(req,res,402,{code:'no_credit',message:'انتهت المباراة المجانية. اختر باقة لإضافة رصيد.'});return true;}
+   // Category 80 is a photo-identification puzzle, not a text quiz. Keep it
+   // unavailable until all 18 genuine, model-checked photographs are licensed.
+   // Reject before any free entitlement or paid credit can be used.
+   if(selected.includes(80)){
+    await client.query('ROLLBACK');
+    send(req,res,409,{code:'car_photos_pending',message:'عالم السيارات قيد تجهيز الصور الحقيقية المطابقة للموديلات. لا يمكنك اختياره الآن ولن يُخصم رصيد.'});
+    return true;
+   }
    if(kind==='paid'&&selected.includes(1)){
     await client.query('ROLLBACK');send(req,res,409,{code:'image_bank_pending',message:'فئة ولا كلمة المدفوعة تحتاج صورًا جديدة قبل استخدامها؛ اختر فئة أخرى حاليًا.'});return true;
    }
