@@ -46,7 +46,7 @@ for(const [kind,count,perTier] of [['free',6,2],['paid',12,4]]){
  }
 }
 assert.equal(photoKeys.size,18);
-assert.equal(verifiedPhotoCount,3,'Only three verified attributed photos approved so far');
+assert.equal(verifiedPhotoCount,6,'Six verified attributed photos approved so far');
 assert.equal(models.size,18);
 const commerce=src('commerce.mjs');
 assert(commerce.includes('id<81'),'Admin must recognize game 81');
@@ -60,4 +60,4 @@ assert(app.includes('<CarQuestion imageUrl={currentQuestion.imageUrl} view={curr
 const visual=src('src/CarQuestion.tsx');
 assert(visual.includes('!imageUrl||failed'),'Missing photos must never become fake images');
 assert(visual.includes('onError={()=>setFailed(true)}'),'Broken photo URL must be explicit');
-console.log('LAMNA car-game QA OK: category 80 (game 81), dedicated section, 18 unique model/photo slots; all 200/400/600 tiers; player and credit safety; 3 real photos attached; 15 still PENDING.');
+console.log('LAMNA car-game QA OK: category 80 (game 81), dedicated section, 18 unique model/photo slots; all 200/400/600 tiers; player and credit safety; 6 real photos attached; 12 still PENDING.');
