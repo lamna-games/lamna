@@ -6,3 +6,7 @@
 .lm-car-photo-placeholder{font-size:clamp(39px,12vw,66px);line-height:1}
 @media(max-width:440px){.lm-car-photo{width:min(90%,335px);height:min(28dvh,230px);min-height:90px;border-radius:13px}}
 @media(orientation:landscape) and (max-height:640px){.lm-car-photo{height:27dvh;min-height:70px;max-width:295px}.lm-car-photo figcaption{font-size:9px}}
+
+.lm-car-photo-credit{position:absolute;top:6px;left:7px;display:flex;gap:5px;align-items:center;flex-wrap:wrap;max-width:96%;padding:3px 7px;border-radius:9px;background:rgba(12,29,43,.83);color:#fff;font:600 10px Tajawal,Arial,sans-serif;line-height:1.5;direction:rtl}
+.lm-car-photo-credit a{color:#d4f5ff;text-decoration:underline;text-underline-offset:2px}
+@media(max-width:440px){.lm-car-photo-credit{font-size:9px;padding:2px 5px}}
