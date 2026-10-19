@@ -20,12 +20,12 @@ assert.deepEqual(alphabet,expectedAlphabet,'Arabic alphabet must contain all 28 
 assert(alphabet.every(letter=>Array.from(letter).length===1),'Every Arabic tile must contain exactly one letter');
 const letterGameIds=new Set([36,39,50,51,52,53,54,55,56,57]);
 assert.deepEqual(sections.find(section=>section.name==='الحروف')?.ids.slice().sort((a,b)=>a-b), [...letterGameIds].sort((a,b)=>a-b),'All ten letter games must be in the exclusive letter section');
-assert.equal(names.length,80,'Exactly eighty categories expected');
-assert.equal(new Set(names).size,80,'Duplicated game names');
+assert.equal(names.length,81,'Eighty-one category entries expected');
+assert.equal(new Set(names).size,81,'Duplicated game names');
 const assigned=sections.flatMap(section=>section.ids);
-assert.equal(assigned.length,80,'Each game must appear in exactly one section');
-assert.equal(new Set(assigned).size,80,'Duplicate game section ID');
-assert.deepEqual([...assigned].sort((a,b)=>a-b),Array.from({length:80},(_,i)=>i),'Missing catalogue IDs');
+assert.equal(assigned.length,81,'Each game must appear in exactly one section');
+assert.equal(new Set(assigned).size,81,'Duplicate game section ID');
+assert.deepEqual([...assigned].sort((a,b)=>a-b),Array.from({length:81},(_,i)=>i),'Missing catalogue IDs');
 assert(sections.some(section=>section.name==='الحروف'&&section.ids.length>=8),'Dedicated alphabet section must exist');
 let total=0;
 const allPrompts=new Map();
@@ -43,7 +43,7 @@ function answerLetter(answer){
  return first;
 }
 const localSpelling=/[�□]|\s{3,}|(\?|؟){3,}/;
-for(let id=0;id<80;id++){
+for(let id=0;id<81;id++){
  for(const kind of ['free','paid']){
   const questions=catalogByCategory(id,kind);
   assert.equal(questions.length,kind==='free'?6:12,'Bad question capacity for game '+id+' '+kind);
@@ -65,6 +65,6 @@ for(let id=0;id<80;id++){
   }
  }
 }
-assert.equal(total,80*18);
+assert.equal(total,81*18);
 console.log('LAMNA QA OK: '+names.length+' real games; '+sections.length+' sections; '+total+' free/paid question entries; complete section coverage; no repeated prompts across games; 28 valid letter tiles.');
 console.log('Game IDs and existing paid match snapshots are immutable; external provider activation is excluded from build QA.');
