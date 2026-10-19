@@ -54,6 +54,20 @@ export default function NewCovers80({i}:{i:number}){
  case 76:return <Film/>;
  case 77:return <Instrument/>;
  case 78:return <g><path d="M0 0H400V350H0Z" fill="#f5dda9"/><path d="M6 0h135Q127 91 76 172Q127 271 26 335L6 340Z" fill="#c64c62" {...stroke}/><path d="M393 0H268Q278 93 327 172Q273 277 384 339H393Z" fill="#c64c62" {...stroke}/><path d="M49 10q81 107 0 325M340 10q-71 115 1 325" stroke="#e8828c" strokeWidth="12" fill="none"/><g transform="translate(116 109)"><ellipse cx="83" cy="113" rx="73" ry="104" fill="#eeb997" {...stroke}/><path d="M10 93Q-17-8 85-16Q179-5 158 98L139 36Q82 1 32 47Z" fill="#3b3948" {...stroke}/><path d="M53 101h13M99 101h13M65 148q22 21 43 0" stroke={navy} strokeWidth="6" fill="none"/></g><path d="M0 319h400" stroke="#91664f" strokeWidth="23"/></g>;
+ case 80:return <g>
+  <g transform="translate(25 43)">
+   <rect x="16" y="12" width="333" height="250" rx="33" fill="#243c51" stroke="#23374c" strokeWidth="7"/>
+   <path d="M33 151q48-79 151-92 108 7 146 92v93H33Z" fill="#a0c6d4" stroke="#f4dcab" strokeWidth="6"/>
+   <rect x="139" y="112" width="120" height="68" rx="12" fill="#253e58" stroke="#e6b86a" strokeWidth="5"/>
+   <circle cx="113" cy="194" r="47" fill="#324f68" stroke="#f7e6ce" strokeWidth="14"/>
+   <circle cx="113" cy="194" r="19" fill="#f7e6ce"/>
+   <path d="M113 150v30m-44 18h27m34 0h27m-44 22v23" stroke="#e6b86a" strokeWidth="6" strokeLinecap="round"/>
+   <rect x="276" y="155" width="42" height="61" rx="8" fill="#f3ddbd" stroke="#3c6278" strokeWidth="5"/>
+   <path d="M288 171h16m-16 14h16m-16 14h16" stroke="#3c6278" strokeWidth="4"/>
+  </g>
+  <circle cx="348" cy="273" r="33" fill="#fff2d1" stroke="#385d79" strokeWidth="6"/>
+  <Text x={348} y={285} size={44} fill="#2c465e">؟</Text>
+ </g>;
  case 79:return <Controls/>;
  default:return null;
  }
