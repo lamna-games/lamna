@@ -2,7 +2,12 @@
 // Don't introduce answer-shaped clues into visual puzzles, Zoom, logos,
 // 'guess the thing', memory or letter-board games: they already have
 // their own visual rules.
-const puzzles=new Set([1,2,7,9,12,13,16,38,39,40,41,50,51,52,53,54,55,56,57,74]);
+// Games that depend on identifying real media must not masquerade as photo
+// questions by showing one repeated cartoon illustration. Existing photo
+// uploads still render via QuestionVisual's imageUrl-first branch.
+// 5: singers; 47: musical instruments; 48: aircraft; 49: mobile apps.
+// 16 already has no cartoon fallbacks but still needs actual image gameplay.
+const puzzles=new Set([1,2,5,7,9,12,13,16,38,39,40,41,47,48,49,50,51,52,53,54,55,56,57,74,80]);
 const specificTheme={
  3:'film',4:'football',5:'music',6:'language',8:'history',10:'history',11:'globe',
  15:'food',17:'language',18:'sport',19:'ideas',20:'language',21:'nature',
