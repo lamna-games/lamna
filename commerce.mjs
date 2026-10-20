@@ -135,7 +135,7 @@ export async function handleStore(req,res,url,pool,ensureAccounts){
   const parts=String(url.searchParams.get('selected')||'').split(',');
   const selected=parts.map(x=>Number(x));
   if(parts.length!==6||parts.some(x=>!/^(0|[1-9][0-9]?)$/.test(x))||
-    new Set(selected).size!==6||selected.some(x=>!Number.isInteger(x)||x<0||x>=80)){
+    new Set(selected).size!==6||selected.some(x=>!Number.isInteger(x)||x<0||x>=81)){
     send(req,res,400,{message:'اختر ست فئات مختلفة متاحة لتجربة لمنا دون حساب.'});return true;
   }
   const questions=selected.map(category=>catalogByCategory(category,'free').slice(0,6));
