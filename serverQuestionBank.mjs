@@ -444,8 +444,21 @@ export const catalogByCategory = (category,kind='paid')=>{
   const piano=category===47&&kind==='free'&&index===1&&answer==='البيانو';
   const violin=category===47&&kind==='free'&&index===4&&answer==='الكمان';
   const instrumentPhoto=oud?instrumentPhotoAssets['free-0']:piano?instrumentPhotoAssets['free-1']:violin?instrumentPhotoAssets['free-4']:null;
-  return {id:kind+'-'+category+'-'+index,category,prompt:oud?'أي آلة وترية عربية تظهر في الصورة؟':piano?'من الصورة، ما اسم الآلة الموسيقية؟':violin?'ما اسم الآلة الظاهرة في الصورة؟':prompt,answer,hint:oud?'تُعزف بريشة، ولها صندوق رنان كمثري':piano?'تُعزف بالضغط على المفاتيح':violin?'تُعزف بقوس':hint,
+  // Six free real-photo challenges for Zoom. Existing Commons photos are
+  // already hosted in our approved Cloudinary account with source/license.
+  // No paid rows or saved matches are modified.
+  const zoomFreePhotos=[
+   {answer:'البيانو',hint:'آلة تُستخدم في العزف',photo:instrumentPhotoAssets['free-1']},
+   {answer:'الكمان',hint:'آلة موسيقية وترية',photo:instrumentPhotoAssets['free-4']},
+   {answer:'العود',hint:'آلة وترية تقليدية',photo:instrumentPhotoAssets['free-0']},
+   {answer:'تويوتا لاندكروزر',hint:'سيارة دفع رباعي',photo:carPhotoAssets['free-1']},
+   {answer:'كيا سبورتاج',hint:'سيارة رياضية متعددة الاستخدامات',photo:carPhotoAssets['free-3']},
+   {answer:'فورد موستانج',hint:'سيارة رياضية أمريكية',photo:carPhotoAssets['paid-2']}
+  ];
+  const zoom=category===2&&kind==='free'?zoomFreePhotos[index]:null;
+  return {id:kind+'-'+category+'-'+index,category,prompt:zoom?'تعرّف على الشيء الحقيقي الظاهر في الصورة':oud?'أي آلة وترية عربية تظهر في الصورة؟':piano?'من الصورة، ما اسم الآلة الموسيقية؟':violin?'ما اسم الآلة الظاهرة في الصورة؟':prompt,answer:zoom?zoom.answer:answer,hint:zoom?zoom.hint:oud?'تُعزف بريشة، ولها صندوق رنان كمثري':piano?'تُعزف بالضغط على المفاتيح':violin?'تُعزف بقوس':hint,
    ...(instrumentPhoto||{}),
+   ...(zoom?.photo||{}),
    ...(category===74?{passportCode:passportCodes[kind+'-'+index]}:{}),
    ...(category===11?{flagCode:flagCodes[kind+'-'+index],imageUrl:'https://flagcdn.com/w320/'+flagCodes[kind+'-'+index].toLowerCase()+'.png'}:{}),
    ...(category===80?{carPhotoKey:carCards[kind+'-'+index].photoKey,carView:carCards[kind+'-'+index].view,carTier:carCards[kind+'-'+index].tier,...(carPhotoAssets[kind+'-'+index]||{})}:{})};
